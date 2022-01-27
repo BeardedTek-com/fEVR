@@ -1,5 +1,4 @@
 version: '2'
-
 services:
   fevr:
     image: 'beardedtek/fevr:latest'
