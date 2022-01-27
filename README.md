@@ -1,5 +1,5 @@
 # fEVR
-## (f)rigate / (E)vent (V)ideo (R)ecorder. Pronounced [fee-ver]
+## frigate Event Video Recorder - pronounced [fee-ver]
 Written in python, pure HTML, pure javascript, and pure CSS.
 I want to include the minimum amount of frameworks as this will prevent breakage due to upstream changes.
 
