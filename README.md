@@ -60,6 +60,11 @@ mv www/config/config-example.json www/config/config.json
   }
 }
 ```
+- Database
+```sh
+mv wew/db/fEVR.blank.sqlite www/db/fEVR.sqlite
+```
+
 - Build the docker image
 Don't forget the trailing .
 ```bash
