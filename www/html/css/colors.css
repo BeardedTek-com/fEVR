@@ -1,0 +1,67 @@
+/* Classes defining colors here */
+/* background colors */
+.bg-brand{
+    background-color: rgb(21, 31, 90);
+}
+.bg-charcoal{
+    background-color: rgb(59, 66, 72);
+}
+.bg-dark{
+    background-color: rgb(49, 55, 66);
+}
+.bg-dark-accent{
+    background-color: rgb(94, 93, 104);
+}
+.bg-light-accent{
+    background-color: rgb(160, 168, 170);
+}
+.bg-light-accent-40{
+    background-color: rgba(160, 168, 170, 0.4);
+}
+.bg-light-accent-30{
+    background-color: rgba(160, 168, 170, 0.3);
+}
+.bg-light{
+    background-color: rgb(230, 230, 230);
+}
+.bg-light-40{
+    background-color: rgba(230, 230, 230, 0.4);
+}
+/* border colors */
+.border-brand{
+    border-color: rgb(21, 31, 90);
+}
+.border-charcoal{
+    border-color: rgb(59, 66, 72)
+}
+.border-dark{
+    border-color: rgb(49, 55, 66);
+}
+.border-dark-accent{
+    border-color: rgb(94, 93, 104);
+}
+.border-light-accent{
+    border-color: rgb(160, 168, 170);
+}
+.border-light{
+    border-color: rgb(230, 230, 230);
+}
+/* text colors */
+.text-light{
+    color: rgb(230, 230, 230);
+}
+.text-light-accent{
+    color: rgb(160, 168, 170);
+}
+.text-dark-accent{
+    color: rgb(94, 93, 104);
+}
+.text-brand{
+    color: rgb(21, 31, 90);
+}
+.text-dark{
+    color: rgb(49, 55, 66);
+}
+.text-charcoal{
+    color: rgb(59, 66, 72);
+}

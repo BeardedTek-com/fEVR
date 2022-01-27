@@ -1,0 +1,10 @@
+version: '2'
+
+services:
+  fevr:
+    image: 'beardedtek/fevr:latest'
+    restart: unless-stopped
+    ports:
+      - '80:80'
+    volumes:
+      - ./www:/var/www

@@ -1,0 +1,5 @@
+config.json
+fEVR.sqlite
+events/*
+www/html/cgi-bin/__pycache__/
+www/html/events/*-*

@@ -1,0 +1,14 @@
+{
+  "table": "events",
+  "debug": "1",
+  "function": "CREATE",
+  "columns" : {
+    "id": "integer PRIMARY KEY",
+    "event_id": "text UNIQUE",
+    "url": "text",
+    "camera": "text",
+    "type": "text",
+    "bbox": "text",
+    "ack": "text"
+  }
+}

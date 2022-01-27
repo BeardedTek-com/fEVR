@@ -1,0 +1,16 @@
+{
+  "fevr"             :
+  {
+    "title"         : "Frigate Event Viewer",
+    "domain"        : "fevr.mydomain.com",
+    "admin"         : "admin",
+    "adminPassword" : "password"
+  },
+  "frigate"         :
+  {
+    "url"           : "http://frigate.mydomain.com",
+    "apiEventPath"  : "/api/events/",
+    "snapPath"      : "/snapshot.jpg",
+    "clipPath"      : "/clip.mp4"
+  }
+}
