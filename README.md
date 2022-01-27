@@ -31,8 +31,14 @@ services:
       - ./www:/var/www
 ```
 - edit config.json
+
 admin, adminPassword, and domain do nothing right now, but will be used in the future.
-Ensure you change http://frigate.mydomain.com" to your frigate instance.  It MUST be accessible by the fEVR web server.  If fEVR is behind an SSL proxy, then frigate also must be served as https otherwise it will fail.
+Ensure you change http://frigate.mydomain.com" to your frigate instance.
+
+It MUST:
+- be accessible by the fEVR web server.
+- If fEVR is behind an SSL proxy, then frigate also must be served as https otherwise it will fail.
+
 ```bash
 mv www/config/config-example.json www/config/config.json
 ```
