@@ -1,0 +1,75 @@
+body{
+    background-color: rgb(51, 51, 56);
+    margin: 0.5em;
+    overflow: hidden;
+    margin-bottom: 3em;
+    font-family:-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+}
+body::-webkit-scrollbar {
+    width:0em;
+}
+
+a{
+    text-decoration: none;
+    color: rgb(49, 55, 66);
+}
+a:hover{
+    filter: drop-shadow(0 0 0.03em rgb(49, 55, 66));
+    color:rgb(21, 31, 90);
+}
+.hidden{
+    display: none;
+}
+.title{
+    width: 100%;
+    border-bottom: 2px rgb(160,168,170)
+}
+.subtitle{
+    font-size: 1.5em;
+    padding-left: 0.5em;
+    color:rgb(160, 168, 170)
+}
+.hamburger{
+    position: relative;
+    top: 0.15em;
+    height: 2em;
+    width: auto;
+    aspect-ratio: 1;
+    fill: red;
+}
+.hamburger:hover{
+    cursor: pointer;
+}
+.fevrIcon{
+    height: 2em;
+    width: auto;
+    padding-left: 10px;
+}
+.contentFrame{
+    width: 100%;
+    height: 90%;
+    border: none;
+}
+.menu{
+    position:absolute;
+    z-index:100;
+    left:0em;
+
+    margin-top: 0.5em;
+    background: rgba(244, 244, 250, 0.2);
+    max-width: 25%;
+    max-height:100%;
+    width: 0;
+    height: 100%;
+    overflow: hidden;
+    transition: width 1s ease;
+    margin-left: 0em;
+    backdrop-filter: blur(3px) contrast(0.5);
+}
+.menu_content{
+    width: 100%;
+    padding: 1em;
+    line-height: 1.5em;
+    white-space: nowrap;
+    font-size: 1.5em;
+}
