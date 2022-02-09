@@ -1,7 +1,5 @@
 const divInstall = document.getElementById('installContainer');
 const butInstall = document.getElementById('butInstall');
-
-
 function hideElement(target,targetClass){
     target.style.transition = "width 1s ease, opacity 100ms ease"
     target.style.width= 0;
@@ -20,9 +18,9 @@ function toggleMenu(menuId,contentId){
     target = document.getElementById(menuId)
     menu = document.getElementById(contentId)
     if (target.style.width == 0 || target.style.width == "0px" || target.style.width == "0%"){
-        slideElement(target,'menuBorder');
+        slideElement(target,'menuOpen');
     } else {
-        hideElement(target,'menuBorder');
+        hideElement(target,'menuOpen');
 
     }
 }

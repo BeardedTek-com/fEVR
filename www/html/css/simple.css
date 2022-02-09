@@ -35,7 +35,6 @@ a:hover{
     height: 2em;
     width: auto;
     aspect-ratio: 1;
-    fill: red;
 }
 .hamburger:hover{
     cursor: pointer;
@@ -59,7 +58,7 @@ a:hover{
     background: rgba(244, 244, 250, 0.2);
     max-width: 25%;
     max-height:100%;
-    width: 0;
+    width: 0%;
     height: 100%;
     overflow: hidden;
     transition: width 1s ease;
@@ -72,4 +71,8 @@ a:hover{
     line-height: 1.5em;
     white-space: nowrap;
     font-size: 1.5em;
+}
+.themeUIElement{
+    fill: rgb(160, 168, 170);
+    fill-opacity: 0.7;
 }
