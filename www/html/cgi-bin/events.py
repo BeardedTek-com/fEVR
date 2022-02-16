@@ -143,10 +143,10 @@ class events:
     def execute(self):
         from config import Config
         fconfig = Config()
-        self.config = fconfig.config
         print('content-type: text/html; charset=UTF-8\n\n')
         print()
-        if fconfig:
+        if fconfig.exists:
+            self.config = fconfig.config
             self.frigate = self.config['frigate']
             self.fevr = self.config['fevr']
             self.error(self.frigate)
