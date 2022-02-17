@@ -39,10 +39,10 @@ class events:
                         self.selectors[key] = item
                     else:
                         self.extraOptions[key] = item
-
-    def error(self,msg):
-        from sys import stderr
-        stderr.write(f"{str(msg)}\n")    
+    def error(self,msg,level='debug'):
+        if self.debug or level == 'info':
+            from sys import stderr
+            stderr.write(f"{str(msg)}\n")
     def getEvent(self,event,thumbSize=180,location='/var/www/html/events/'):
         eventPATH = f"{location}{event['id']}"
         snapPATH = f"{eventPATH}{self.frigate['snap']}"
@@ -139,6 +139,8 @@ class events:
                     n += 1
                     if n > count:
                         break
+        if n <= 1:
+            print('No Results...  Are you sure you configured everything right? <a href="/install.html">Config</a>')
         return data
     def execute(self):
         from config import Config
@@ -146,6 +148,7 @@ class events:
         print('content-type: text/html; charset=UTF-8\n\n')
         print()
         if fconfig.exists:
+            self.debug = fconfig.debug
             self.config = fconfig.config
             self.frigate = self.config['frigate']
             self.fevr = self.config['fevr']
