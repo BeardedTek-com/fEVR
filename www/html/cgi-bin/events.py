@@ -159,7 +159,7 @@ class events:
             footer = self.getStub(f"{self.fevr['html']}/stub/eventsFooter.html")
         else:
             header = self.getStub("/var/www/html/stub/eventsHeader.html")
-            content = self.getStub("/var/www/html/install.html")
+            content = self.getStub("/var/www/html/config.html")
             footer = self.getStub("/var/www/html/stub/eventsFooter.html")
         print(f"{header}{content}{footer}")
 
