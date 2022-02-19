@@ -1,10 +1,23 @@
 <html>
     <head>
-        <link rel='stylesheet' src='/css/config.css'>
+        <link rel='stylesheet' src='css/config.css'>
     </head>
     <body>
-        <div class='configHeader'>
-            Configuration of System will go here.
-        </div>
+        <dialog open class="dialog install step-0">
+            <div id="titlebar">
+                <img src="/img/fevr.png" class="dialog logo"><span class="title">Install</span>
+            </div>
+            <div id="content">
+                You are seeing this dialog because your installation of fEVR
+                is not configured correctly.  Please follow the configuration
+                utility to either initially configure fEVR or to correct
+                configuration errors.
+            </div>
+            <div class="footer">
+                <button type="button" id="previous"><< Previous</button>
+                <button type="button" id="next">Next >></button>
+                <button type="button" id="finish">Finish</button>
+            </div>
+        </dialog>
     </body>
 </html>
