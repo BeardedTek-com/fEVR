@@ -30,8 +30,5 @@ class Config:
         from os.path import exists
         if exists(self.configFile):
             self.getConfig()
-            if exists(self.config['fevr']['db']):
+            if exists(str(self.config['fevr']['db'])):
                 return self.configCheck()
-            
-        
-

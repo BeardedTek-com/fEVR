@@ -23,9 +23,10 @@ class fetchEvent:
         self.thumbSize = thumbSize
         self.location = location
         self.eventPATH = f"{self.location}{self.event}"
-        self.snapPATH = f"{self.eventPATH}{self.frigate['snap']}"
+        self.error(('FETCH - ',self.frigate))
+        self.snapPATH = f"{self.eventPATH}{self.frigate['snapPath']}"
         self.thumbPATH= f"{self.eventPATH}/thumb.jpg"
-        self.clipPATH = f"{self.location}{self.event}{self.frigate['clip']}"
+        self.clipPATH = f"{self.location}{self.event}{self.frigate['clipPath']}"
         self.default = "/var/www/default/"
         self.Return = {}
         self.Return['event'] = self.event

@@ -46,7 +46,8 @@ a:hover{
 }
 .contentFrame{
     width: 100%;
-    height: 90%;
+    height: 100%;
+    overflow: none;
     border: none;
 }
 .menu{

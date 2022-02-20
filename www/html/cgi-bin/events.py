@@ -20,6 +20,7 @@ stub='../stub/event.html'
 class events:
     def __init__(self):
         self.getOptions()
+        self.noResults = False
     def getOptions(self):
         import cgi
         fieldStorage = cgi.FieldStorage()
@@ -74,7 +75,18 @@ class events:
         dt_utc = datetime.strptime(dt_str,format)
         dt_utc = dt_utc.replace(tzinfo=pytz.UTC)
         return dt_utc.astimezone(pytz.timezone('America/Anchorage'))
-
+    def noEvents(self):
+        if os.path.isfile(stub):
+            with open(stub) as eventStub:
+                url = "/install.html"
+                thumbURL = "/img/fevr.png"
+                caption = "No Events Found"
+                data = eventStub.read()
+                data = data.replace('##EVENT_URL##',url)
+                data = data.replace('##EVENT_IMG##',thumbURL)
+                data = data.replace('##EVENT_CAPTION##',caption)
+        if data:
+            return data
     def generateEventDiv(self,event):
         from datetime import datetime
         time = datetime.fromtimestamp(int(event['id'].split('.')[0]))
@@ -140,7 +152,7 @@ class events:
                     if n > count:
                         break
         if n <= 1:
-            print('No Results...  Are you sure you configured everything right? <a href="/install.html">Config</a>')
+            self.noResults = True
         return data
     def execute(self):
         from config import Config
@@ -154,13 +166,15 @@ class events:
             self.fevr = self.config['fevr']
             self.error(self.frigate)
             self.error(self.fevr)
-            header = self.getStub(f"/var/www/html/stub/eventsHeader.html")
             content = self.getEvents(self.count,self.selectors,self.order)
-            footer = self.getStub(f"{self.fevr['html']}/stub/eventsFooter.html")
         else:
-            header = self.getStub("/var/www/html/stub/eventsHeader.html")
             content = self.getStub("/var/www/html/config.html")
-            footer = self.getStub("/var/www/html/stub/eventsFooter.html")
+        
+        if self.noResults:
+            content = self.noEvents()
+
+        header = self.getStub("/var/www/html/stub/eventsHeader.html")
+        footer = self.getStub("/var/www/html/stub/eventsFooter.html")
         print(f"{header}{content}{footer}")
 
 def main():

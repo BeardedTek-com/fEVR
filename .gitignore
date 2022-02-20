@@ -1,5 +1,6 @@
 config.json
 fEVR.sqlite
-events/*
+events
 www/html/cgi-bin/__pycache__/
-www/html/events/*-*
+events/*-*
+backup/*

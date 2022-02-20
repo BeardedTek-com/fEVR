@@ -7,8 +7,8 @@
     "adminPassword" : "password",
     "base"          : "/var/www/",
     "html"          : "/var/www/html",
-    "db"            : "/var/www/db/fEVR.sqlite"
-
+    "db"            : "/var/www/db/fEVR.sqlite",
+    "debug"         : "false"
   },
   "frigate"         :
   {

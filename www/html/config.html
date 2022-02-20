@@ -121,29 +121,35 @@
                 Please fill out the following form to configure config.json<br/>
                 Default values are shown.<br/>
                 <br/>
-                <form>
+                <form id="webConfig" action="/cgi-bin/webconfig.py">
                     <div class="formSection">fEVR Config:</div>
                     <div class="formField">
+                        <label for="title">Base Directory:</label>
+                        <input id="title" name="title" type="text" value="Home"/><br/>
+                        <span class="description">Initial Title Displayed</span>
+                    </div>
+
+                    <div class="formField">
                         <label for="base">Base Directory:</label>
-                        <input id="base" type="text" value="/var/www/"/><br/>
+                        <input id="base" name="base" type="text" value="/var/www/"/><br/>
                         <span class="description">Base Directory of fEVR on server</span>
                     </div>
 
                     <div class="formField">
                         <label for="html">HTML Directory:</label>
-                        <input id="html" type="text" value="/var/www/html/"/><br/>
+                        <input id="html" name="html" type="text" value="/var/www/html/"/><br/>
                         <span class="description">HTML Directory on server</span>
                     </div>
 
                     <div class="formField">
                         <label for="db">Database:</label>
-                        <input id="db" type="text" value="/var/www/db/fEVR.sqlite"/><br/>
+                        <input id="db" name="db" type="text" value="/var/www/db/fEVR.sqlite"/><br/>
                         <span class="description">SQLite Database Path on server</span>
                     </div>
 
                     <div class="formField">
                         <label for="debug">Debug:</label>
-                        <input id="debug" type="text" value="false"/><br/>
+                        <input id="debug" name="debug" type="text" value="false"/><br/>
                         <span class="description">Enable Debug Logging (true/false)</span>
                     </div>
 
@@ -151,25 +157,25 @@
 
                     <div class="formField">
                         <label for="url">URL:</label>
-                        <input id="url" type="text" value="http://10.0.0.200:5000"/><br/>
+                        <input id="url" name="url" type="text" value="http://10.0.0.200:5000"/><br/>
                         <span class="description">Frigate Base URL (NO TRAILING SLASH)</span>
                     </div>
 
                     <div class="formField">
                         <label for="apiEventPath">API Event Path:</label>
-                        <input id="apiEventPath" type="text" value="/api/events/"/><br/>
+                        <input id="apiEventPath" name="apiEventPath" type="text" value="/api/events/"/><br/>
                         <span class="description">Frigate API Event Path</span>
                     </div>
 
                     <div class="formField">
                         <label for="snapPath">Snapshot Path:</label>
-                        <input id="snapPath" type="text" value="/snapshot.jpg"/><br/>
+                        <input id="snapPath" name="snapPath" type="text" value="/snapshot.jpg"/><br/>
                         <span class="description">Frigate Event Snapshot Path</span>
                     </div>
 
                     <div class="formField">
                         <label for="clipPath">Video Clip Path:</label>
-                        <input id="clipPath" type="text" value="/clip.mp4"/><br/>
+                        <input id="clipPath" name="clipPath" type="text" value="/clip.mp4"/><br/>
                         <span class="description">Frigate Event Video Clip Path</span>
                     </div>
                 </form>
@@ -181,7 +187,7 @@
                 </div>
                 <div class="right">
                     <button type="button" id="next" class="disabled">Next >></button>
-                    <button onclick="checkConfig();" type="button" id="finish" class="enabled">Finish</button>
+                    <button onclick="submitForm('webConfig');" type="button" id="finish" class="enabled">Finish</button>
                 </div>
             </div>
         </dialog>
@@ -217,6 +223,9 @@
                 dialogCurrent.close();
                 dialogChecking.showModal();
                 setTimeout(() => {parent.location.reload();},5000);
+            }
+            function submitForm(formID){
+                document.getElementById(formID).submit()
             }
             function configJson(){
                 dialogCurrent.close();
