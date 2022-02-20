@@ -79,7 +79,7 @@ class events:
         if os.path.isfile(stub):
             with open(stub) as eventStub:
                 url = "/install.html"
-                thumbURL = "/img/fevr.png"
+                thumbURL = "/img/not_available.jpg"
                 caption = "No Events Found"
                 data = eventStub.read()
                 data = data.replace('##EVENT_URL##',url)
