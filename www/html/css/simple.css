@@ -4,6 +4,7 @@ body{
     overflow: hidden;
     margin-bottom: 3em;
     font-family:-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+    min-width: 350px;
 }
 body::-webkit-scrollbar {
     width:0em;
@@ -44,8 +45,14 @@ a:hover{
     width: auto;
     padding-left: 10px;
 }
+.content{
+    display:flex;
+    justify-content: center;
+    height: 100%;
+    margin: auto;
+}
 .contentFrame{
-    width: 100%;
+    width: 75%;
     height: 100%;
     overflow: none;
     border: none;
@@ -54,10 +61,8 @@ a:hover{
     position:absolute;
     z-index:100;
     left:0em;
-
     margin-top: 0.5em;
     background: rgba(244, 244, 250, 0.2);
-    max-width: 25%;
     max-height:100%;
     width: 0%;
     height: 100%;
@@ -65,6 +70,9 @@ a:hover{
     transition: width 1s ease;
     margin-left: 0em;
     backdrop-filter: blur(3px) contrast(0.5);
+    max-width: fit-content;
+    border-top-right-radius: 1em;
+    border-bottom-right-radius: 1em;
 }
 .menu_content{
     width: 100%;
@@ -76,4 +84,89 @@ a:hover{
 .themeUIElement{
     fill: rgb(160, 168, 170);
     fill-opacity: 0.7;
+}
+.menuVisible{
+    max-width: 25vw;
+}
+@media screen and (max-width: 1439px) {
+    .menu{
+        max-width: fit-content;
+        margin-top: 0em;
+    }
+    .hamburger{
+        height: 2em;
+    }
+    .fevrIcon{
+        height: 2em;
+    }
+    .subtitle{
+        font-size: 1.5em;
+        padding-left: 0.2em;
+    }
+    .content{
+        display:flex;
+        justify-content: center;
+        height: 100%;
+        margin: auto;
+    }
+    .contentFrame{
+        width: 1200px;
+    }
+}
+@media screen and (max-width: 1115px) {
+    .menu{
+        max-width: fit-content;
+        margin-top: 0em;
+    }
+    .hamburger{
+        height: 1.85em;
+    }
+    .fevrIcon{
+        height: 1.85em;
+    }
+    .subtitle{
+        font-size: 1.45em;
+        padding-left: 0.175em;
+    }
+    .contentFrame{
+        width: 800px;
+    }
+}
+@media screen and (max-width: 750px) {
+    .menu{
+        max-width: fit-content;
+        margin-top: 0em;
+    }
+    .hamburger{
+        height: 1.75em;
+    }
+    .fevrIcon{
+        height: 1.75em;
+    }
+    .subtitle{
+        font-size: 1.35em;
+        padding-left: 0.15em;
+    }
+    .contentFrame{
+        width: 400px;
+    }
+}
+@media screen and (max-width: 600px) {
+    .menu{
+        max-width: fit-content;
+        margin-top: 0em;
+    }
+    .hamburger{
+        height: 1.5em;
+    }
+    .fevrIcon{
+        height: 1.5em;
+    }
+    .subtitle{
+        font-size: 1.25em;
+        padding-left: 0.125em;
+    }
+    .contentFrame{
+        width: 400px;
+    }
 }

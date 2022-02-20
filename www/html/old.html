@@ -1,0 +1,62 @@
+<html>
+    <head>
+        <title>fEVR - frigate Event Video Recorder</title>
+        <link rel='stylesheet' href='css/main.css'/>
+        <link rel='stylesheet' href='css/colors.css'/>
+    </head>
+    <body class='bg-dark'>
+        <p id="requireHTTPS" class="hidden">
+        </p>
+        <div class='titleBar text-light'>
+            <div id='titleContainer'>
+                <span id='title' onclick='toggleMenu("menuContainer");' class='title'><img class='menu' src='img/menu.svg'/><img class='fevrIcon' src='img/fevr.png'>
+                    <span id='subtitle' class='subtitle text-light-accent'>frigate Event Video Recorder</span>
+                </span>
+            </div>
+        </div>
+        <div id='container' class='container bg-charcoal border-brand text-light-accent'>
+            <div id='menuContainer' class='menuContainer bg-light-40 border-brand'>
+                <div id='menu_event_list' class='menuItem '>
+                    <a onclick='clickItem("All Events");' target='contentFrame' href='/cgi-bin/events.py'>all events</a>
+                </div>
+                <div id='menu_event_list' class='menuItem '>
+                    <a onclick='clickItem("Last 10 Events");' target='contentFrame' href="/cgi-bin/events.py?count=10">last 10 events</a>
+                </div>
+                <div id='menu_event_list' class='menuItem '>
+                    <a onclick='clickItem("Last 10 People");' target='contentFrame' href="/cgi-bin/events.py?count=10&type=person">last 10 people</a>
+                </div>
+                <div id='menu_event_list' class='menuItem '>
+                    <a onclick='clickItem("Last 10 Vehicles");' target='contentFrame' href="/cgi-bin/events.py?count=10&type=car">last 10 cars</a>
+                </div>
+                <div id='menu_event_list' class='menuItem '>
+                    <a onclick='clickItem("All Driveway Events");' target='contentFrame' href="/cgi-bin/events.py?camera=driveway">driveway events</a>
+                </div>
+                <div id='menu_help' class='menuSeperator'>
+                </div>
+                <div id='menu_config' class='menuItem'>
+                    <a onclick='clickItem("config");' target='contentFrame' href='/config.html'>config</a>
+                </div>
+                <div id='menu_help' class='menuItem '>
+                    <a onclick='clickItem("docs");' target='contentFrame' href='/docs.html'>docs</a>
+                </div>
+                <div id='menu_help' class='menuSeperator '>
+                </div>
+                <div id='menu_github' class='menuItem '>
+                    <a onclick='clickItem("docs");' target="_blank" href='https://github.com/beardedtek-com/fEVR'>github</a>
+                </div>
+                <div id='menu_bt' class='menuItem '>
+                    <a onclick='clickItem("docs");' target='_blank' href='https://beardedtek.com'>website</a>
+                </div>
+            </div>
+            <div id='content' class='content'>
+                <iframe id='contentFrame' class='contentFrame' name='contentFrame' src='/cgi-bin/events.py?count=10'></iframe>
+            </div>
+        </div>
+        <div id="installContainer" class="hidden">
+            <button id="butInstall" type="button">
+              Install
+            </button>
+          </div>
+        <script type="text/javascript" src="js/main.js"></script>
+    </body>
+</html>

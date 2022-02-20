@@ -121,6 +121,11 @@ a:hover{
 .popout{
     padding-left: 0.5em;
 }
+@media screen and (max-width: 1000px) {
+    body::-webkit-scrollbar {
+        width: 0px;
+    }
+}
 @media screen and (max-width: 600px) {
     .eventInfo{
         font-size: 1.25rem;

@@ -124,6 +124,9 @@ class events:
             sql += """ORDER BY event DESC"""
         if count:
             count = int(count)
+            n = 1
+        else:
+            n = 0
             
         from fetch import fetchEvent
         from sqlite import sqlite
@@ -131,7 +134,7 @@ class events:
         fsqlite.open(self.fevr['db'])
         self.error(sql)
         items = fsqlite.retrieve(sql)
-        n = 1
+        self.error(f"# ITEMS: {len(items)}")
         data =""
         for row in items:
             event = {}
@@ -151,7 +154,7 @@ class events:
                     n += 1
                     if n > count:
                         break
-        if n <= 1:
+        if n <= 1 and n != 0:
             self.noResults = True
         return data
     def execute(self):

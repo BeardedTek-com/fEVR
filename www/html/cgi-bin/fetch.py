@@ -44,8 +44,8 @@ class fetchEvent:
         if not os.path.exists(self.thumbPATH):
             if not os.path.exists(self.eventPATH):
                 os.makedirs(self.eventPATH)
-            snapURL = f"{self.frigate['localURL']}{self.frigate['api']}{self.event}{self.frigate['snap']}"
-            clipURL = f"{self.frigate['localURL']}{self.frigate['api']}{self.event}{self.frigate['clip']}"
+            snapURL = f"{self.frigate['url']}{self.frigate['apiEventPath']}{self.event}{self.frigate['snapPath']}"
+            clipURL = f"{self.frigate['url']}{self.frigate['apiEventPath']}{self.event}{self.frigate['clipPath']}"
             import requests
             snap = requests.get(snapURL, allow_redirects=True)
             open(self.snapPATH,'wb').write(snap.content)
@@ -68,10 +68,10 @@ class fetchEvent:
             # Resizes an image from the filesystem
             width = int(height*ratio)
             size = (int(height*ratio),height)
-            from PIL import Image as CompressImage
-            picture = CompressImage.open(img)
-            thumb = picture.resize(size)
-            thumb.save(self.thumbPATH,"JPEG",optimize=True)
+            from PIL import Image
+            picture = Image.open(img)
+            thumb = picture.resize(size, Image.ANTIALIAS)
+            thumb.save(self.thumbPATH,"JPEG", quality=75,optimize=True)
         else:
             self.error("Can not resize snapshot.  Grabbing default!!!!!")
             self.copyDefaults("event","thumb.jpg",self.thumbPATH)
