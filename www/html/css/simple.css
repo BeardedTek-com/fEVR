@@ -62,18 +62,25 @@ a:hover{
     z-index:100;
     left:0em;
     margin-top: 0.5em;
-    background: rgba(244, 244, 250, 0.2);
+    background: rgba(160, 168, 170, 0.9);
     max-height:100%;
     width: 0%;
     height: 100%;
     overflow: hidden;
     transition: width 1s ease;
     margin-left: 0em;
-    backdrop-filter: blur(3px) contrast(0.5);
     max-width: fit-content;
     border-top-right-radius: 1em;
     border-bottom-right-radius: 1em;
 }
+@supports ((-webkit-backdrop-filter: none) or (backdrop-filter: none)) {
+    .menu {
+      background-color: rgba(244, 244, 250, 0.2);
+      -webkit-backdrop-filter: blur(3px) contrast(0.5);
+      backdrop-filter: blur(3px) contrast(0.5);
+    }
+  }
+  
 .menu_content{
     width: 100%;
     padding: 1em;
