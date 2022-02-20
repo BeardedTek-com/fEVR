@@ -5,9 +5,7 @@
                 border-color: rgb(137, 143, 145);
                 border-radius: 1em;
                 margin: auto;
-                min-width: 550px;
-                max-width: 1000px;
-                width: 90%;
+                width: 95vw;
                 vertical-align: middle;
             }
             .dialog::backdrop{
@@ -89,7 +87,7 @@
     <body>
         <dialog id="errors" class="dialog">
             <div id="titlebar">
-                <img src="/img/fevr.png" class="logo"><span class="title">Configuration</span>
+                <span class="title">config</span>
             </div>
             <div id="content">
                 You are seeing this dialog because your installation of fEVR
@@ -104,7 +102,7 @@
             <div id="footer">
                 <div class="left">
                     <button onclick="checkConfig()" type="button" id="previous" class="enabled">Cancel</button>
-                    <button type="button" id="previous" class="disabled"><< Previous</button>
+                    <button type="button" id="previous" class="disabled"><< Prev</button>
                 </div>
                 <div class="right">
                     <button onclick="configJson()" type="button" id="next" class="enabled">Next >></button>
@@ -115,14 +113,12 @@
 
         <dialog id="configJSON" class="dialog">
             <div id="titlebar">
-                <img src="/img/fevr.png" class="logo"><span class="title">config.json</span>
+                <span class="title">config - config.json</span>
             </div>
             <div id="content">
-                Please fill out the following form to configure config.json<br/>
                 Default values are shown.<br/>
-                <br/>
                 <form id="webConfig" action="/cgi-bin/webconfig.py">
-                    <div class="formSection">fEVR Config:</div>
+                    <div class="formSection">fEVR:</div>
                     <div class="formField">
                         <label for="title">Base Directory:</label>
                         <input id="title" name="title" type="text" value="Home"/><br/>
@@ -153,7 +149,7 @@
                         <span class="description">Enable Debug Logging (true/false)</span>
                     </div>
 
-                    <div class="formSection">Frigate Config:</div>
+                    <div class="formSection">Frigate:</div>
 
                     <div class="formField">
                         <label for="url">URL:</label>
@@ -183,7 +179,7 @@
             <div id="footer">
                 <div class="left">
                     <button type="button" id="previous" class="enabled">Cancel</button>
-                    <button type="button" id="previous" class="disabled"><< Previous</button>
+                    <button type="button" id="previous" class="disabled"><< Prev</button>
                 </div>
                 <div class="right">
                     <button type="button" id="next" class="disabled">Next >></button>
@@ -196,7 +192,7 @@
 
         <dialog id="checking" class="dialog">
             <div id="titlebar">
-                <img src="/img/fevr.png" class="logo"><span class="title">Checking Configuration...</span>
+                <span class="title">config - verifying...</span>
             </div>
             <div id="content">
                 Please wait while your configuration is checked.  Upon completion, this page will reload.
@@ -204,7 +200,7 @@
             <div id="footer">
                 <div class="left">
                     <button type="button" id="previous" class="disabled">Cancel</button>
-                    <button type="button" id="previous" class="disabled"><< Previous</button>
+                    <button type="button" id="previous" class="disabled"><< Prev</button>
                 </div>
                 <div class="right">
                     <button type="button" id="next" class="disabled">Next >></button>
