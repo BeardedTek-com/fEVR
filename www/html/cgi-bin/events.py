@@ -20,6 +20,7 @@ stub='../stub/event.html'
 class events:
     def __init__(self):
         self.getOptions()
+        self.noResults = False
     def getOptions(self):
         import cgi
         fieldStorage = cgi.FieldStorage()
@@ -39,10 +40,10 @@ class events:
                         self.selectors[key] = item
                     else:
                         self.extraOptions[key] = item
-
-    def error(self,msg):
-        from sys import stderr
-        stderr.write(f"{str(msg)}\n")    
+    def error(self,msg,level='debug'):
+        if self.debug or level == 'info':
+            from sys import stderr
+            stderr.write(f"{str(msg)}\n")
     def getEvent(self,event,thumbSize=180,location='/var/www/html/events/'):
         eventPATH = f"{location}{event['id']}"
         snapPATH = f"{eventPATH}{self.frigate['snap']}"
@@ -74,7 +75,18 @@ class events:
         dt_utc = datetime.strptime(dt_str,format)
         dt_utc = dt_utc.replace(tzinfo=pytz.UTC)
         return dt_utc.astimezone(pytz.timezone('America/Anchorage'))
-
+    def noEvents(self):
+        if os.path.isfile(stub):
+            with open(stub) as eventStub:
+                url = "/install.html"
+                thumbURL = "/img/not_available.jpg"
+                caption = "No Events Found"
+                data = eventStub.read()
+                data = data.replace('##EVENT_URL##',url)
+                data = data.replace('##EVENT_IMG##',thumbURL)
+                data = data.replace('##EVENT_CAPTION##',caption)
+        if data:
+            return data
     def generateEventDiv(self,event):
         from datetime import datetime
         time = datetime.fromtimestamp(int(event['id'].split('.')[0]))
@@ -139,25 +151,30 @@ class events:
                     n += 1
                     if n > count:
                         break
+        if n <= 1:
+            self.noResults = True
         return data
     def execute(self):
         from config import Config
         fconfig = Config()
-        self.config = fconfig.config
         print('content-type: text/html; charset=UTF-8\n\n')
         print()
-        if fconfig:
+        if fconfig.exists:
+            self.debug = fconfig.debug
+            self.config = fconfig.config
             self.frigate = self.config['frigate']
             self.fevr = self.config['fevr']
             self.error(self.frigate)
             self.error(self.fevr)
-            header = self.getStub(f"/var/www/html/stub/eventsHeader.html")
             content = self.getEvents(self.count,self.selectors,self.order)
-            footer = self.getStub(f"{self.fevr['html']}/stub/eventsFooter.html")
         else:
-            header = self.getStub("/var/www/html/stub/eventsHeader.html")
-            content = self.getStub("/var/www/html/install.html")
-            footer = self.getStub("/var/www/html/stub/eventsFooter.html")
+            content = self.getStub("/var/www/html/config.html")
+        
+        if self.noResults:
+            content = self.noEvents()
+
+        header = self.getStub("/var/www/html/stub/eventsHeader.html")
+        footer = self.getStub("/var/www/html/stub/eventsFooter.html")
         print(f"{header}{content}{footer}")
 
 def main():

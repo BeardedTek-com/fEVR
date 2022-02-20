@@ -4,7 +4,11 @@
     "title"         : "Frigate Event Viewer",
     "domain"        : "fevr.mydomain.com",
     "admin"         : "admin",
-    "adminPassword" : "password"
+    "adminPassword" : "password",
+    "base"          : "/var/www/",
+    "html"          : "/var/www/html",
+    "db"            : "/var/www/db/fEVR.sqlite",
+    "debug"         : "false"
   },
   "frigate"         :
   {
