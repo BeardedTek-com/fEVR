@@ -3,6 +3,7 @@ import cgi
 import json
 import shutil
 import time
+from os.path import exists
 class webConfig:
     def __init__(self):
         self.configDir = "/var/www/config"
@@ -23,13 +24,17 @@ class webConfig:
     def toJSON(self):
         return json.dumps(self.webconfig, indent=2,sort_keys=True)
     def writeConfig(self):
-        
         shutil.copyfile(self.configFile,self.configBackup)
         with open(self.configFile,"w+") as configFile:
             configFile.write(self.toJSON())
+    def dbSetup(self):
+        if not exists(self.webconfig['fevr']['db']):
+            blankDB = f"{self.webconfig['fevr']['base']}/db/fEVR.blank.sqlite"
+            shutil.copyfile(blankDB,self.webconfig['fevr']['db'])
     def execute(self):
         self.webConfig()
         self.writeConfig()
+        self.dbSetup()
         print("<script>parent.location.reload()</script>")
 def main():
     wconfig = webConfig()

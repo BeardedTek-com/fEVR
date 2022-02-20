@@ -1,7 +1,7 @@
 {
   "fevr": {
     "base": "/var/www/",
-    "db": "/var/www/db/fEVR2.sqlite",
+    "db": "/var/www/db/fEVR.sqlite",
     "debug": "false",
     "html": "/var/www/html/",
     "title": "Home"
