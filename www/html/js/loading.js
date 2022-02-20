@@ -3,6 +3,14 @@ function changeClass(el,cls){
 }
 function fade(el,opacity){
     e = document.getElementById(el);
+    if (opacity > 0){
+        if (el == 'container'){
+            e.style.display = "flex";
+        }
+        else{
+            e.style.display = "block";
+        }
+    }
     e.style.opacity = opacity;
 }
 function remove(el){
