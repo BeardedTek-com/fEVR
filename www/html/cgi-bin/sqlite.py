@@ -21,11 +21,11 @@ class sqlite:
     def __init__(self,debug=False):
         from os.path import basename
         self.script = basename(__file__)
+        from logging import logging as flogging
+        self.error = flogging()
         self.conn = None
         self.version = ""
         self.debug = debug
-        from logging import logging
-        self.error = logging()
     def open(self,db="/var/www/db/fEVR.sqlite"):
         try:
             if self.debug:

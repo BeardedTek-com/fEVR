@@ -20,6 +20,8 @@ class fetchEvent:
     def __init__(self,frigate,event,debug=False,thumbSize=180,location='/var/www/html/events/'):
         from os.path import basename
         self.script = basename(__file__)
+        from logging import logging as flogging
+        self.error = flogging()
         self.frigate = frigate
         self.event = event
         self.debug = debug
@@ -32,8 +34,6 @@ class fetchEvent:
         self.default = "/var/www/default/"
         self.Return = {}
         self.Return['event'] = self.event
-        from logging import logging
-        self.error = logging()
     def delEvent(self,db=True):
         import shutil
         path = f"{self.location}{self.event}"

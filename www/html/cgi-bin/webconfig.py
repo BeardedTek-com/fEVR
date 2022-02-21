@@ -8,12 +8,12 @@ class webConfig:
     def __init__(self):
         from os.path import basename
         self.script = basename(__file__)
+        from logging import logging as flogging
+        self.error = flogging()
         self.configDir = "/var/www/config"
         self.configFile = f"{self.configDir}/config.json"
         self.configBackup = f"{self.configDir}/backup/{time.time()}.json"
         self.input = cgi.FieldStorage()
-        from logging import logging
-        self.error = logging()
         self.error.execute(f"Processing Web Config...",src=self.script)
         print('content-type: text/html\n\n')
     def webConfig(self):

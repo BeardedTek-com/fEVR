@@ -22,11 +22,11 @@ class rest:
     def __init__(self,frigate):
         from os.path import basename
         self.script = basename(__file__)
+        from logging import logging as flogging
+        self.error = flogging()
         self.sql = ""
         self.debug = ""
         self.frigate = frigate
-        from logging import logging
-        self.error = logging()
     def load_json(self,src="POST",file=None):
         if src == 'POST':
             self.input = json.loads(sys.stdin.read())

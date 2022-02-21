@@ -19,8 +19,8 @@ class event:
     def __init__(self,frigate,fevr,stub='/var/www/html/stub/eventdetail.html',db='/var/www/db/fEVR.sqlite'):
         from os.path import basename
         self.script = basename(__file__)
-        from logging import logging
-        self.error = logging()
+        from logging import logging as flogging
+        self.error = flogging()
         self.frigate = frigate
         self.fevr = fevr
         import cgi

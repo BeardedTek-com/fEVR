@@ -21,6 +21,8 @@ class events:
     def __init__(self):
         from os.path import basename
         self.script = basename(__file__)
+        from logging import logging as flogging
+        self.error = flogging()
         self.getOptions()
         self.noResults = False
     def getOptions(self):
@@ -42,8 +44,6 @@ class events:
                         self.selectors[key] = item
                     else:
                         self.extraOptions[key] = item
-        from logging import logging
-        self.error = logging()
     def getEvent(self,event,thumbSize=180,location='/var/www/html/events/'):
         eventPATH = f"{location}{event['id']}"
         snapPATH = f"{eventPATH}{self.frigate['snap']}"
