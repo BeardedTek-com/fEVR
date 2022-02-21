@@ -20,46 +20,42 @@ from sqlite3 import Error
 class sqlite:
     def __init__(self,debug=False):
         self.conn = None
-        self.error = ""
         self.version = ""
         self.debug = debug
-
-    def open(self,db="default.sqlite"):
+    def error(self,msg,level='debug',logpath='/var/www/logs'):
+        logfile = f"{logpath}/{level}.log"
+        from time import time
+        from os.path import basename
+        script = basename(__file__)
+        logentry = f"{time()} {str(msg)}\n"
+        with open(logfile,"a+") as logFile:
+            logFile.write(f"[{script}]{logentry}")
+    def open(self,db="/var/www/db/fEVR.sqlite"):
         try:
             if self.debug:
-                print(f"connecting to {db}.....\n")
+                self.error(f"connecting to {db}.....\n")
             self.conn = sqlite3.connect(db)
         except Error as e:
-            self.error = e
             if self.debug:
-                print(f"Gathered Error Message: {self.error}\n")
-
+                self.error(e)
     def close(self):
-        if self.debug:
-            print("Is the connecion open?\n")
         if self.conn:
-            if self.debug:
-                print("yes.  yes it is.\n")
             self.conn.commit()
-            if self.debug:
-                print("committing")
             self.conn.close()
-            if self.debug:
-                print("closed.\n")
-    
+            self.error('SQL Connection Closed')
     def execute(self,sql):
         retval = []
         e = ""
         try:
             exe = self.conn.execute(sql)
             if self.debug:
-                print(f"Executed SQL: {sql}")
+                self.error(f"Executed SQL: {sql}")
             retval = [0,sql,exe]
         except Error as e:
             retval = [1,sql,str(e).split(":")]
         finally:
             self.close()
-            print(retval)
+            self.error(retval)
             return retval
     
     def retrieve(self,sql):

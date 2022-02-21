@@ -7,28 +7,83 @@
     <body>
         <div class='event text-light-accent'>
             <div class="eventDetails eventTitle">
-            <div class="eventDetailsItem" id="eventInfo"><a href="events.py?count=10"><img class="backImg" src="/img/back.svg"/></a>##TCAMERA##: ##TTYPE## Detected</div>
+            <div class="eventDetailsItem" id="eventInfo"><a href="events.py?count=10"><img class="backImg" src="/img/back.svg"/></a>##TCAMERA##: ##TTYPE## Detected ##TIME##</div>
             <div class="eventDetailsTime" id="eventTime"></div>
             </div>
             <div class="eventHeader">
                 <div class="eventThumb">
                     <img class='thumb' src='##THUMB##'><br/>
+                    <div id="new" class="new ##NEWCLASS##">NEW</div>
                 </div>
                 <div class="eventInfo eventText">
-                    ##TIME##<br/>
-                    ID: ##EVENT##<br/>
-                    ##ACK##<br/>
-                    ##REFRESH##<br/>
-                    ##DEL##<br/>
-                    <br/>
-                    <a target='_blank' href='/events/##EVENT##/clip.mp4'>View Clip <img class='popout' src='/img/popout.svg'></a><br/>
-                    <a target='_blank' href='/events/##EVENT##/snapshot.jpg'>View Snapshot <img class='popout' src='/img/popout.svg'></a><br/>
-                    <a target='_blank' href='##FRIGATE##/api/##CAMERA##'>Live Camera Feed <img class='popout' src='/img/popout.svg'></a>
+                    <button class="buttonAction" onclick="buttonClick('/events/##EVENT##/clip.mp4','_blank')">View Video Clip <img class='popout' src='/img/popout.svg'></button><br/>
+                    <button class="buttonAction" onclick="buttonClick('/events/##EVENT##/snapshot.jpg','_blank')">View Snapshot <img class='popout' src='/img/popout.svg'></button><br/>
+                    <button class="buttonAction" onclick="buttonClick('##FRIGATE##/api/##CAMERA##','_blank')">Live Stream via Frigate <img class='popout' src='/img/popout.svg'></button><br/>
+                    <button class="buttonAction" onclick="modalAction('open','acknowledge')">##ACKACTION##</button><br/>
+                    <button class="buttonAction danger" onclick="modalAction('open','refresh')">Refresh Event</button><br/>
+                    <button class="buttonAction danger" onclick="modalAction('open','delete')">Delete Event</button><br/>
                 </div>
             </div>
             <div class='view'>
                 ##VIEW##
             </div>
         </div>
+
+        <dialog id="acknowledge" class="dialog">
+            <div id="titlebar">
+                <span class="title">##ACKACTION## Event</span>
+            </div>
+            <div id="content" class="acknowledge">
+                <br/>
+                <br/>
+            </div>
+            <div id="footer">
+                <div class="left">
+                    <button onclick='modalAction("close","acknowledge")' type="button" id="previous" class="enabled">Cancel</button>
+                </div>
+                <div class="right">
+                    <button onclick="buttonClick('##ACK##');" type="button" id="finish" class="enabled ">OK</button>
+                </div>
+            </div>
+        </dialog>
+
+        <dialog id="delete" class="dialog">
+            <div id="titlebar">
+                <span class="title danger">Delete Event</span>
+            </div>
+            <div id="content" class="delete danger">
+                Are you sure you want to delete this event?<br/>
+                This can not be easily undone, especially if frigate has already deleted this event.<br/>
+                Please be sure you want to do this!
+            </div>
+            <div id="footer">
+                <div class="left">
+                    <button onclick='modalAction("close","delete")' type="button" id="previous" class="enabled">Cancel</button>
+                </div>
+                <div class="right">
+                    <button onclick="buttonClick('##DEL##')" type="button" id="finish" class="enabled danger">Delete</button>
+                </div>
+            </div>
+        </dialog>
+
+        <dialog id="refresh" class="dialog">
+            <div id="titlebar">
+                <span class="title danger">Refresh Event</span>
+            </div>
+            <div id="content" class="refresh danger">
+                Are you sure you want to refresh this event?<br/>
+                If frigate has already deleted this event, it will not be recovered.<br/>
+                Please be sure you want to do this!
+            </div>
+            <div id="footer">
+                <div class="left">
+                    <button onclick='modalAction("close","refresh")' type="button" id="previous" class="enabled">Cancel</button>
+                </div>
+                <div class="right">
+                    <button onclick="buttonClick('##REFRESH##')" type="button" id="finish" class="enabled danger">Refresh</button>
+                </div>
+            </div>
+        </dialog>
+
     </body>
 </html>

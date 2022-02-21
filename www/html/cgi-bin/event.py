@@ -16,8 +16,9 @@
 #    You should have received a copy of the GNU General Public License
 #    along with this program.  If not, see <https://www.gnu.org/licenses/>.
 class event:
-    def __init__(self,frigate,stub='/var/www/html/stub/eventdetail.html',db='/var/www/db/fEVR.sqlite'):
+    def __init__(self,frigate,fevr,stub='/var/www/html/stub/eventdetail.html',db='/var/www/db/fEVR.sqlite'):
         self.frigate = frigate
+        self.fevr = fevr
         import cgi
         self.input = cgi.FieldStorage()
         self.id = self.input.getvalue('id')
@@ -25,7 +26,16 @@ class event:
         self.stub = stub
         self.db = db
         self.event = self.getEvent()
-        self.frigate = frigate
+    def error(self,msg,level='info',logpath='/var/www/logs'):
+        if self.fevr['debug'].lower() == 'true' or 'yes':
+            level = 'debug'
+        logfile = f"{logpath}/{level}.log"
+        from time import time
+        from os.path import basename
+        script = basename(__file__)
+        logentry = f"{time()} {str(msg)}\n"
+        with open(logfile,"a+") as logFile:
+            logFile.write(f"[{script}]{logentry}")
     def convertTZ(self,dt_str):
         from datetime import datetime
         from dateutil import tz
@@ -36,7 +46,8 @@ class event:
         return dt_utc.astimezone(pytz.timezone('America/Anchorage'))
     def getEvent(self):
         from sqlite import sqlite
-        SQL = f"""SELECT * FROM events WHERE event='{self.id}' ORDER BY event DESC"""
+        SQL = f"""SELECT * FROM events WHERE event='{self.id}' ORDER BY event DESC LIMIT 1"""
+        self.error(SQL)
         hpsql = sqlite()
         hpsql.open(self.db)
         items = hpsql.retrieve(SQL)
@@ -58,12 +69,16 @@ class event:
         time = datetime.fromtimestamp(int(self.id.split('.')[0]))
         ftime = str(self.convertTZ(str(time))).rsplit('-')
         self.event['time'] = f"{ftime[0]}-{ftime[1]}-{ftime[2]}"
-        if self.event['ack'] == "yes":
-            ackLink = f"<a href='?id={self.id}&action=unack'>Mark UnSeen</a>"
+        if str(self.event['ack']).lower() == "true":
+            newClass = "newhidden"
+            ackAction = "Unacknowledge"
+            ackLink = f"/cgi-bin/event.py?id={self.id}&action=unack"
         else:
-            ackLink = f"<a href='?id={self.id}&action=ack'>Mark Seen</a>"
-        refreshLink = f"<span class='danger'><a href='?id={self.id}&action=refresh'>Refresh Event</a></span>"
-        delLink = f"<span class='danger'><a href='?id={self.id}&action=delete'>Delete Event</a></span>"
+            newClass= ""
+            ackAction = "Acknowledge"
+            ackLink = f"/cgi-bin/event.py?id={self.id}&action=ack"
+        refreshLink = f"/cgi-bin/event.py?id={self.id}&action=refreshEvent"
+        delLink = f"/cgi-bin/event.py?id={self.id}&action=delEvent"
         if os.path.isfile(self.stub):
             with open(self.stub) as eventStub:
                 thumbURL = f"/events/{self.id}/thumb.jpg"
@@ -74,35 +89,33 @@ class event:
                     view = f"<img class='snap' src='/events/##EVENT##/snapshot.jpg'/>\n"
                 elif self.action == "live":
                     view = f"<iframe class='live' src='##FRIGATE##/api/##CAMERA##'></iframe>"
-                elif self.action == "delete":
-                    view = f"<div id='delete' class='delEvent eventText'>\n\
-                                Are you sure you want to delete this event?<br/>\n\
-                                This action can not be undone.<br/>\n\
-                                <a onclick='replaceInnerHTML(\"delete\",\"Deleting Event... This may take some time.\");'\
-                                    href='?action=delEvent&id={self.id}'>Yes, I'm Sure</a><br/><br/>\n\
-                                <a href='javascript:history.back()'>No, Go Back</a>\n\
-                             </div>\n"
                 elif self.action == "delEvent":
                     from fetch import fetchEvent
                     fetch = fetchEvent(self.frigate,self.id)
                     fetch.delEvent()
-                    view = f"<script>location.href='events.py';</script>"
-                elif self.action == "refresh":
-                    view = f"<div id='refresh' class='refreshEvent eventText'>\n\
-                                Are you sure you want to refresh this event?<br/>\n\
-                                If this event has been removed from Frigate, this event will be lost.<br/>\n\
-                                <a onclick='replaceInnerHTML(\"refresh\",\"Refreshing Event... This may take some time.\");'\
-                                    href='?action=refreshEvent&id={self.id}'>Yes, I'm Sure</a><br/><br/>\n\
-                                <a href='javascript:history.back()'>No, Go Back</a>\n\
-                             </div>\n"
+                    view = f"<script>window.history.go(-1);</script>"
                 elif self.action == "refreshEvent":
-                    fetch.delEvent()
+                    from fetch import fetchEvent
+                    fetch = fetchEvent(self.frigate,self.id)
+                    fetch.delEvent(db=False)
                     fetch.getEvent()
+                    view = f"<script>location.href='/cgi-bin/event.py?id={self.id}';</script>"
+                elif self.action == "ack":
+                    from fetch import fetchEvent
+                    fetch = fetchEvent(self.frigate,self.id)
+                    fetch.ackEvent('true')
+                    view = f"<script>location.href='/cgi-bin/event.py?id={self.id}';</script>"
+                elif self.action == "unack":
+                    from fetch import fetchEvent
+                    fetch = fetchEvent(self.frigate,self.id)
+                    fetch.ackEvent('')
                     view = f"<script>location.href='/cgi-bin/event.py?id={self.id}';</script>"
                 else:
                     view = ""
                 data = data.replace("##VIEW##",view)
+                data = data.replace("##NEWCLASS##",newClass)
                 data = data.replace("##ACK##",ackLink)
+                data = data.replace("##ACKACTION##",ackAction)
                 data = data.replace("##DEL##",delLink)
                 data = data.replace("##REFRESH##",refreshLink)
                 data = data.replace('##THUMB##',thumbURL)
@@ -119,6 +132,6 @@ def main():
     from config import Config
     myConfig = Config()
     print('content-type: text/html; charset=UTF-8\n\n')
-    hpf = event(myConfig.config['frigate'])
+    hpf = event(myConfig.config['frigate'],myConfig.config['fevr'])
     print(hpf.displayEvent())
 main()

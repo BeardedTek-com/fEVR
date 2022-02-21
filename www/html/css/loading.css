@@ -61,7 +61,6 @@
     display: flex;
 }
 #loading{
-  display: none;
   opacity: 1;
   -webkit-transition: opacity 1900ms linear;
   transition: opacity 1900ms linear;
