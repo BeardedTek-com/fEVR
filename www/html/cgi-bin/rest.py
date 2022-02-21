@@ -20,19 +20,23 @@ import json
 import sys
 class rest:
     def __init__(self,frigate):
-        from os.path import basename
-        self.script = basename(__file__)
         self.sql = ""
         self.debug = ""
         self.frigate = frigate
-        from logging import logging
-        self.error = logging()
+    def error(self,msg,level='debug',logpath='/var/www/logs'):
+        logfile = f"{logpath}/{level}.log"
+        from time import time
+        from os.path import basename
+        script = basename(__file__)
+        logentry = f"{time()} {str(msg)}\n"
+        with open(logfile,"a+") as logFile:
+            logFile.write(f"[{script}]{logentry}")
     def load_json(self,src="POST",file=None):
         if src == 'POST':
             self.input = json.loads(sys.stdin.read())
             sys.stderr.write(f"{str(self.input)}")
-            self.error.execute("RECEIVED\n",src=self.script)
-            self.error.execute(str(self.input),src=self.script)
+            self.error_log("RECEIVED\n")
+            self.error_log(str(self.input))
         elif src == 'FILE':
             with open(file) as page_json:
                 self.input = json.load(page_json)        
@@ -55,10 +59,10 @@ class rest:
             self.values.append(value)
             if self.function == "CREATE":
                 self.create.append([index,value])
-        self.error.execute(f"table: {self.table}",src=self.script)
-        self.error.execute(f"function: {self.function}",src=self.script)
-        self.error.execute(f"fields: {self.fields}",src=self.script)
-        self.error.execute(f"values: {self.values}",src=self.script)
+        self.error_log(f"table: {self.table}")
+        self.error_log(f"function: {self.function}")
+        self.error_log(f"fields: {self.fields}")
+        self.error_log(f"values: {self.values}")
         return True
     def json2sql(self):
         if self.function == "CREATE":
@@ -117,11 +121,18 @@ def main():
     isEvent = fRest.loadEvent()
     if isEvent != 20:
         sql = fRest.json2sql()
-        fRest.error(sql)
+        fRest.error_log(sql)
         hpsql = sqlite()
         hpsql.open("/var/www/db/fEVR.sqlite")
-        fRest.error(hpsql.execute(sql))
+        if hpsql.error:
+            fRest.error_log(f"Error: {hpsql.error}")
+        else:
+            temp = hpsql.execute(sql)
+            fRest.error_log(temp)
+        fRest.error_log("OK")
     else:
-        fRest.error("Not a valid Frigate Event")
+        fRest.error_log("Not a valid Frigate Event")
         fRest.deleteEvent()
+        sql = 
+
 main()
