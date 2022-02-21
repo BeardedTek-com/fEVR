@@ -23,10 +23,14 @@ class rest:
         self.sql = ""
         self.debug = ""
         self.frigate = frigate
-    def error_log(self,msg):
-        if self.debug:
-            sys.stderr.write(f"{str(msg)}\n")
-            print(msg)
+    def error(self,msg,level='debug',logpath='/var/www/logs'):
+        logfile = f"{logpath}/{level}.log"
+        from time import time
+        from os.path import basename
+        script = basename(__file__)
+        logentry = f"{time()} {str(msg)}\n"
+        with open(logfile,"a+") as logFile:
+            logFile.write(f"[{script}]{logentry}")
     def load_json(self,src="POST",file=None):
         if src == 'POST':
             self.input = json.loads(sys.stdin.read())
@@ -107,27 +111,28 @@ class rest:
 def main():
     from config import Config
     myConfig = Config()
-    myConfig = myConfig.getConfig()
+    myConfig.getConfig()
     from sqlite import sqlite
-    j2sql=rest(myConfig['frigate'])
+    fRest=rest(myConfig.config['frigate'])
     # Print headers in case we're talking to a web browser...
     print("content-type: text/plain\n\n")
-    j2sql.load_json()
-    j2sql.parse_json()
-    isEvent = j2sql.loadEvent()
+    fRest.load_json()
+    fRest.parse_json()
+    isEvent = fRest.loadEvent()
     if isEvent != 20:
-        sql = j2sql.json2sql()
-        j2sql.error_log(sql)
+        sql = fRest.json2sql()
+        fRest.error_log(sql)
         hpsql = sqlite()
         hpsql.open("/var/www/db/fEVR.sqlite")
         if hpsql.error:
-            j2sql.error_log(f"Error: {hpsql.error}")
+            fRest.error_log(f"Error: {hpsql.error}")
         else:
             temp = hpsql.execute(sql)
-            j2sql.error_log(temp)
-        j2sql.error_log("OK")
+            fRest.error_log(temp)
+        fRest.error_log("OK")
     else:
-        j2sql.error_log("Not a valid Frigate Event")
-        j2sql.delEvent()
+        fRest.error_log("Not a valid Frigate Event")
+        fRest.deleteEvent()
+        sql = 
 
 main()

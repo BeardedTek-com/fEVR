@@ -40,10 +40,15 @@ class events:
                         self.selectors[key] = item
                     else:
                         self.extraOptions[key] = item
-    def error(self,msg,level='debug'):
-        if self.debug or level == 'info':
-            from sys import stderr
-            stderr.write(f"{str(msg)}\n")
+    
+    def error(self,msg,level='debug',logpath='/var/www/logs'):
+        logfile = f"{logpath}/{level}.log"
+        from time import time
+        from os.path import basename
+        script = basename(__file__)
+        logentry = f"{time()} {str(msg)}\n"
+        with open(logfile,"a+") as logFile:
+            logFile.write(f"[{script}]{logentry}")
     def getEvent(self,event,thumbSize=180,location='/var/www/html/events/'):
         eventPATH = f"{location}{event['id']}"
         snapPATH = f"{eventPATH}{self.frigate['snap']}"
@@ -94,6 +99,10 @@ class events:
         event['time'] = ftime[ftime.index('-')+1:]
         if os.path.isfile(stub):
             with open(stub) as eventStub:
+                if str(event['ack']).lower() != "true":
+                    newMarker = "NEW"
+                else:
+                    newMarker = ""
                 url = f"/cgi-bin/event.py?id={event['id']}"
                 thumbURL = f"/events/{event['id']}/thumb.jpg"
                 caption = f"{event['time']}<br/>\n {event['type']} detected in {event['camera']}"
@@ -101,6 +110,7 @@ class events:
                 data = data.replace('##EVENT_URL##',url)
                 data = data.replace('##EVENT_IMG##',thumbURL)
                 data = data.replace('##EVENT_CAPTION##',caption)
+                data = data.replace('##NEW##',newMarker)
         if data:
             return data
     def getStub(self,stub):
@@ -123,11 +133,7 @@ class events:
         else:
             sql += """ORDER BY event DESC"""
         if count:
-            count = int(count)
-            n = 1
-        else:
-            n = 0
-            
+            sql += f""" LIMIT {str(count)};"""
         from fetch import fetchEvent
         from sqlite import sqlite
         fsqlite = sqlite()
@@ -148,13 +154,7 @@ class events:
             fetchevent = fetchEvent(self.frigate,event['id'])
             fetchevent.execute()
             data += self.generateEventDiv(event)
-            if count:
-
-                if count != 0:
-                    n += 1
-                    if n > count:
-                        break
-        if n <= 1 and n != 0:
+        if len(items) < 1:
             self.noResults = True
         return data
     def execute(self):

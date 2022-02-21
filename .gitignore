@@ -4,3 +4,4 @@ events
 www/html/cgi-bin/__pycache__/
 events/*-*
 backup/*
+*.log

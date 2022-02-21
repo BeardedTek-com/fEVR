@@ -17,9 +17,10 @@
 #    along with this program.  If not, see <https://www.gnu.org/licenses/>.
 import os
 class fetchEvent:
-    def __init__(self,frigate,event,thumbSize=180,location='/var/www/html/events/'):
+    def __init__(self,frigate,event,debug=False,thumbSize=180,location='/var/www/html/events/'):
         self.frigate = frigate
         self.event = event
+        self.debug = debug
         self.thumbSize = thumbSize
         self.location = location
         self.eventPATH = f"{self.location}{self.event}"
@@ -29,17 +30,31 @@ class fetchEvent:
         self.default = "/var/www/default/"
         self.Return = {}
         self.Return['event'] = self.event
-    def error(self,msg):
-        from sys import stderr
-        stderr.write(f"{str(msg)}\n")
-    def delEvent(self):
+    def error(self,msg,level='debug',logpath='/var/www/logs'):
+        logfile = f"{logpath}/{level}.log"
+        from time import time
+        from os.path import basename
+        script = basename(__file__)
+        logentry = f"{time()} {str(msg)}\n"
+        with open(logfile,"a+") as logFile:
+            logFile.write(f"[{script}]{logentry}")
+    def delEvent(self,db=True):
         import shutil
         path = f"{self.location}{self.event}"
         shutil.rmtree(path)
-        sql = f"""DELETE FROM events WHERE event='{self.event}'"""
+        if db:
+            sql = f"""DELETE FROM events WHERE event='{self.event}';"""
+            self.error(f"SQL: {sql}")
+            from sqlite import sqlite
+            fsql = sqlite()
+            fsql.open()
+            self.error(fsql.execute(sql))
+    def ackEvent(self,value):
+        sql = f"""UPDATE events SET ack='{value}' WHERE event='{self.event}' LIMIT 1;"""
         from sqlite import sqlite
         fsql = sqlite()
-        fsql.execute(sql)
+        fsql.open()
+        self.error(fsql.execute(sql))
     def getEvent(self):
         if not os.path.exists(self.thumbPATH):
             if not os.path.exists(self.eventPATH):
