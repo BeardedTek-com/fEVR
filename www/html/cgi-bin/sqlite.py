@@ -19,43 +19,39 @@ import sqlite3
 from sqlite3 import Error
 class sqlite:
     def __init__(self,debug=False):
+        from os.path import basename
+        self.script = basename(__file__)
         self.conn = None
         self.version = ""
         self.debug = debug
-    def error(self,msg,level='debug',logpath='/var/www/logs'):
-        logfile = f"{logpath}/{level}.log"
-        from time import time
-        from os.path import basename
-        script = basename(__file__)
-        logentry = f"{time()} {str(msg)}\n"
-        with open(logfile,"a+") as logFile:
-            logFile.write(f"[{script}]{logentry}")
+        from logging import logging
+        self.error = logging()
     def open(self,db="/var/www/db/fEVR.sqlite"):
         try:
             if self.debug:
-                self.error(f"connecting to {db}.....\n")
+                self.error.execute(f"connecting to {db}.....\n",src=self.script)
             self.conn = sqlite3.connect(db)
         except Error as e:
             if self.debug:
-                self.error(e)
+                self.error.execute(e,src=self.script)
     def close(self):
         if self.conn:
             self.conn.commit()
             self.conn.close()
-            self.error('SQL Connection Closed')
+            self.error.execute('SQL Connection Closed',src=self.script)
     def execute(self,sql):
         retval = []
         e = ""
         try:
             exe = self.conn.execute(sql)
             if self.debug:
-                self.error(f"Executed SQL: {sql}")
+                self.error.execute(f"Executed SQL: {sql}",src=self.script)
             retval = [0,sql,exe]
         except Error as e:
             retval = [1,sql,str(e).split(":")]
         finally:
             self.close()
-            self.error(retval)
+            self.error.execute(retval,src=self.script)
             return retval
     
     def retrieve(self,sql):

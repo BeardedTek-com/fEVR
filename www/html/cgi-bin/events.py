@@ -19,6 +19,8 @@ import os
 stub='../stub/event.html'
 class events:
     def __init__(self):
+        from os.path import basename
+        self.script = basename(__file__)
         self.getOptions()
         self.noResults = False
     def getOptions(self):
@@ -40,15 +42,8 @@ class events:
                         self.selectors[key] = item
                     else:
                         self.extraOptions[key] = item
-    
-    def error(self,msg,level='debug',logpath='/var/www/logs'):
-        logfile = f"{logpath}/{level}.log"
-        from time import time
-        from os.path import basename
-        script = basename(__file__)
-        logentry = f"{time()} {str(msg)}\n"
-        with open(logfile,"a+") as logFile:
-            logFile.write(f"[{script}]{logentry}")
+        from logging import logging
+        self.error = logging()
     def getEvent(self,event,thumbSize=180,location='/var/www/html/events/'):
         eventPATH = f"{location}{event['id']}"
         snapPATH = f"{eventPATH}{self.frigate['snap']}"
@@ -121,8 +116,8 @@ class events:
         wheres = ""
         if selectors:
             for key in selectors:
-                self.error(selectors[key])
-                self.error(f"COUNT: {count}")
+                self.error.execute(selectors[key],src=self.script)
+                self.error.execute(f"COUNT: {count}",src=self.script)
                 wheres += f"""WHERE {key}='{selectors[key]}'"""
         sql = """SELECT * FROM events """
         if wheres:
@@ -138,9 +133,9 @@ class events:
         from sqlite import sqlite
         fsqlite = sqlite()
         fsqlite.open(self.fevr['db'])
-        self.error(sql)
+        self.error.execute(sql,src=self.script)
         items = fsqlite.retrieve(sql)
-        self.error(f"# ITEMS: {len(items)}")
+        self.error.execute(f"# ITEMS: {len(items)}",src=self.script)
         data =""
         for row in items:
             event = {}
@@ -167,8 +162,8 @@ class events:
             self.config = fconfig.config
             self.frigate = self.config['frigate']
             self.fevr = self.config['fevr']
-            self.error(self.frigate)
-            self.error(self.fevr)
+            self.error.execute(self.frigate,src=self.script)
+            self.error.execute(self.fevr,src=self.script)
             content = self.getEvents(self.count,self.selectors,self.order)
         else:
             content = self.getStub("/var/www/html/config.html")

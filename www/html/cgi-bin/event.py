@@ -17,6 +17,10 @@
 #    along with this program.  If not, see <https://www.gnu.org/licenses/>.
 class event:
     def __init__(self,frigate,fevr,stub='/var/www/html/stub/eventdetail.html',db='/var/www/db/fEVR.sqlite'):
+        from os.path import basename
+        self.script = basename(__file__)
+        from logging import logging
+        self.error = logging()
         self.frigate = frigate
         self.fevr = fevr
         import cgi
@@ -26,16 +30,6 @@ class event:
         self.stub = stub
         self.db = db
         self.event = self.getEvent()
-    def error(self,msg,level='info',logpath='/var/www/logs'):
-        if self.fevr['debug'].lower() == 'true' or 'yes':
-            level = 'debug'
-        logfile = f"{logpath}/{level}.log"
-        from time import time
-        from os.path import basename
-        script = basename(__file__)
-        logentry = f"{time()} {str(msg)}\n"
-        with open(logfile,"a+") as logFile:
-            logFile.write(f"[{script}]{logentry}")
     def convertTZ(self,dt_str):
         from datetime import datetime
         from dateutil import tz
@@ -47,7 +41,7 @@ class event:
     def getEvent(self):
         from sqlite import sqlite
         SQL = f"""SELECT * FROM events WHERE event='{self.id}' ORDER BY event DESC LIMIT 1"""
-        self.error(SQL)
+        self.error.execute(SQL,src=self.script)
         hpsql = sqlite()
         hpsql.open(self.db)
         items = hpsql.retrieve(SQL)
@@ -69,7 +63,7 @@ class event:
         time = datetime.fromtimestamp(int(self.id.split('.')[0]))
         ftime = str(self.convertTZ(str(time))).rsplit('-')
         self.event['time'] = f"{ftime[0]}-{ftime[1]}-{ftime[2]}"
-        if str(self.event['ack']).lower() == "true":
+        if self.event['ack'] == "true":
             newClass = "newhidden"
             ackAction = "Unacknowledge"
             ackLink = f"/cgi-bin/event.py?id={self.id}&action=unack"
@@ -93,7 +87,7 @@ class event:
                     from fetch import fetchEvent
                     fetch = fetchEvent(self.frigate,self.id)
                     fetch.delEvent()
-                    view = f"<script>window.history.go(-1);</script>"
+                    view = f"<script>window.history.go(-2);</script>"
                 elif self.action == "refreshEvent":
                     from fetch import fetchEvent
                     fetch = fetchEvent(self.frigate,self.id)

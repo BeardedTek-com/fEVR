@@ -50,15 +50,18 @@
   }
 }
 .frigateIcon{
-    position: relative;
-    top: 0.1em;
-    left: 0.1em;
-    height: 1.5em;
-    width: auto;
+  position: relative;
+  top: 0.15em;
+  height: 3.5em;
+  width: auto;
+  opacity: 0.5;
 
 }
 .visible{
-    display: flex;
+  display: flex;
+}
+.hidden{
+  display: none;
 }
 #loading{
   opacity: 1;
