@@ -1,6 +1,10 @@
 #!/usr/bin/python
 class Config:
     def __init__(self,file='/var/www/config/config.json'):
+        from os.path import basename
+        self.script = basename(__file__)
+        from logit import logit
+        self.error = logit()
         self.configFile = file
         self.reqdKeys = ['title','domain','admin','adminPassword','url','api','snap','clip']
         self.reqd = len(self.reqdKeys)

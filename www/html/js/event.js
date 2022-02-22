@@ -16,11 +16,26 @@ function buttonClick(link){
     location.href=link;
 }
 */
-function buttonClick(url,target="none") {
+function buttonClick(id,url,progress="no",target="none") {
     var a = document.createElement('a');
     if (target != "none"){
         a.target=target;
     }
     a.href=url;
-    a.click();
+    if (progress == "yes"){
+        modalAction('close',id)
+        switch (id){
+            case "delete":
+                modalAction('open','deleting');
+                break;
+            case "refresh":
+                modalAction('open','refreshing');
+                break;
+        }
+        setTimeout(() => {a.click();},2000);
+
+    }
+    else{
+       a.click(); 
+    }
   }

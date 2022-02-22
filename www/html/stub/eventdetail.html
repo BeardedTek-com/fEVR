@@ -61,7 +61,24 @@
                     <button onclick='modalAction("close","delete")' type="button" id="previous" class="enabled">Cancel</button>
                 </div>
                 <div class="right">
-                    <button onclick="buttonClick('##DEL##')" type="button" id="finish" class="enabled danger">Delete</button>
+                    <button onclick="buttonClick('delete','##DEL##',progress='yes')" type="button" id="finish" class="enabled danger">Delete</button>
+                </div>
+            </div>
+        </dialog>
+
+        <dialog id="deleting" class="dialog">
+            <div id="titlebar">
+                <span class="title danger">Delete Event</span>
+            </div>
+            <div id="content" class="delete danger">
+                Please wait while deleting event.
+            </div>
+            <div id="footer">
+                <div class="left">
+                    <button type="button" id="previous" class="disabled">Cancel</button>
+                </div>
+                <div class="right">
+                    <button type="button" id="finish" class="disabled danger">Delete</button>
                 </div>
             </div>
         </dialog>
@@ -80,7 +97,24 @@
                     <button onclick='modalAction("close","refresh")' type="button" id="previous" class="enabled">Cancel</button>
                 </div>
                 <div class="right">
-                    <button onclick="buttonClick('##REFRESH##')" type="button" id="finish" class="enabled danger">Refresh</button>
+                    <button onclick="buttonClick('refresh','##REFRESH##',progress='yes')" type="button" id="finish" class="enabled danger">Refresh</button>
+                </div>
+            </div>
+        </dialog>
+
+        <dialog id="refreshing" class="dialog">
+            <div id="titlebar">
+                <span class="title danger">Refreshing Event</span>
+            </div>
+            <div id="content" class="refresh danger">
+                Please wait while refreshing the event.
+            </div>
+            <div id="footer">
+                <div class="left">
+                    <button type="button" id="previous" class="disabled">Cancel</button>
+                </div>
+                <div class="right">
+                    <button type="button" id="finish" class="disabled danger">Refresh</button>
                 </div>
             </div>
         </dialog>

@@ -18,6 +18,10 @@
 import os
 class fetchEvent:
     def __init__(self,frigate,event,debug=False,thumbSize=180,location='/var/www/html/events/'):
+        from os.path import basename
+        self.script = basename(__file__)
+        from logit import logit
+        self.error = logit()
         self.frigate = frigate
         self.event = event
         self.debug = debug
@@ -30,31 +34,26 @@ class fetchEvent:
         self.default = "/var/www/default/"
         self.Return = {}
         self.Return['event'] = self.event
-    def error(self,msg,level='debug',logpath='/var/www/logs'):
-        logfile = f"{logpath}/{level}.log"
-        from time import time
-        from os.path import basename
-        script = basename(__file__)
-        logentry = f"{time()} {str(msg)}\n"
-        with open(logfile,"a+") as logFile:
-            logFile.write(f"[{script}]{logentry}")
     def delEvent(self,db=True):
         import shutil
         path = f"{self.location}{self.event}"
         shutil.rmtree(path)
         if db:
+            self.error.execute(f" delEvent() - DELETING DATABASE ENTRY",src=self.script)
             sql = f"""DELETE FROM events WHERE event='{self.event}';"""
-            self.error(f"SQL: {sql}")
+            self.error.execute(f"delEvent() - {sql}",src=self.script)
             from sqlite import sqlite
             fsql = sqlite()
             fsql.open()
-            self.error(fsql.execute(sql))
+            self.error.execute(f" delEvent() - {fsql.execute(sql)}",src=self.script)
+        else:
+            self.error.execute(f" delEvent() - NOT DELETING DATABASE ENTRY",src=self.script)
     def ackEvent(self,value):
         sql = f"""UPDATE events SET ack='{value}' WHERE event='{self.event}' LIMIT 1;"""
         from sqlite import sqlite
         fsql = sqlite()
         fsql.open()
-        self.error(fsql.execute(sql))
+        self.error.execute(f" ackEvent() - {fsql.execute(sql)}",src=self.script)
     def getEvent(self):
         if not os.path.exists(self.thumbPATH):
             if not os.path.exists(self.eventPATH):
@@ -74,10 +73,10 @@ class fetchEvent:
     def copyDefaults(self,type,item,destPATH):
         from shutil import copy
         src = f"{self.default}{type}/{item}"
-        self.error(f"{src} -> {destPATH}")
+        self.error.execute(f" copyDefaults() - {src} -> {destPATH}",src=self.script)
         copy(src,destPATH)
     def resizeImg(self,img,height=180,ratio=1.777777778):
-        self.error(f"resizeImage({img},{height},{ratio})")
+        self.error.execute(f" resizeImage() - resizeImage({img},{height},{ratio})",src=self.script)
         from os.path import exists
         if exists(img):
             # Resizes an image from the filesystem
@@ -88,7 +87,7 @@ class fetchEvent:
             thumb = picture.resize(size, Image.ANTIALIAS)
             thumb.save(self.thumbPATH,"JPEG", quality=75,optimize=True)
         else:
-            self.error("Can not resize snapshot.  Grabbing default!!!!!")
+            self.error.execute(" resizeImage() - Can not resize snapshot.  Grabbing default!!!!!",src=self.script)
             self.copyDefaults("event","thumb.jpg",self.thumbPATH)
     def execute(self):
         self.getEvent()
