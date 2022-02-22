@@ -16,9 +16,9 @@
                     <div id="new" class="new ##NEWCLASS##">NEW</div>
                 </div>
                 <div class="eventInfo eventText">
-                    <button class="buttonAction" onclick="buttonClick('/events/##EVENT##/clip.mp4','_blank')">View Video Clip <img class='popout' src='/img/popout.svg'></button><br/>
-                    <button class="buttonAction" onclick="buttonClick('/events/##EVENT##/snapshot.jpg','_blank')">View Snapshot <img class='popout' src='/img/popout.svg'></button><br/>
-                    <button class="buttonAction" onclick="buttonClick('##FRIGATE##/api/##CAMERA##','_blank')">Live Stream via Frigate <img class='popout' src='/img/popout.svg'></button><br/>
+                    <button class="buttonAction" onclick="buttonClick('null','/events/##EVENT##/clip.mp4','_blank')">View Video Clip <img class='popout' src='/img/popout.svg'></button><br/>
+                    <button class="buttonAction" onclick="buttonClick('null','/events/##EVENT##/snapshot.jpg','_blank')">View Snapshot <img class='popout' src='/img/popout.svg'></button><br/>
+                    <button class="buttonAction" onclick="buttonClick('null','##FRIGATE##/api/##CAMERA##','_blank')">Live Stream via Frigate <img class='popout' src='/img/popout.svg'></button><br/>
                     <button class="buttonAction" onclick="modalAction('open','acknowledge')">##ACKACTION##</button><br/>
                     <button class="buttonAction danger" onclick="modalAction('open','refresh')">Refresh Event</button><br/>
                     <button class="buttonAction danger" onclick="modalAction('open','delete')">Delete Event</button><br/>
@@ -42,7 +42,7 @@
                     <button onclick='modalAction("close","acknowledge")' type="button" id="previous" class="enabled">Cancel</button>
                 </div>
                 <div class="right">
-                    <button onclick="buttonClick('##ACK##');" type="button" id="finish" class="enabled ">OK</button>
+                    <button onclick="buttonClick('acknowledge','##ACK##');" type="button" id="finish" class="enabled ">OK</button>
                 </div>
             </div>
         </dialog>

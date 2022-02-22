@@ -16,7 +16,7 @@ function buttonClick(link){
     location.href=link;
 }
 */
-function buttonClick(id,url,progress="no",target="none") {
+function buttonClick(id,url,target="none",progress="no") {
     var a = document.createElement('a');
     if (target != "none"){
         a.target=target;

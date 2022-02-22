@@ -24,14 +24,15 @@ class rest:
         self.script = basename(__file__)
         from logit import logit
         self.error = logit()
+        self.error.execute("BEGIN RECEIVE EVENT",src=self.script)
         self.sql = ""
         self.debug = ""
         self.frigate = frigate
     def load_json(self,src="POST",file=None):
         if src == 'POST':
             self.input = json.loads(sys.stdin.read())
-            sys.stderr.write(f"{str(self.input)}")
-            self.error.execute("RECEIVED\n",src=self.script)
+            self.error.execute(f"{str(self.input)}",src=self.script)
+            self.error.execute("RECEIVED",src=self.script)
             self.error.execute(str(self.input),src=self.script)
         elif src == 'FILE':
             with open(file) as page_json:
@@ -117,11 +118,12 @@ def main():
     isEvent = fRest.loadEvent()
     if isEvent != 20:
         sql = fRest.json2sql()
-        fRest.error(sql)
+        fRest.error.execute(f"Event SQL: {sql}",src=fRest.script)
         hpsql = sqlite()
         hpsql.open("/var/www/db/fEVR.sqlite")
-        fRest.error(hpsql.execute(sql))
+        fRest.error.execute(f"Execute SQL: {hpsql.execute(sql)}",src=fRest.script)
+        fRest.error.execute("Event Loaded",src=fRest.script)
     else:
-        fRest.error("Not a valid Frigate Event")
+        fRest.error.execute("Not a valid Frigate Event",src=fRest.script)
         fRest.deleteEvent()
 main()
