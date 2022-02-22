@@ -1,5 +1,5 @@
 #!/usr/bin/python
-class logging:
+class logit:
     def __init__(self):
         self.logfile = "/var/www/logs/debug.log"
     def execute(self,msg,src='fEVR',level='debug',logpath='/var/www/logs'):

@@ -22,8 +22,8 @@ class rest:
     def __init__(self,frigate):
         from os.path import basename
         self.script = basename(__file__)
-        from logging import logging as flogging
-        self.error = flogging()
+        from logit import logit
+        self.error = logit()
         self.sql = ""
         self.debug = ""
         self.frigate = frigate

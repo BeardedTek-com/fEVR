@@ -19,8 +19,8 @@ class event:
     def __init__(self,frigate,fevr,stub='/var/www/html/stub/eventdetail.html',db='/var/www/db/fEVR.sqlite'):
         from os.path import basename
         self.script = basename(__file__)
-        from logging import logging as flogging
-        self.error = flogging()
+        from logit import logit
+        self.error = logit()
         self.frigate = frigate
         self.fevr = fevr
         import cgi
@@ -87,7 +87,9 @@ class event:
                     from fetch import fetchEvent
                     fetch = fetchEvent(self.frigate,self.id)
                     fetch.delEvent()
-                    view = f"<script>window.history.go(-2);</script>"
+                    from time import sleep
+                    sleep(1.5)
+                    view = f"<script>parent.location.reload();</script>"
                 elif self.action == "refreshEvent":
                     from fetch import fetchEvent
                     fetch = fetchEvent(self.frigate,self.id)

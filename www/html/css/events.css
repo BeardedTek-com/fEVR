@@ -114,10 +114,18 @@ a:hover{
     margin: auto;
     width: 95vw;
     vertical-align: middle;
+    background-color: rgba(244, 244, 250, 0.8)
 }
 .dialog::backdrop{
     background: none;
 }
+@supports ((-webkit-backdrop-filter: none) or (backdrop-filter: none)) {
+    .dialog {
+      background-color: rgba(244, 244, 250, 0.5);
+      -webkit-backdrop-filter: blur(3px) contrast(0.5);
+      backdrop-filter: blur(3px) contrast(0.5);
+    }
+  }
 #titlebar{
     border: 0 solid darkblue;
     height: 2em;

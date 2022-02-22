@@ -20,8 +20,8 @@ class fetchEvent:
     def __init__(self,frigate,event,debug=False,thumbSize=180,location='/var/www/html/events/'):
         from os.path import basename
         self.script = basename(__file__)
-        from logging import logging as flogging
-        self.error = flogging()
+        from logit import logit
+        self.error = logit()
         self.frigate = frigate
         self.event = event
         self.debug = debug
