@@ -25,11 +25,13 @@ class event:
         self.fevr = fevr
         import cgi
         self.input = cgi.FieldStorage()
+        self.error.execute(f"self.input: {self.input}",self.script)
         self.id = self.input.getvalue('id')
         self.action = self.input.getvalue('action')
         self.stub = stub
         self.db = db
         self.event = self.getEvent()
+        self.referrer = ""
     def convertTZ(self,dt_str):
         from datetime import datetime
         from dateutil import tz
@@ -55,6 +57,17 @@ class event:
             event['snap'] = row[6]
             event['score'] = row[7]
         return event
+    def delEvent(self):
+        if self.action == "delEvent":
+            from fetch import fetchEvent
+            fetch = fetchEvent(self.frigate,self.id)
+            fetch.delEvent()
+            self.referrer = self.input.getvalue('referrer')
+            self.error.execute(f"self.referrer: {self.referrer}",src=self.script)
+            data = True
+        else:
+            data = False
+        return data
     def displayEvent(self):
         from fetch import fetchEvent
         fetch = fetchEvent(self.frigate,self.id)
@@ -83,13 +96,6 @@ class event:
                     view = f"<img class='snap' src='/events/##EVENT##/snapshot.jpg'/>\n"
                 elif self.action == "live":
                     view = f"<iframe class='live' src='##FRIGATE##/api/##CAMERA##'></iframe>"
-                elif self.action == "delEvent":
-                    from fetch import fetchEvent
-                    fetch = fetchEvent(self.frigate,self.id)
-                    fetch.delEvent()
-                    from time import sleep
-                    sleep(1.5)
-                    view = f"<script>parent.location.reload();</script>"
                 elif self.action == "refreshEvent":
                     from fetch import fetchEvent
                     fetch = fetchEvent(self.frigate,self.id)
@@ -129,5 +135,10 @@ def main():
     myConfig = Config()
     print('content-type: text/html; charset=UTF-8\n\n')
     hpf = event(myConfig.config['frigate'],myConfig.config['fevr'])
-    print(hpf.displayEvent())
+    if hpf.delEvent():
+        from time import sleep
+        sleep(0.25)
+        print(f"<script>location.href='{hpf.referrer}'</script>")
+    else:
+        print(hpf.displayEvent())
 main()

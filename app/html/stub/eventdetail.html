@@ -18,7 +18,7 @@
                 <div class="eventInfo eventText">
                     <button class="buttonAction" onclick="buttonClick(false,'/events/##EVENT##/clip.mp4','_blank')">View Video Clip <img class='popout' src='/img/popout.svg'></button><br/>
                     <button class="buttonAction" onclick="buttonClick(false,'/events/##EVENT##/snapshot.jpg','_blank')">View Snapshot <img class='popout' src='/img/popout.svg'></button><br/>
-                    <button class="buttonAction" onclick="buttonClick(false,'##FRIGATE##/api/##CAMERA##','_blank')">Live Stream via Frigate <img class='popout' src='/img/popout.svg'></button><br/>
+                    <button class="buttonAction" onclick="buttonClick(false,'##FRIGATE##/api/##CAMERA##?h=720&bbox=1&motion=1','_blank')">Live Stream via Frigate <img class='popout' src='/img/popout.svg'></button><br/>
                     <button class="buttonAction" onclick="modalAction('open','acknowledge')">##ACKACTION##</button><br/>
                     <button class="buttonAction danger" onclick="modalAction('open','refresh')">Refresh Event</button><br/>
                     <button class="buttonAction danger" onclick="modalAction('open','delete')">Delete Event</button><br/>
@@ -39,10 +39,10 @@
             </div>
             <div id="footer">
                 <div class="left">
-                    <button onclick='modalAction("close","acknowledge")' type="button" id="previous" class="enabled">Cancel</button>
+                    <button onclick='modalAction("close","acknowledge");' type="button" id="previous" class="enabled">Cancel</button>
                 </div>
                 <div class="right">
-                    <button onclick="buttonClick('acknowledge','##ACK##','none','yes',document.referrer);" type="button" id="finish" class="enabled ">OK</button>
+                    <button onclick="buttonClick('acknowledge','##ACK##','none');" type="button" id="finish" class="enabled ">OK</button>
                 </div>
             </div>
         </dialog>
@@ -61,16 +61,16 @@
                     <button onclick='modalAction("close","delete")' type="button" id="previous" class="enabled">Cancel</button>
                 </div>
                 <div class="right">
-                    <button onclick="buttonClick('delete','##DEL##','none','yes',document.referrer)" type="button" id="finish" class="enabled danger">Delete</button>
+                    <button onclick="buttonClick('delete','##DEL##','contentFrame','yes',document.referrer)" type="button" id="finish" class="enabled danger">Delete</button>
                 </div>
             </div>
         </dialog>
 
-        <dialog id="deleting" class="dialog">
-            <div id="titlebar">
+        <dialog id="delete-progress" class="dialog">
+            <div id="delete-progress-titlebar">
                 <span class="title danger">Delete Event</span>
             </div>
-            <div id="content" class="delete danger">
+            <div id="delete-progress-content" class="delete danger">
                 Please wait while deleting event.
             </div>
             <div id="footer">
@@ -97,16 +97,16 @@
                     <button onclick='modalAction("close","refresh")' type="button" id="previous" class="enabled">Cancel</button>
                 </div>
                 <div class="right">
-                    <button onclick="buttonClick('refresh','##REFRESH##',progress='yes')" type="button" id="finish" class="enabled danger">Refresh</button>
+                    <button onclick="buttonClick('refresh','##REFRESH##','contentFrame','yes',document.referrer)" type="button" id="finish" class="enabled danger">Refresh</button>
                 </div>
             </div>
         </dialog>
 
-        <dialog id="refreshing" class="dialog">
-            <div id="titlebar">
+        <dialog id="refresh-progress" class="dialog">
+            <div id="refresh-progress-titlebar">
                 <span class="title danger">Refreshing Event</span>
             </div>
-            <div id="content" class="refresh danger">
+            <div id="refresh-progress-content" class="refresh danger">
                 Please wait while refreshing the event.
             </div>
             <div id="footer">

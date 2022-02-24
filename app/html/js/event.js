@@ -3,18 +3,22 @@ function modalAction(action,id){
     target = document.getElementById(id)
     switch(action){
         case "open": target.showModal(); break;
-        case "close": target.showModal();
+        case "close": target.close();
     }
 }
-function buttonClick(id,url,target="none",progress="no",referrer) {
+function buttonClick(id,url,target="none",progress="no",referrer=false) {
     var a = document.createElement('a');
-    if (target || target != "none"){ a.target=target; }
-    if (referrer){ a.href=referrer; } else { a.href=url; }
-    if (id || progress || progress == "yes"){
+    if (target && target != "none"){ a.target=target; }
+    if (referrer){ url = url.concat('&referrer=').concat(document.referrer); }
+    a.href=url;
+    if (id && progress && progress == "yes"){
         modalAction('close',id);
         if (typeof id == 'string' || id instanceof String){
-            id = id.concat('-refresh');
+            id = id.concat('-progress');
             modalAction('open',id);
+            modalContent = id.concat('-content')
+            newModalContent = document.getElementById(modalContent)
+            newModalContent.innerHTML.concat("<br/>\n This page will refresh to: ",referrer)
         }
         setTimeout(() => {a.click();},2000);
     }
