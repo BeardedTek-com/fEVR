@@ -1,10 +1,9 @@
 version: '2'
 services:
   fevr:
-    network_mode: host
     image: 'beardedtek/fevr:latest'
     restart: unless-stopped
     ports:
       - '80:80'
     volumes:
-      - ./www:/var/www
+      - ./app:/var/www
