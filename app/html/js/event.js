@@ -1,41 +1,22 @@
-function replaceInnerHTML(id,text) {
-    document.getElementById(id).innerHTML = text
-}
-
+function replaceInnerHTML(id,text) { document.getElementById(id).innerHTML = text; }
 function modalAction(action,id){
     target = document.getElementById(id)
-    if (action == "open"){
-        target.showModal();
-    }
-    if (action == "close"){
-        target.close();
+    switch(action){
+        case "open": target.showModal(); break;
+        case "close": target.showModal();
     }
 }
-/*
-function buttonClick(link){
-    location.href=link;
-}
-*/
-function buttonClick(id,url,target="none",progress="no") {
+function buttonClick(id,url,target="none",progress="no",referrer) {
     var a = document.createElement('a');
-    if (target != "none"){
-        a.target=target;
-    }
-    a.href=url;
-    if (progress == "yes"){
-        modalAction('close',id)
-        switch (id){
-            case "delete":
-                modalAction('open','deleting');
-                break;
-            case "refresh":
-                modalAction('open','refreshing');
-                break;
+    if (target || target != "none"){ a.target=target; }
+    if (referrer){ a.href=referrer; } else { a.href=url; }
+    if (id || progress || progress == "yes"){
+        modalAction('close',id);
+        if (typeof id == 'string' || id instanceof String){
+            id = id.concat('-refresh');
+            modalAction('open',id);
         }
         setTimeout(() => {a.click();},2000);
-
     }
-    else{
-       a.click(); 
-    }
+    else{ a.click(); }
   }
