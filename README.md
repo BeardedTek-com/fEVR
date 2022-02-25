@@ -3,8 +3,13 @@
 Written in python, pure HTML, pure javascript, and pure CSS.
 I want to include the minimum amount of frameworks as this will prevent breakage due to upstream changes.
 
-![fEVR-main](https://user-images.githubusercontent.com/93575915/151338205-c1e0f12e-1d8a-4c56-be59-d4b2c5e96bd7.png)
+![fEVR-0 3 3 Main](https://user-images.githubusercontent.com/93575915/155628108-99e39877-b57b-4c13-ba62-fcf1a04941ee.png)
 
+## Known Bugs
+- Modals do not work properly in Firefox
+  - I plan on fixing this in an upcoming release
+  - For now Chromium derivatives work
+- [See Issues for other known bugs.](https://github.com/BeardedTek-com/fEVR/issues)
 
 ## Requirements:
 - Home Assistant
@@ -28,58 +33,45 @@ services:
     ports:
       - '80:80'
     volumes:
-      - ./www:/var/www
+      - ./app:/var/www
 ```
-- edit config.json
-
-admin, adminPassword, and domain do nothing right now, but will be used in the future.
-Ensure you change http://frigate.mydomain.com" to your frigate instance.
-
-It MUST:
-- be accessible by the fEVR web server.
-- If fEVR is behind an SSL proxy, then frigate also must be served as https otherwise it will fail.
-
-```bash
-mv www/config/config-example.json www/config/config.json
+The easiest way to get this running is via docker-compose.
+First, clone the repo and get all up in there:
 ```
-```json
-{
-  "fevr"             :
-  {
-    "title"         : "frigate Event Video Recorder",
-    "domain"        : "fevr.mydomain.com",
-    "admin"         : "admin",
-    "adminPassword" : "password"
-  },
-  "frigate"         :
-  {
-    "url"           : "http://frigate.mydomain.com",
-    "apiEventPath"  : "/api/events/",
-    "snapPath"      : "/snapshot.jpg",
-    "clipPath"      : "/clip.mp4"
-  }
-}
+git clone https://github.com/beardedtek-com/fEVR
+cd fEVR
 ```
-- Database
-```sh
-mv www/db/fEVR.blank.sqlite www/db/fEVR.sqlite
+Set permissions for the app
+For development:
 ```
-
-- Build the docker image
-Don't forget the trailing .
-```bash
+sudo chown -R 33:1000 app
+sudo chmod -R 0770 app
+```
+For non-development / pre-production:
+```
+sudo chmod -R 33:33 /app
+sudo chmod -R 0770 app
+```
+```
 cd docker
-sudo docker build -t beardedtek/fevr:latest .
+sudo docker build -t beardedtek/fevr:latest
 ```
-- Start the container
-```bash
-cd ..
-sudo docker-compose up
+Bring it all up
+```
+sudo docker-compose up -d
+```
 
-# This will show the apache error log.  If there is an error, it will show up here.
-# This will be changed to a custom logging solution eventually, but I haven't written it yet.
-sudo docker-compose exec fEVR tail -n 50 -f /var/log/apache2/error.log
+Go to the web interface and follow the prompts:
+http://<your_ip>:PORT/
+
+The config page will automatically come up if this is the first time you've run fEVR or if anything major is misconfigured.
+
+Once it's all up and running, you can run the following to see if there are any permission errors:
+- I plan on making this more userfriendly in a future release...
 ```
+docker-compose exec fevr tail -n 50 -f /var/log/apache2/error.log
+```
+
 ## Home Assistant Automation v2
 [v2 of the Home Assistant Automation](https://raw.githubusercontent.com/BeardedTek-com/fEVR/main/docs/automation.yml) adds a "break" using an input boolean helper.
 ```yaml
@@ -152,24 +144,31 @@ sudo docker-compose exec fEVR tail -n 50 -f /var/log/apache2/error.log
 ```
 
 ## Main Display
-![fEVR-main](https://user-images.githubusercontent.com/93575915/151338205-c1e0f12e-1d8a-4c56-be59-d4b2c5e96bd7.png)
+![fEVR-0 3 3 Main](https://user-images.githubusercontent.com/93575915/155628975-d61614ef-843c-4f82-ab99-add7e9de04b6.png)
 
 ## Menu
-![fEVR-menu](https://user-images.githubusercontent.com/93575915/151338307-2df5f44d-2149-496a-850b-98e5b1c70b87.png)
+![fEVR-0 3 3 Menu](https://user-images.githubusercontent.com/93575915/155628992-2fffd3d6-f5f6-407b-91b9-2f2a3c6a27bd.png)
 
 ## Event View
-![fEVR-event](https://user-images.githubusercontent.com/93575915/151338353-ae2d7c21-8d6c-4ed8-aa8e-752b3914a9cb.png)
+![fEVR-0 3 3 Event Detail](https://user-images.githubusercontent.com/93575915/155629005-1f20d47e-a3c5-4bd0-b169-b87dc2848def.png)
+
+## Event Acknowledgement (shows or hides "new" label)
+More to come on this in future releases
+![fEVR-0 3 3 Acknowledge Event](https://user-images.githubusercontent.com/93575915/155629269-d8cd6581-88b5-4091-9cc2-546f859aadad.png)
+![fEVR-0 3 3 Event Detail Acknowledged](https://user-images.githubusercontent.com/93575915/155629282-885b3159-685f-4864-a303-6cc30309b46f.png)
+![fEVR-0 3 3 Unacknowledge Event](https://user-images.githubusercontent.com/93575915/155629293-1fd25823-7938-416d-b3c4-c0e12841a8ba.png)
+
 
 ## Delete Event
-At the moment, deleting an event will delete the associated files, but not the database entry.  This is for testing purposes.  The next update *should* include deleting the event from the database.
-![fEVR-delete](https://user-images.githubusercontent.com/93575915/151338410-230f9512-4b0a-4a90-942c-0ee97d050983.png)
+![fEVR-0 3 3 Delete Event](https://user-images.githubusercontent.com/93575915/155629034-19fda859-cf84-4375-969c-68c52e414561.png)
 
 ## Refresh Event
-One *minor* bug is sometimes the clip doesn't play properly.  *Usually* refreshing the event will fix it.  However, if frigate deletes the event prior to you refreshing, the event will be lost.  This will be fixed soon, but for now it's acceptable behavior.  Remember, THIS IS NOT PRODUCTION READY!!! YOU MAY LOSE DATA!!!
-![fEVR-refresh](https://user-images.githubusercontent.com/93575915/151338629-9616b08a-66f6-445f-a277-447009c2e683.png)
+![fEVR-0 3 3 Refresh Event](https://user-images.githubusercontent.com/93575915/155629084-54474c5c-bda1-4379-8751-c127faba3cd1.png)
 
 ## Config
-If you click the "config" menu item, basic configuration will be shown.  In the near future I plan on making configuration automatic throught Home Assistant's API and a couple forms.  Until then, a bit of knowledge of Home Assistant and Frigate is required.
+![fEVR-0 3 3 Config-1](https://user-images.githubusercontent.com/93575915/155629116-7260056a-1d4b-4490-bacb-173a15477136.png)
+![fEVR-0 3 3 Config-2](https://user-images.githubusercontent.com/93575915/155629125-f45f0ffb-a283-4ea5-a7f4-74882de10c38.png)
+
 
 ## Pull Requests welcome!
 Feel free to fork the project and submit pull requests.
