@@ -73,6 +73,11 @@ a:hover{
     border-top-right-radius: 1em;
     border-bottom-right-radius: 1em;
 }
+.menuBottom{
+    position: absolute;
+    bottom: 10vw;
+    vertical-align: bottom;
+}
 @supports ((-webkit-backdrop-filter: none) or (backdrop-filter: none)) {
     .menu {
       background-color: rgba(244, 244, 250, 0.2);
