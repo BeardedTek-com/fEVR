@@ -78,8 +78,8 @@ class events:
     def noEvents(self):
         if os.path.isfile(stub):
             with open(stub) as eventStub:
-                url = "/install.html"
-                thumbURL = "/img/not_available.jpg"
+                url = "../config.html"
+                thumbURL = "../img/not_available.jpg"
                 caption = "No Events Found"
                 data = eventStub.read()
                 data = data.replace('##EVENT_URL##',url)
@@ -98,8 +98,8 @@ class events:
                     newMarker = "NEW"
                 else:
                     newMarker = ""
-                url = f"/cgi-bin/event.py?id={event['id']}"
-                thumbURL = f"/events/{event['id']}/thumb.jpg"
+                url = f"event.py?id={event['id']}"
+                thumbURL = f"../events/{event['id']}/thumb.jpg"
                 caption = f"{event['time']}<br/>\n {event['type']} detected in {event['camera']}"
                 data = eventStub.read()
                 data = data.replace('##EVENT_URL##',url)

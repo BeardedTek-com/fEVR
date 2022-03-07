@@ -1,13 +1,13 @@
 <html>
     <head>
-        <link rel='stylesheet' href='/css/events.css'>
-        <link rel='stylesheet' href='/css/colors.css'>
-        <script type="text/javascript" src="/js/event.js"></script>
+        <link rel='stylesheet' href='../css/events.css'>
+        <link rel='stylesheet' href='../css/colors.css'>
+        <script type="text/javascript" src="../js/event.js"></script>
     </head>
     <body>
         <div class='event text-light-accent'>
             <div class="eventDetails eventTitle">
-            <div class="eventDetailsItem" id="eventInfo"><a href="events.py?count=10"><img class="backImg" src="/img/back.svg"/></a>##TCAMERA##: ##TTYPE## Detected ##TIME##</div>
+            <div class="eventDetailsItem" id="eventInfo"><a href="events.py?count=10"><img class="backImg" src="../img/back.svg"/></a>##TCAMERA##: ##TTYPE## Detected ##TIME##</div>
             <div class="eventDetailsTime" id="eventTime"></div>
             </div>
             <div class="eventHeader">
@@ -16,9 +16,9 @@
                     <div id="new" class="new ##NEWCLASS##">NEW</div>
                 </div>
                 <div class="eventInfo eventText">
-                    <button class="buttonAction" onclick="buttonClick(false,'/events/##EVENT##/clip.mp4','_blank')">View Video Clip <img class='popout' src='/img/popout.svg'></button><br/>
-                    <button class="buttonAction" onclick="buttonClick(false,'/events/##EVENT##/snapshot.jpg','_blank')">View Snapshot <img class='popout' src='/img/popout.svg'></button><br/>
-                    <button class="buttonAction" onclick="buttonClick(false,'##FRIGATE##/api/##CAMERA##?h=720&bbox=1&motion=1','_blank')">Live Stream via Frigate <img class='popout' src='/img/popout.svg'></button><br/>
+                    <button class="buttonAction" onclick="buttonClick(false,'/events/##EVENT##/clip.mp4','_blank')">View Video Clip <img class='popout' src='../img/popout.svg'></button><br/>
+                    <button class="buttonAction" onclick="buttonClick(false,'/events/##EVENT##/snapshot.jpg','_blank')">View Snapshot <img class='popout' src='../img/popout.svg'></button><br/>
+                    <button class="buttonAction" onclick="buttonClick(false,'##FRIGATE##/api/##CAMERA##?h=720&bbox=1&motion=1','_blank')">Live Stream via Frigate <img class='popout' src='../img/popout.svg'></button><br/>
                     <button class="buttonAction" onclick="modalAction('open','acknowledge')">##ACKACTION##</button><br/>
                     <button class="buttonAction danger" onclick="modalAction('open','refresh')">Refresh Event</button><br/>
                     <button class="buttonAction danger" onclick="modalAction('open','delete')">Delete Event</button><br/>

@@ -79,21 +79,21 @@ class event:
         if self.event['ack'] == "true":
             newClass = "newhidden"
             ackAction = "Unacknowledge"
-            ackLink = f"/cgi-bin/event.py?id={self.id}&action=unack"
+            ackLink = f"?id={self.id}&action=unack"
         else:
             newClass= ""
             ackAction = "Acknowledge"
-            ackLink = f"/cgi-bin/event.py?id={self.id}&action=ack"
-        refreshLink = f"/cgi-bin/event.py?id={self.id}&action=refreshEvent"
-        delLink = f"/cgi-bin/event.py?id={self.id}&action=delEvent"
+            ackLink = f"?id={self.id}&action=ack"
+        refreshLink = f"?id={self.id}&action=refreshEvent"
+        delLink = f"?id={self.id}&action=delEvent"
         if os.path.isfile(self.stub):
             with open(self.stub) as eventStub:
-                thumbURL = f"/events/{self.id}/thumb.jpg"
+                thumbURL = f"../events/{self.id}/thumb.jpg"
                 data = eventStub.read()
                 if self.action == "clip" and self.event['clip'] != "no":
-                    view = f"<video class='clip' controls autoplay>\n<source src='/events/##EVENT##/clip.mp4' type='video/mp4'>\n</video>"
+                    view = f"<video class='clip' controls autoplay>\n<source src='../events/##EVENT##/clip.mp4' type='video/mp4'>\n</video>"
                 elif self.action == "snap" and self.event['snap'] != "no":
-                    view = f"<img class='snap' src='/events/##EVENT##/snapshot.jpg'/>\n"
+                    view = f"<img class='snap' src='../events/##EVENT##/snapshot.jpg'/>\n"
                 elif self.action == "live":
                     view = f"<iframe class='live' src='##FRIGATE##/api/##CAMERA##'></iframe>"
                 elif self.action == "refreshEvent":
@@ -101,17 +101,17 @@ class event:
                     fetch = fetchEvent(self.frigate,self.id)
                     fetch.delEvent(db=False)
                     fetch.getEvent()
-                    view = f"<script>location.href='/cgi-bin/event.py?id={self.id}';</script>"
+                    view = f"<script>location.href='?id={self.id}';</script>"
                 elif self.action == "ack":
                     from fetch import fetchEvent
                     fetch = fetchEvent(self.frigate,self.id)
                     fetch.ackEvent('true')
-                    view = f"<script>location.href='/cgi-bin/event.py?id={self.id}';</script>"
+                    view = f"<script>location.href='?id={self.id}';</script>"
                 elif self.action == "unack":
                     from fetch import fetchEvent
                     fetch = fetchEvent(self.frigate,self.id)
                     fetch.ackEvent('')
-                    view = f"<script>location.href='/cgi-bin/event.py?id={self.id}';</script>"
+                    view = f"<script>location.href='?id={self.id}';</script>"
                 else:
                     view = ""
                 data = data.replace("##VIEW##",view)

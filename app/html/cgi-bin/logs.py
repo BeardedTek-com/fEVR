@@ -10,7 +10,7 @@ class displog:
         self.error = logit()
     def displayLog(self):
         print("content-type: text/html\n\n")
-        print("<html><head><title>fEVR debug log</title><link rel='stylesheet' href='/css/logs.css'/></head><body><div class='logfile'><pre><code>")
+        print("<html><head><title>fEVR debug log</title><link rel='stylesheet' href='..//css/logs.css'/></head><body><div class='logfile'><pre><code>")
         logpath = f"/var/www/logs/"
         logfile = f"{self.type}.log"
         self.error.execute(f"Displaying {logfile}",src=self.script)
