@@ -1,7 +1,7 @@
 #!/usr/bin/python
 class logit:
-    def __init__(self):
-        self.logfile = "/var/www/logs/debug.log"
+    def __init__(self,logfile="/var/www/logs/debug.log"):
+        self.logfile = logfile
     def execute(self,msg,src='fEVR',level='debug',logpath='/var/www/logs'):
         from time import time
         self.logtime = "{:.4f}".format(time())
