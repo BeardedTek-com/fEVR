@@ -8,11 +8,24 @@ services:
       - '8003:8001'
       - '8004:8002'
     volumes:
-      - alpinenas:/nas
-
-volumes:
-  alpinenas:
-    driver_opts:
-      type: "nfs"
-      o: "addr=192.168.2.240,nfsvers=4"
-      device: ":/export/files"
+     - ./data/events:/var/www/html/events ##OPTIONAL: save events to a local folder
+     - ./data/fEVR.sqlite:/var/www/db/fEVR.sqlite ##OPTIONAL: save database file
+     - ./data/config.json:/var/www/config/config.json ##OPTIONAL: save config file locally
+     #- ./app:/var/www # FOR DEVELOPMENT - Exposes the entire stack to a local volume
+     # If you go with this option, take the following actions:
+     # git clone https://github.com/beardedtek-com/fevr
+     # cd fevr
+     # sudo chmod -R 100:101 app
+     # edit docker-compose.yml and comment out or remove first 3 volume definitions,
+     # uncomment 4th volume definition and run the container:
+     # docker-compose up -d
+     
+# Uncomment the following to map to an NFS share
+#    - nfsvolume:/var/www/html/events ##OPTIONAL: save events to an NFS volume
+#volumes:
+#  nfsvolume:
+#    driver_opts:
+#      type: "nfs"
+#      o: "addr=<your_nas_ip>,nfsvers=4" # Make sure to change to your NFS server's address
+#     #o: "addr=<your_nas_ip>,rw,nfsvers=4" < SOME NFS SHARES REQUIRE THIS!!!
+#      device: ":/path/to/your/nfs/share"
