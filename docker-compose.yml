@@ -1,9 +1,18 @@
-version: '2'
+version: '3'
 services:
   fevr:
-    image: 'beardedtek/fevr:latest'
+    image: beardedtek/fevr-standalone:alpine
+    container_name: fevr-alpine
     restart: unless-stopped
     ports:
-      - '80:80'
+      - '8003:8001'
+      - '8004:8002'
     volumes:
-      - ./app:/var/www
+      - alpinenas:/nas
+
+volumes:
+  alpinenas:
+    driver_opts:
+      type: "nfs"
+      o: "addr=192.168.2.240,nfsvers=4"
+      device: ":/export/files"

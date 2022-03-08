@@ -1,0 +1,18 @@
+#!/usr/bin/with-contenv bashio
+# ==============================================================================
+# Start the example service
+# s6-overlay docs: https://github.com/just-containers/s6-overlay
+# ==============================================================================
+
+# Declare variables
+declare debug
+declare title
+declare frigate
+
+## Get the user config options.
+debug="true"
+title="Home"
+frigate="http://192.168.2.240:5000"
+
+## Run your program
+exec /writeConfig "${debug}" "${title}" "${frigate}"
