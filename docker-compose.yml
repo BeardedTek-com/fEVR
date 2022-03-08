@@ -1,7 +1,7 @@
 version: '3'
 services:
   fevr:
-    image: beardedtek/fevr-standalone:alpine
+    image: ghcr.io/beardedtek/fevr-standalone:main
     container_name: fevr-alpine
     restart: unless-stopped
     ports:
