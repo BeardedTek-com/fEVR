@@ -11,7 +11,7 @@ on:
 
 env:
   REGISTRY: ghcr.io
-  IMAGE_NAME: fevr-standalone
+  IMAGE_NAME: beardedtek-com/fevr-standalone
 
 jobs:
   build-and-push-image:
