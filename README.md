@@ -3,6 +3,10 @@
 Written in python, pure HTML, pure javascript, and pure CSS.
 I want to include the minimum amount of frameworks as this will prevent breakage due to upstream changes.
 
+### Cloud Instances of fEVR
+I be offering cloud instances of fEVR starting on March 31st.  See [My Sponsorship Page](https://github.com/sponsors/BeardedTek-com) for more details.
+If you would like to beta test this feature, please let me know by submitting an issue.
+
 ![fEVR-0 3 3 Main](https://user-images.githubusercontent.com/93575915/155628108-99e39877-b57b-4c13-ba62-fcf1a04941ee.png)
 
 ## Known Bugs
