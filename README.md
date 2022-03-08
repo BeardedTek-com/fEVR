@@ -4,8 +4,10 @@ Written in python, pure HTML, pure javascript, and pure CSS.
 I want to include the minimum amount of frameworks as this will prevent breakage due to upstream changes.
 
 ### Cloud Instances of fEVR
-I be offering cloud instances of fEVR starting on March 31st.  See [My Sponsorship Page](https://github.com/sponsors/BeardedTek-com) for more details.
-If you would like to beta test this feature, please let me know by submitting an issue.
+- I will be offering cloud instances of fEVR starting on March 31st.
+- See [My Sponsorship Page](https://github.com/sponsors/BeardedTek-com) for more details.
+#### Cloud BETA Testing
+- If you would like to beta test this feature, please let me know by submitting an issue.
 
 ![fEVR-0 3 3 Main](https://user-images.githubusercontent.com/93575915/155628108-99e39877-b57b-4c13-ba62-fcf1a04941ee.png)
 
@@ -174,10 +176,5 @@ More to come on this in future releases
 
 ## Pull Requests welcome!
 Feel free to fork the project and submit pull requests.
-
-## I would really like the UI rewritten for such and such a framework
-If you wish to rewrite this with some fancy framework, please feel free to fork and submit a pull request against main.
-We can then start a new branch for that framework.  
-At this point, this branch of the UI will be supported only by you.
 
 Hope you find this useful.
