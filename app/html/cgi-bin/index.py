@@ -6,11 +6,11 @@ if fevr:
     from frigateConfig import frigateConfig
     frigate = fevr.config['frigate']
     fConfig = frigateConfig(frigate['url'])
-    with open('/var/www/html/stub/index.stub') as indexStub:
+    with open('/var/www/html/stub/index.html') as indexStub:
         index = indexStub.read()
-    with open('/var/www/html/stub/menuCamera.stub') as menuCameraStub:
+    with open('/var/www/html/stub/menuCamera.html') as menuCameraStub:
         menuCameraItem = menuCameraStub.read()
-    with open('/var/www/html/stub/menuObject.stub') as menuObjectStub:
+    with open('/var/www/html/stub/menuObject.html') as menuObjectStub:
         menuObjectItem = menuObjectStub.read()
         menu = ""
     for camera in fConfig.cameras:

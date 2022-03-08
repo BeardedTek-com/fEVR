@@ -1,3 +1,0 @@
-            <div id='#CAMERA#_#OBJECT#' class='menuItem subitem'>
-                <a onclick'clickItem("#CAMERA#: #OBJECT#")' target='contentFrame' href='events.py?count=10&camera=#CAMERA#&type=person'>#OBJECT#</a>
-            </div>

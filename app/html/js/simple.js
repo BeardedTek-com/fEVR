@@ -1,15 +1,14 @@
 const divInstall = document.getElementById('installContainer');
 const butInstall = document.getElementById('butInstall');
 function hideElement(target,targetClass){
-    target.style.transition = "width 1s ease, opacity 100ms ease"
+    target.style.transition = "width 500ms ease"
     target.style.width= 0;
-    setTimeout(() => { target.classList.remove(targetClass); }, 500);
+    target.classList.remove(targetClass);
 }
 
 function slideElement(target,targetClass){
 
-    target.style.transition = "width 1s ease"
-    target.style.width = "100"
+    target.style.transition = "width 500ms ease"
     target.classList.add(targetClass);
     target.style.width = target.scrollWidth+"%";
 }
@@ -24,6 +23,18 @@ function toggleMenu(menuId,contentId){
 
     }
 }
+function hideMenu(){
+    menu = document.querySelector("#menu");
+    hideElement(menu,'menuOpen');
+}
+
+document.onclick = function (e) {
+    if (e.target.id !== 'menu') {
+        if (e.target.offsetParent && e.target.offsetParent.id !== 'menu')
+            hideMenu()
+    }
+}
+
 function clickItem(menuItem){
     document.getElementById('subtitle').innerHTML = titleCase(" ".concat(menuItem.replace('menu_','').replace('_',' ')));
     toggleMenu("menu",750);

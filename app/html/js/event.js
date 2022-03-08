@@ -24,3 +24,7 @@ function buttonClick(id,url,target="none",progress="no",referrer=false) {
     }
     else{ a.click(); }
   }
+
+document.onclick = function (e) {
+    window.parent.document.getElementById('menu').style = "display: hidden;"
+}

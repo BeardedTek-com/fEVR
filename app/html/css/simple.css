@@ -78,14 +78,15 @@ a:hover{
 }
 .menuBottom{
     position: absolute;
-    bottom: 3em;
+    bottom: 5em;
     vertical-align: bottom;
+    font-size: 0.7em;
 }
 .menuItem{
     padding-right: 1em;
 }
 .subitem{
-    padding-left: 2.5em;
+    padding-left: 0.5em;
 }
 @supports ((-webkit-backdrop-filter: none) or (backdrop-filter: none)) {
     .menu {
@@ -100,7 +101,7 @@ a:hover{
     padding: 1em;
     line-height: 1.5em;
     white-space: nowrap;
-    font-size: 1.5em;
+    font-size: 1.25em;
 }
 .themeUIElement{
     fill: rgb(160, 168, 170);

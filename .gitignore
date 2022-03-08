@@ -5,3 +5,9 @@ www/html/cgi-bin/__pycache__/
 events/*-*
 backup/*
 *.log
+*.pyc
+*.pyc
+app/html/cgi-bin/__pycache__/config.cpython-38.pyc
+app/html/cgi-bin/__pycache__/fetch.cpython-38.pyc
+app/html/cgi-bin/__pycache__/logit.cpython-38.pyc
+app/html/cgi-bin/__pycache__/sqlite.cpython-38.pyc

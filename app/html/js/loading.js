@@ -1,3 +1,7 @@
+document.onclick = function (e) {
+    window.parent.document.getElementById('menu').style = "display: hidden;"
+}
+
 function changeClass(el,cls){
     document.getElementById(el).className = cls;
 }
@@ -18,9 +22,9 @@ function remove(el){
     e.remove();
 }
 async function loadpage(){
-    setTimeout(() => fade('loading',0),2100);
-    setTimeout(() => fade('container',1),3500);
-    setTimeout(() => remove('loading'),4000);
+    setTimeout(() => fade('loading',0),0);
+    setTimeout(() => fade('container',1),1300);
+    setTimeout(() => remove('loading'),2500);
     
     // setTimeout(() => changeClass('container','eventsContainer'),4400);
 }
