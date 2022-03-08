@@ -73,10 +73,19 @@ a:hover{
     border-top-right-radius: 1em;
     border-bottom-right-radius: 1em;
 }
+.menuspace{
+    margin-top: 1em;
+}
 .menuBottom{
     position: absolute;
-    bottom: 10vw;
+    bottom: 3em;
     vertical-align: bottom;
+}
+.menuItem{
+    padding-right: 1em;
+}
+.subitem{
+    padding-left: 2.5em;
 }
 @supports ((-webkit-backdrop-filter: none) or (backdrop-filter: none)) {
     .menu {

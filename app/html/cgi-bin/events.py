@@ -85,6 +85,7 @@ class events:
                 data = data.replace('##EVENT_URL##',url)
                 data = data.replace('##EVENT_IMG##',thumbURL)
                 data = data.replace('##EVENT_CAPTION##',caption)
+                data = data.replace('##NEW##','')
         if data:
             return data
     def generateEventDiv(self,event):

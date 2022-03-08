@@ -12,7 +12,7 @@
   },
   "frigate"         :
   {
-    "url"           : "http://frigate.mydomain.com",
+    "url"           : "http://frigate.local:5000",
     "apiEventPath"  : "/api/events/",
     "snapPath"      : "/snapshot.jpg",
     "clipPath"      : "/clip.mp4"
