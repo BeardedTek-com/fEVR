@@ -78,7 +78,7 @@ a:hover{
 }
 .menuBottom{
     position: absolute;
-    bottom: 5em;
+    bottom: 10em;
     vertical-align: bottom;
     font-size: 0.7em;
 }
