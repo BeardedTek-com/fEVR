@@ -106,9 +106,6 @@ a:hover{
     text-align: center;
     padding: 5em;
 }
-#frigateErr a{
-    text-decoration: underline;
-}
 @supports ((-webkit-backdrop-filter: none) or (backdrop-filter: none)) {
     .menu {
       background-color: rgba(244, 244, 250, 0.2);

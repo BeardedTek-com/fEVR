@@ -1,5 +1,10 @@
-            <dialog open id='frigateErr' class='menuItem subitem'>
-                We are sorry, but your frigate server is unreachable at the moment.<br/>
-                If you sure it is up and running, please 
-                <a onclick='clickItem("config");' target='contentFrame' href='../config.html'>update your configuration</a>.<br/>
+            <dialog id='frigateErr' class='menuItem subitem'>
+                <span>
+                    We are sorry, but your frigate server is unreachable at the moment.<br/>
+                    If you sure it is up and running, please 
+                    <a onclick='closeError("frigateErr","config");' target='contentFrame' href='../config.html'>update your configuration</a>
+                </span>
             </dialog>
+            <script>
+                document.getElementById('frigateErr').showModal()
+            </script>

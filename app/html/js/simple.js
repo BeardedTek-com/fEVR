@@ -34,10 +34,17 @@ document.onclick = function (e) {
             hideMenu()
     }
 }
-
+function changeSubTitle(subtitle){
+    document.getElementById('subtitle').innerHTML = titleCase(" ".concat(subtitle.replace('menu_','').replace('_',' ')))
+}
 function clickItem(menuItem){
-    document.getElementById('subtitle').innerHTML = titleCase(" ".concat(menuItem.replace('menu_','').replace('_',' ')));
+    changeSubTitle(menuItem);
     toggleMenu("menu",750);
+}
+
+function closeError(target,menuItem){
+    changeSubTitle(menuItem)
+    target.close()
 }
 function titleCase(str) {
     str = str.toLowerCase().split(' ');
