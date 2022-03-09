@@ -43,7 +43,9 @@ else:
     from shutil import copy
     if exists(config['fevr']['db']):
         copy(config['fevr']['db'],f"{config['fevr']['db']}.BAK")
+    from os import chown
     copy("/var/www/default/fEVR.sqlite",config['fevr']['db'])
+    chown(config['fevr']['db'],100,101)
 
 while n==0:
     from time import sleep
