@@ -17,7 +17,11 @@
 #    along with this program.  If not, see <https://www.gnu.org/licenses/>.
 class fevr:
     def __init__(self):
+        from logit import logit
+        self.error = logit()
         import cgi
+        self.getAction = ""
+        self.script = ""
         self.input = cgi.FieldStorage()
         if self.input.getvalue('action'):
             self.getAction = self.input.getvalue('action')
@@ -32,6 +36,7 @@ class fevr:
     def header(self):
         # Check to see if we should output something other than html headers.
         variant = {"rest":"application/json","text":"text/plain"}
+        ctype = ""
         for loki in variant:
             if self.getAction:
                 if loki == self.getAction:
@@ -42,6 +47,11 @@ class fevr:
 
     def action(self):
         actions = {"event":['id','count'],"config":False}
+        ext = ".py?"
+        self.script = ""
+        if self.getAction == "config":
+            ext = "html"
+            self.script += "<script>document.querySelector('#frigateErr').close()</script>\n"
         url = f"{self.getAction}.py?"
         for action in actions:
             if action == self.getAction:
@@ -49,17 +59,14 @@ class fevr:
                     for value in actions[action]:
                         if self.input.getvalue(value):
                             url += f"{value}={self.input.getvalue(value)}&"
-        self.script = f"<script>document.getElementById('contentFrame').src = '{url}';</script>\n"
-        if self.getAction == "config":
-            self.script += "<script>document.querySelector('#frigateErr').close()</script>\n"
-
+        self.script += f"<script>document.getElementById('contentFrame').src = '{url}';</script>\n"
     def mainPage(self):
         from config import Config
         from frigateConfig import frigateConfig
         myConfig = Config()
         if myConfig:
             frigateURL = myConfig.config['frigate']['url']
-            fConfig = frigateConfig(myConfig.config['frigate'])
+            fConfig = frigateConfig(frigateURL)
             index = self.getStub(f"{self.stub}/index.html")
             menuCamera = self.getStub(f"{self.stub}/menuCamera.html")
             menuObject = self.getStub(f"{self.stub}/menuObject.html")

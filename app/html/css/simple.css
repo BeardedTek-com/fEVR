@@ -88,9 +88,6 @@ a:hover{
 .subitem{
     padding-left: 0.5em;
 }
-dialog{
-    display: none;
-}
 #frigateErr{
     position: absolute;
     top: 2.5em;
