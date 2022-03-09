@@ -9,7 +9,7 @@ I want to include the minimum amount of frameworks as this will prevent breakage
 #### Cloud BETA Testing
 - If you would like to beta test this feature, please let me know by submitting an issue.
 
-![fEVR-0 3 3 Main](https://user-images.githubusercontent.com/93575915/155628108-99e39877-b57b-4c13-ba62-fcf1a04941ee.png)
+![fEVR Main View](https://user-images.githubusercontent.com/93575915/157530105-32daa1ad-04c2-45ca-8ff6-5fbc7c75c8a1.png)
 
 ## Known Bugs
 - Modals do not work properly in Firefox < 98
@@ -38,32 +38,23 @@ services:
     container_name: fevr-alpine
     restart: unless-stopped
     ports:
-      - '8003:8001'
-      - '8004:8002'
+      - '8001:8001'
+      - '8002:8002'
     volumes:
+     - ./data/db:/var/www/db ##OPTIONAL: save database file
+     - ./data/config:/var/www/config ##OPTIONAL: save config file locally
      - ./data/events:/var/www/html/events ##OPTIONAL: save events to a local folder
-     - ./data/fEVR.sqlite:/var/www/db/fEVR.sqlite ##OPTIONAL: save database file
-     - ./data/config.json:/var/www/config/config.json ##OPTIONAL: save config file locally
-     #- ./app:/var/www # FOR DEVELOPMENT - Exposes the entire stack to a local volume
-     # If you go with this option, take the following actions:
-     # git clone https://github.com/beardedtek-com/fevr
-     # cd fevr
-     # sudo chmod -R 100:101 app
-     # edit docker-compose.yml and comment out or remove first 3 volume definitions,
-     # uncomment 4th volume definition and run the container:
-     # docker-compose up -d
-     
 # Uncomment the following to map to an NFS share
-#    - nfsvolume:/var/www/html/events ##OPTIONAL: save events to an NFS volume
+#     - nfsvolume:/var/www/html/events ##OPTIONAL: save events to an NFS volume
 #volumes:
 #  nfsvolume:
 #    driver_opts:
 #      type: "nfs"
 #      o: "addr=<your_nas_ip>,nfsvers=4" # Make sure to change to your NFS server's address
-#     #o: "addr=<your_nas_ip>,rw,nfsvers=4" < SOME NFS SHARES REQUIRE THIS!!!
+#     # o: "addr=<your_nas_ip>,rw,nfsvers=4" < SOME NFS SHARES REQUIRE THIS!!!
 #      device: ":/path/to/your/nfs/share"
 ```
-- Follow the instructions in docker-compose.yml
+- Modify docker-compose.yml as needed
 - Run the container with docker-compose:
 ```
 docker-compose up -d
@@ -144,35 +135,6 @@ docker-compose exec fevr tail -n 50 -f /var/log/apache2/error*
     default: []
   mode: single
 ```
-
-## Screenshots
-
-### Main Display
-![fEVR-0 3 3 Main](https://user-images.githubusercontent.com/93575915/155628975-d61614ef-843c-4f82-ab99-add7e9de04b6.png)
-
-### Menu
-![fEVR-0 3 3 Menu](https://user-images.githubusercontent.com/93575915/155628992-2fffd3d6-f5f6-407b-91b9-2f2a3c6a27bd.png)
-
-### Event View
-![fEVR-0 3 3 Event Detail](https://user-images.githubusercontent.com/93575915/155629005-1f20d47e-a3c5-4bd0-b169-b87dc2848def.png)
-
-### Event Acknowledgement (shows or hides "new" label)
-More to come on this in future releases
-![fEVR-0 3 3 Acknowledge Event](https://user-images.githubusercontent.com/93575915/155629269-d8cd6581-88b5-4091-9cc2-546f859aadad.png)
-![fEVR-0 3 3 Event Detail Acknowledged](https://user-images.githubusercontent.com/93575915/155629282-885b3159-685f-4864-a303-6cc30309b46f.png)
-![fEVR-0 3 3 Unacknowledge Event](https://user-images.githubusercontent.com/93575915/155629293-1fd25823-7938-416d-b3c4-c0e12841a8ba.png)
-
-
-### Delete Event
-![fEVR-0 3 3 Delete Event](https://user-images.githubusercontent.com/93575915/155629034-19fda859-cf84-4375-969c-68c52e414561.png)
-
-### Refresh Event
-![fEVR-0 3 3 Refresh Event](https://user-images.githubusercontent.com/93575915/155629084-54474c5c-bda1-4379-8751-c127faba3cd1.png)
-
-### Config
-![fEVR-0 3 3 Config-1](https://user-images.githubusercontent.com/93575915/155629116-7260056a-1d4b-4490-bacb-173a15477136.png)
-![fEVR-0 3 3 Config-2](https://user-images.githubusercontent.com/93575915/155629125-f45f0ffb-a283-4ea5-a7f4-74882de10c38.png)
-
 
 ## Pull Requests welcome!
 Feel free to fork the project and submit pull requests.
