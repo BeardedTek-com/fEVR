@@ -29,12 +29,13 @@ if fevr:
     with open('/var/www/html/stub/menuObject.html') as menuObjectStub:
         menuObjectItem = menuObjectStub.read()
         menu = ""
-    for camera in fConfig.cameras:
-        menu += f"{menuCameraItem}\n"
-        for object in fConfig.cameras[camera]['objects']:
-            menu+= f"{menuObjectItem.replace('#OBJECT#',object)}"
-        menu = menu.replace("#CAMERA#",camera)
-    index = index.replace('##MENU##',menu)
+    if !fConfig.error:
+        for camera in fConfig.cameras:
+            menu += f"{menuCameraItem}\n"
+            for object in fConfig.cameras[camera]['objects']:
+                menu+= f"{menuObjectItem.replace('#OBJECT#',object)}"
+            menu = menu.replace("#CAMERA#",camera)
+        index = index.replace('##MENU##',menu)
     index = index.replace('#FRIGATE#',frigate['url'])
     print(index)
 

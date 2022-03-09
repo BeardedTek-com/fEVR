@@ -23,11 +23,14 @@ class frigateConfig:
         self.getConfig()
         self.getCameras()
     def getConfig(self):
-        configURL = f"{self.url}{self.configAPI}"
-        import requests
-        frigateConfig = requests.get(configURL, allow_redirects=True)
-        import json
-        self.frigateConfig = json.loads(frigateConfig.content)
+        try:
+            configURL = f"{self.url}{self.configAPI}"
+            import requests
+            frigateConfig = requests.get(configURL, allow_redirects=True)
+            import json
+            self.frigateConfig = json.loads(frigateConfig.content)
+        except:
+            self.error = True
     def getCameras(self):
         for camera in self.frigateConfig['cameras']:
             self.cameras[camera] = {}

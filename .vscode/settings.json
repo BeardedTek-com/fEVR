@@ -1,0 +1,11 @@
+{
+    "sqltools.connections": [
+        {
+            "previewLimit": 50,
+            "driver": "SQLite",
+            "name": "fEVR",
+            "database": "/usr/local/docker/fevr/data/db/fEVR.sqlite"
+        }
+    ],
+    "sqltools.useNodeRuntime": true
+}
