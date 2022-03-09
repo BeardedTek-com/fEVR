@@ -90,10 +90,11 @@ a:hover{
 }
 #frigateErr{
     position: absolute;
-    width: 80vw;
-    height: 80vh;
-    top: 10vh;
-    left: 10vw;
+    left: 12.5%;
+    top: 25%;
+    width: 50%;
+    height: 25%;
+    min-width: 20em;
     word-wrap: break-word;
     background-color: rgba(244, 244, 250, 0.8);
     border-color: rgb(137, 143, 145);
@@ -103,7 +104,7 @@ a:hover{
     border-radius: 1em;
     vertical-align: middle;
     text-align: center;
-    padding: 3em;
+    padding: 5em;
 }
 #frigateErr a{
     text-decoration: underline;
