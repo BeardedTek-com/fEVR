@@ -44,7 +44,7 @@ function clickItem(menuItem){
 
 function closeError(target,menuItem){
     changeSubTitle(menuItem)
-    target.close()
+    document.querySelector(target).close()
 }
 function titleCase(str) {
     str = str.toLowerCase().split(' ');

@@ -88,12 +88,16 @@ a:hover{
 .subitem{
     padding-left: 0.5em;
 }
+dialog{
+    display: none;
+}
 #frigateErr{
-    display: flex;
+    position: absolute;
+    top: 2.5em;
     justify-content: space-around;
     margin: auto;
     width: 50%;
-    min-height: 25%;
+    min-height: 10%;
     min-width: 20em;
     word-wrap: break-word;
     background-color: rgba(244, 244, 250, 0.8);
@@ -104,7 +108,7 @@ a:hover{
     border-radius: 1em;
     vertical-align: middle;
     text-align: center;
-    padding: 5em;
+    padding: 2em;
 }
 @supports ((-webkit-backdrop-filter: none) or (backdrop-filter: none)) {
     .menu {
