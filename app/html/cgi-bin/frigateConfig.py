@@ -17,17 +17,22 @@
 #    along with this program.  If not, see <https://www.gnu.org/licenses/>.
 class frigateConfig:
     def __init__(self,frigateURL):
+        self.error = False
         self.url = frigateURL
         self.configAPI = "/api/config"
         self.cameras = {}
         self.getConfig()
-        self.getCameras()
+        if not self.error:
+            self.getCameras()
     def getConfig(self):
-        configURL = f"{self.url}{self.configAPI}"
-        import requests
-        frigateConfig = requests.get(configURL, allow_redirects=True)
-        import json
-        self.frigateConfig = json.loads(frigateConfig.content)
+        try:
+            configURL = f"{self.url}{self.configAPI}"
+            import requests
+            frigateConfig = requests.get(configURL, timeout=5, allow_redirects=True)
+            import json
+            self.frigateConfig = json.loads(frigateConfig.content)
+        except:
+            self.error = True
     def getCameras(self):
         for camera in self.frigateConfig['cameras']:
             self.cameras[camera] = {}
