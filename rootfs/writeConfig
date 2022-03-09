@@ -53,12 +53,15 @@ if not dbPathExists or dbTooSmall:
     chown(db,100,101)
 
 # Check if paths exists and check permissions...
-from os import chmod
 chown('/var/www/config',100,101)
 chmod('/var/www/config',0o770)
 makedirs('/var/www/config/backup',exist_ok=True)
 chown('/var/www/config/backup',100,101)
 chmod('/var/www/config/backup',0o770)
+chown('/var/www/db',100,101)
+chmod('/var/www/db',0o770)
+chown('/var/www/db/fEVR.sqlite',100,101)
+chmod('/var/www/db/fEVR.sqlite',0o770)
 
 
 while n==0:
