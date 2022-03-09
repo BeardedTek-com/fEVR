@@ -22,7 +22,8 @@ class frigateConfig:
         self.configAPI = "/api/config"
         self.cameras = {}
         self.getConfig()
-        self.getCameras()
+        if not self.error:
+            self.getCameras()
     def getConfig(self):
         try:
             configURL = f"{self.url}{self.configAPI}"
