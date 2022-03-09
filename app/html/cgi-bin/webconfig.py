@@ -47,9 +47,10 @@ class webConfig:
     def toJSON(self):
         return json.dumps(self.webconfig, indent=2,sort_keys=True)
     def writeConfig(self):
-        shutil.copyfile(self.configFile,self.configBackup)
-        with open(self.configFile,"w+") as configFile:
-            configFile.write(self.toJSON())
+        if not exists(self.configFile):
+            shutil.copyfile(self.configFile,self.configBackup)
+            with open(self.configFile,"w+") as configFile:
+                configFile.write(self.toJSON())
     def dbSetup(self):
         if not exists(self.webconfig['fevr']['db']):
             blankDB = f"{self.webconfig['fevr']['base']}/db/fEVR.blank.sqlite"
