@@ -1,7 +1,7 @@
 version: '3'
 services:
   fevr:
-    image: ghcr.io/beardedtek-com/fevr-standalone:v0.4
+    image: ghcr.io/beardedtek-com/fevr-standalone:main
     container_name: fevr
     restart: unless-stopped
     ports:
