@@ -13,7 +13,7 @@ RUN apk --no-cache add apache2 libxml2-dev apache2-utils py3-pip py3-pillow git 
 COPY rootfs /
 
 # get latest version of fEVR, enable CGI Environment, set permissions, and cleanup files
-RUN git clone -b v0.4 https://github.com/beardedtek-com/fevr && mv fevr/app/* /var/www/ \
+RUN git clone https://github.com/beardedtek-com/fevr && mv fevr/app/* /var/www/ \
  && mkdir /var/www/logs && touch /var/www/logs/debug.log \
  && mv /var/www/db/fEVR.blank.sqlite /var/www/db/fEVR.sqlite \
  && mv /var/www/config/config-example.json /var/www/config/config.json \
