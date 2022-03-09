@@ -41,7 +41,8 @@ if exists(config['fevr']['db']):
         dbExists = True
 else:
     from shutil import copy
-    copy(config['fevr']['db'],f"{config['fevr']['db']}.BAK")
+    if exists(config['fevr']['db']):
+        copy(config['fevr']['db'],f"{config['fevr']['db']}.BAK")
     copy("/var/www/default/fEVR.sqlite",config['fevr']['db'])
 
 while n==0:
