@@ -1,5 +1,5 @@
 #!/usr/bin/python
-#    fEVR (Frigate Event Video Recorder) Event Fetcher
+#    fEVR (frigate Event Video Recorder)
 #
 #    Copyright (C) 2021-2022  The Bearded Tek (http://www.beardedtek.com) William Kenny
 #

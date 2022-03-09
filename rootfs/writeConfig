@@ -32,6 +32,21 @@ with open("/var/www/config/config.json", "w+") as file:
     import json
     file.write(json.dumps(config, indent=2,sort_keys=True))
 n=0
+
+# Check if database exsists (and at least the size of the blank.sqlite)
+from os.path import exists
+if exists(config['fevr']['db']):
+    from os.path import getsize
+    if getsize(config['fevr']['db']) >= 24576:
+        dbExists = True
+else:
+    from shutil import copy
+    if exists(config['fevr']['db']):
+        copy(config['fevr']['db'],f"{config['fevr']['db']}.BAK")
+    from os import chown
+    copy("/var/www/default/fEVR.sqlite",config['fevr']['db'])
+    chown(config['fevr']['db'],100,101)
+
 while n==0:
     from time import sleep
     sleep(86400)

@@ -1,27 +1,26 @@
 version: '3'
 services:
   fevr:
-    image: ghcr.io/beardedtek/fevr-standalone:main
-    container_name: fevr-alpine
+    image: ghcr.io/beardedtek-com/fevr-standalone:v0.3.4
+    container_name: fevr
     restart: unless-stopped
     ports:
-      - '8003:8001'
-      - '8004:8002'
+      - '8001:8001' # fEVR web interface
+      - '8002:8002' # sqlite_web interface (FOR DEVELOPMENT PURPOSES ONLY)
     volumes:
-     - ./data/events:/var/www/html/events ##OPTIONAL: save events to a local folder
-     - ./data/fEVR.sqlite:/var/www/db/fEVR.sqlite ##OPTIONAL: save database file
-     - ./data/config.json:/var/www/config/config.json ##OPTIONAL: save config file locally
-     #- ./app:/var/www # FOR DEVELOPMENT - Exposes the entire stack to a local volume
-     # If you go with this option, take the following actions:
-     # git clone https://github.com/beardedtek-com/fevr
-     # cd fevr
-     # sudo chmod -R 100:101 app
-     # edit docker-compose.yml and comment out or remove first 3 volume definitions,
-     # uncomment 4th volume definition and run the container:
-     # docker-compose up -d
-     
-# Uncomment the following to map to an NFS share
-#    - nfsvolume:/var/www/html/events ##OPTIONAL: save events to an NFS volume
+      - ./data/events:/var/www/html/events ##OPTIONAL: save events to a local folder
+      - ./data/db:/var/www/db ##OPTIONAL: save database file
+      - ./data/config.json:/var/www/config/config.json ##OPTIONAL: save config file locally
+#      - ./app:/var/www # FOR DEVELOPMENT - Exposes the entire stack to a local volume
+#        If you go with this option, take the following actions:
+#        git clone https://github.com/beardedtek-com/fevr
+#        cd fevr
+#        sudo chmod -R 100:101 app
+#        edit docker-compose.yml and comment out or remove first 3 volume definitions,
+#        uncomment 4th volume definition and run the container:
+#        docker-compose up -d
+#   Uncomment the following to map to an NFS share
+#      - nfsvolume:/var/www/html/events ##OPTIONAL: save events to an NFS volume
 #volumes:
 #  nfsvolume:
 #    driver_opts:
