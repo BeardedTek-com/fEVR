@@ -91,8 +91,10 @@ a:hover{
 #frigateErr{
     position: absolute;
     width: 80vw;
-    top: 10vw;
+    height: 80vh;
+    top: 10vh;
     left: 10vw;
+    word-wrap: break-word;
     background-color: rgba(244, 244, 250, 0.8);
     border-color: rgb(137, 143, 145);
     font-size: 1.15em;
@@ -101,6 +103,10 @@ a:hover{
     border-radius: 1em;
     vertical-align: middle;
     text-align: center;
+    padding: 3em;
+}
+#frigateErr a{
+    text-decoration: underline;
 }
 @supports ((-webkit-backdrop-filter: none) or (backdrop-filter: none)) {
     .menu {
