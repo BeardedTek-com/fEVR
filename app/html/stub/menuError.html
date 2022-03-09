@@ -2,9 +2,9 @@
                 <span>
                     We are sorry, but your frigate server is unreachable at the moment.<br/>
                     If you sure it is up and running, please 
-                    <a onclick='closeError("frigateErr","config");' target='contentFrame' href='../config.html'>update your configuration</a>
+                    <a onclick='closeError("frigateErr","config");' target='contentFrame' href='?action=config'>update your configuration</a>
                 </span>
             </dialog>
             <script>
-                document.querySelector('#frigateErr').open()
+                document.querySelector('#frigateErr').showModal()
             </script>
