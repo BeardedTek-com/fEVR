@@ -65,7 +65,7 @@ a:hover{
     background: rgba(160, 168, 170, 0.9);
     max-height:100%;
     width: 0%;
-    height: 100%;<a 
+    height: 100%;
     overflow: hidden;
     transition: width 1s ease;
     margin-left: 0em;
