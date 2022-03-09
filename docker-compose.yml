@@ -9,8 +9,8 @@ services:
       - '8002:8002' # sqlite_web interface (FOR DEVELOPMENT PURPOSES ONLY)
     volumes:
       - /usr/local/docker/fevr/data/events:/var/www/html/events ##OPTIONAL: save events to a local folder
-      - /usr/local/docker/fevr/data/db:/var/www/db ##OPTIONAL: save database file
-      - /usr/local/docker/fevr/data/config.json:/var/www/config/config.json ##OPTIONAL: save config file locally
+#      - /usr/local/docker/fevr/data/db:/var/www/db ##OPTIONAL: save database file
+#      - /usr/local/docker/fevr/data/config.json:/var/www/config/config.json ##OPTIONAL: save config file locally
 #      - ./app:/var/www # FOR DEVELOPMENT - Exposes the entire stack to a local volume
 #        If you go with this option, take the following actions:
 #        git clone https://github.com/beardedtek-com/fevr
