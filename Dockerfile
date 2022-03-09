@@ -16,7 +16,7 @@ RUN rm -f /var/www/logs
 COPY rootfs /
 
 # get latest version of fEVR
-RUN git clone https://github.com/beardedtek-com/fevr && mv fevr/app/* /var/www/ \
+RUN git clone -b v0.3.4 https://github.com/beardedtek-com/fevr && mv fevr/app/* /var/www/ \
  && mkdir /var/www/logs && touch /var/www/logs/debug.log \
  && mv /var/www/db/fEVR.blank.sqlite /var/www/db/fEVR.sqlite \
  && mv /var/www/config/config-example.json /var/www/config/config.json
