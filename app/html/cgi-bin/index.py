@@ -29,7 +29,7 @@ if fevr:
     with open('/var/www/html/stub/menuObject.html') as menuObjectStub:
         menuObjectItem = menuObjectStub.read()
         menu = ""
-    if !fConfig.error:
+    if not fConfig.error:
         for camera in fConfig.cameras:
             menu += f"{menuCameraItem}\n"
             for object in fConfig.cameras[camera]['objects']:
