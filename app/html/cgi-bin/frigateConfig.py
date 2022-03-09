@@ -17,6 +17,7 @@
 #    along with this program.  If not, see <https://www.gnu.org/licenses/>.
 class frigateConfig:
     def __init__(self,frigateURL):
+        self.error = False
         self.url = frigateURL
         self.configAPI = "/api/config"
         self.cameras = {}
