@@ -34,7 +34,7 @@ git clone https://github.com/BeardedTek-com/fEVR.git
 version: '3'
 services:
   fevr:
-    image: ghcr.io/beardedtek/fevr-standalone:main
+    image: ghcr.io/beardedtek-com/fevr-standalone:main
     container_name: fevr-alpine
     restart: unless-stopped
     ports:
