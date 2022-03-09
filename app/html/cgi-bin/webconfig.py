@@ -47,8 +47,10 @@ class webConfig:
     def writeConfig(self):
         shutil.copyfile(self.configFile,self.configBackup)
         with open(self.configFile,"w+") as configFile:
-            configFile.write(json.dump(self.webconfig, indent=2,sort_keys=True))
+            configFile.write(json.dumps(self.webconfig, indent=2,sort_keys=True))
     def dbSetup(self):
+        dbTooSmall = False
+        dbPathExists = False
         db = self.webconfig['fevr']['db']
         if exists(db):
             dbPathExists = True
@@ -56,9 +58,7 @@ class webConfig:
                 dbTooSmall = True
         if not dbPathExists or dbTooSmall:
             from shutil import copy
-            from os import chown
             copy("/var/www/default/fEVR.sqlite",db)
-            chown(db,100,101)
 
     def execute(self):
         self.webConfig()

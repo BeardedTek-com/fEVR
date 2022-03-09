@@ -28,7 +28,7 @@ class frigateConfig:
         try:
             configURL = f"{self.url}{self.configAPI}"
             import requests
-            frigateConfig = requests.get(configURL, allow_redirects=True)
+            frigateConfig = requests.get(configURL, timeout=5, allow_redirects=True)
             import json
             self.frigateConfig = json.loads(frigateConfig.content)
         except:

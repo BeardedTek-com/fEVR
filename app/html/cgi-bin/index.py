@@ -49,10 +49,12 @@ class fevr:
         actions = {"event":['id','count'],"config":False}
         ext = ".py?"
         self.script = ""
+        url = ""
         if self.getAction == "config":
-            ext = "html"
+            ext = ".html"
             self.script += "<script>document.querySelector('#frigateErr').close()</script>\n"
-        url = f"{self.getAction}.py?"
+            url = "../"
+        url += f"{self.getAction}{ext}"
         for action in actions:
             if action == self.getAction:
                 if actions[action]:
