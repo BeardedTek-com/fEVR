@@ -42,7 +42,7 @@ if exists(config['fevr']['db']):
 else:
     from shutil import copy
     copy(config['fevr']['db'],f"{config['fevr']['db']}.BAK")
-    copy("/var/www/db/fEVR.blank.sqlite",config['fevr']['db'])
+    copy("/var/www/default/fEVR.sqlite",config['fevr']['db'])
 
 while n==0:
     from time import sleep

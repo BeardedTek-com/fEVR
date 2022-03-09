@@ -1,8 +1,8 @@
-config.json
-fEVR.sqlite
-events
-www/html/cgi-bin/__pycache__/
-events/*-*
-backup/*
-*.log
-*.pyc
+/config/config.json
+/db/fEVR.sqlite
+/app/html/cgi-bin/__pycache__
+/app/html/events/**
+
+
+!/default/config.json
+!/default/fEVR.sqlite
