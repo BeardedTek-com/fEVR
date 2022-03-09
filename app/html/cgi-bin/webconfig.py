@@ -45,6 +45,8 @@ class webConfig:
             self.webconfig['frigate'][var] = str(self.input.getvalue(var))
         self.error.execute(f"New Config.json:\n{str(self.webconfig)}",src=self.script)
     def writeConfig(self):
+        from os import makedirs
+        makedirs(f"{self.configDir}/backup",exist_ok=True)
         shutil.copyfile(self.configFile,self.configBackup)
         with open(self.configFile,"w+") as configFile:
             configFile.write(json.dumps(self.webconfig, indent=2,sort_keys=True))

@@ -2,7 +2,7 @@
 /db/fEVR.sqlite
 /app/html/cgi-bin/__pycache__
 /app/html/events/**
-
+/data
 
 !/default/config.json
 !/default/fEVR.sqlite
