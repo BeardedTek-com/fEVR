@@ -1,5 +1,5 @@
 #!/usr/bin/python
-#    fEVR (Frigate Event Video Recorder) RESTful Interface
+#    fEVR (frigate Event Video Recorder)
 #
 #    Copyright (C) 2021-2022  The Bearded Tek (http://www.beardedtek.com) William Kenny
 #
@@ -16,7 +16,6 @@
 #    You should have received a copy of the GNU General Public License
 #    along with this program.  If not, see <https://www.gnu.org/licenses/>.
 import json
-
 import sys
 class rest:
     def __init__(self,frigate):
