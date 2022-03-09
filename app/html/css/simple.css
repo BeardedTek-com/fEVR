@@ -98,8 +98,9 @@ a:hover{
   
 .menu_content{
     width: 100%;
-    padding: 1em;
-    line-height: 1.5em;
+    padding: 1.5em;
+    padding-top: 1em;
+    line-height: 1.1em;
     white-space: nowrap;
     font-size: 1.25em;
 }
