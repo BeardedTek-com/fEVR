@@ -36,10 +36,12 @@ if fevr:
                 menu+= f"{menuObjectItem.replace('#OBJECT#',object)}"
             menu = menu.replace("#CAMERA#",camera)
         index = index.replace('##MENU##',menu)
+        index = index.replace("##ERROR##","")
     else:
         with open('/var/www/html/stub/menuError.html') as menuError:
-            menu = menuError.read()
-        index = index.replace('##MENU##',menu)
+            error = menuError.read()
+        index = index.replace('##MENU##',"")
+        index = index.replace("##ERROR##",error)
     index = index.replace('#FRIGATE#',frigate['url'])
     print(index)
 
