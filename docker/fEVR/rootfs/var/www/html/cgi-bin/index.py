@@ -23,6 +23,7 @@ class fevr:
         self.getAction = ""
         self.script = ""
         self.input = cgi.FieldStorage()
+        self.errorMsg = ""
         if self.input.getvalue('action'):
             self.getAction = self.input.getvalue('action')
             self.action()
@@ -76,18 +77,20 @@ class fevr:
             menu=""
             if fConfig.error or self.action == "config":
                 self.script += "<script>document.querySelector('#frigateErr').showModal()</script>\n"
+                index = index.replace('##ACTION##',self.script)
+                self.errorMsg = "Your frigate server is unreachable at the moment.<br/>"
                 #menuError = self.getStub(f"{self.stub}/menuError.html")
                 #index = index.replace('##MENU##',"")
                 #index = index.replace("##ERROR##",menuError)
             else:
-                menuError = self.getStub(f"{self.stub}/menuError.html")
                 for camera in fConfig.cameras:
                     menu+=f"{menuCamera}\n"
                     for object in fConfig.cameras[camera]['objects']:
                         menu+=f"{menuObject.replace('#OBJECT#',object)}"
                     menu = menu.replace("#CAMERA#",camera)
-                index = index.replace('##MENU##',menu)
-                index = index.replace("##ERROR##",menuError) 
+            index = index.replace('##MENU##',menu)
+            menuError = self.getStub(f"{self.stub}/menuError.html")
+            index = index.replace("##ERROR##",menuError) 
             index = index.replace('#FRIGATE#',frigateURL)
             return index
 
@@ -102,6 +105,11 @@ class fevr:
         else:
             action = ""
         index = index.replace("##ACTION##",action)
+        if self.errorMsg:
+            index = index.replace("##ERRORMSG##",self.errorMsg)
+        else:
+            index = index.replace("##ERRORMSG##","")
+
         print(index)
 
 def main():

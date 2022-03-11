@@ -56,7 +56,10 @@ class sqlite:
     
     def retrieve(self,sql):
         cursor = self.conn.cursor()
-        cursor.execute(sql)
+        try:
+            cursor.execute(sql)
+        except:
+            return []
         records = cursor.fetchall()
         cursor.close
         return records
