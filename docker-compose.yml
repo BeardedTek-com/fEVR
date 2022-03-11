@@ -1,30 +1,60 @@
 version: '3'
 services:
+  tailscale:                                    # Provides tailscale functionality for the stack
+    build:                                      # By default it uses the 192.168.204.0/24 network
+      context: ./tailscale               # Start tailscale once the container is up:
+      dockerfile: Dockerfile                    # docker-compose exec tailscale tailscale up --advertise-routes=192.168.2.204/24 --accept-routes
+    image: beardedtek-com/tailscale:v0.4        # This will provide you with the Authorization URL to sign into tailscale.
+    container_name: tailscale                   # If you don't have an account, its simple and free to signup.
+    restart: unless-stopped 
+    volumes:
+      - ./vol/tailscale/data:/data
+      - ./vol/tailscale/var_lib:/var/lib        # Required for tailscale
+      - /dev/net/tun:/dev/net/tun               # Required for tailscale
+    cap_add:
+      - net_admin                               # Required for tailscale
+      - sys_module                              # Required for tailscale
+    networks:
+      beardnet:
+        ipv4_address: 192.168.204.253
+    privileged: true
   fevr:
-    image: ghcr.io/beardedtek-com/fevr-standalone:v0.4
+    build:
+      context: ./fEVR
+      dockerfile: Dockerfile
+    image: beardedtek-com/fevr:v0.4
     container_name: fevr
     restart: unless-stopped
-    ports:
-      - '8001:8001' # fEVR web interface
-      - '8002:8002' # sqlite_web interface (FOR DEVELOPMENT PURPOSES ONLY)
+    privileged: true
+    depends_on:                                 # Comment this out if you don't want to run tailscale.
+      - tailscale
+    environment:
+      FEVR_DEBUG: "true"
+      FEVR_TITLE: "Home"
+      FEVR_PORT: "5080"
+      FRIGATE_URL: "http://192.168.2.240:5000"
+      SQLITE_WEB_ENABLE: "true"
+      SQLITE_WEB_PORT: "5081"
+    networks:
+      beardnet:
+        ipv4_address: 192.168.204.1
     volumes:
-      - ./data/events:/var/www/html/events ##OPTIONAL: save events to a local folder
-      - ./data/db:/var/www/db ##OPTIONAL: save database file
-      - ./data/config.json:/var/www/config/config.json ##OPTIONAL: save config file locally
-#      - ./app:/var/www # FOR DEVELOPMENT - Exposes the entire stack to a local volume
-#        If you go with this option, take the following actions:
-#        git clone https://github.com/beardedtek-com/fevr
-#        cd fevr
-#        sudo chmod -R 100:101 app
-#        edit docker-compose.yml and comment out or remove first 3 volume definitions,
-#        uncomment 4th volume definition and run the container:
-#        docker-compose up -d
-#   Uncomment the following to map to an NFS share
-#      - nfsvolume:/var/www/html/events ##OPTIONAL: save events to an NFS volume
+#     - ./vol/fevr/data/:/var/www/data           # OPTIONAL: expose /var/www/data folder which contains the SQLite database and config.json files
+     - ./vol/fevr/events:/var/www/html/events   # OPTIONAL: save events to a local folder
+#     - nfsvolume:/var/www/html/events          # OPTIONAL: save events to an NFS share
+
+networks:
+  beardnet:                                     # Network definition for our tailscale network
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 192.168.204.0/24
+          gateway: 192.168.204.254
+
 #volumes:
-#  nfsvolume:
+#  nfsvolume:                                   # VOLUME DEFINITION FOR NFS share
 #    driver_opts:
 #      type: "nfs"
-#      o: "addr=<your_nas_ip>,nfsvers=4" # Make sure to change to your NFS server's address
-#     #o: "addr=<your_nas_ip>,rw,nfsvers=4" < SOME NFS SHARES REQUIRE THIS!!!
+#      o: "addr=<your_nas_ip>,nfsvers=4"        # Make sure to change to your NFS server's address
+#      # o: "addr=<your_nas_ip>,rw,nfsvers=4"   # SOME NFS SHARES REQUIRE THIS!!!
 #      device: ":/path/to/your/nfs/share"

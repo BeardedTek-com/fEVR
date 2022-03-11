@@ -1,0 +1,6 @@
+
+To authenticate, visit:
+
+	https://login.tailscale.com/a/c70acf764eb7
+
+read unix @->/var/run/tailscale/tailscaled.sock: use of closed network connection (tailscaled stopped running?)

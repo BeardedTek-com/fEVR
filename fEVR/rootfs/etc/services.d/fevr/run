@@ -1,0 +1,23 @@
+#!/bin/bash
+
+# Get Environment Variables
+DEBUG="${FEVR_DEBUG:-true}"
+TITLE="${FEVR_TITLE:-Home}"
+FRIGATE="${FRIGATE_URL:-http://192.168.2.240:5000}"
+HTTPD_PORT="${FEVR_PORT:-5080}"
+IP_ADDR_EXT=$(ip a | grep inet| grep -v "127.0.0.1" | awk '{print $2;}' | cut -d/ -f1) \
+IP_ADDR="${IP_ADDR_EXT:-192.168.204.1}"
+echo ""
+echo ""
+echo "        Starting fEVR on http://$IP_ADDR:$HTTPD_PORT"
+echo ""
+echo ""
+if [ "${HTTPD_PORT}" != "5080" ]; then
+    sed -i "s/Listen 5080/Listen ${HTTPD_PORT}/g" /etc/apache2/httpd.conf
+fi
+## Run your program
+#exec /opt/fevr/startup/writeConfig "${DEBUG}" "${TITLE}" "${FRIGATE}"
+
+if ! $(ps | grep -v grep | grep -q httpd); then
+    exec httpd -DFOREGROUND
+fi

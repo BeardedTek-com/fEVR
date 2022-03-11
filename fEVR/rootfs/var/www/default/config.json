@@ -1,0 +1,21 @@
+{
+  "config"          : "/var/www/data/config/config.json",
+  "fevr"            :
+  {
+    "title"         : "Frigate Event Viewer",
+    "domain"        : "fevr.mydomain.com",
+    "admin"         : "admin",
+    "adminPassword" : "password",
+    "base"          : "/var/www/",
+    "html"          : "/var/www/html",
+    "db"            : "/var/www/data/db/fEVR.sqlite",
+    "debug"         : "false"
+  },
+  "frigate"         :
+  {
+    "url"           : "http://frigate.local:5000",
+    "apiEventPath"  : "/api/events/",
+    "snapPath"      : "/snapshot.jpg",
+    "clipPath"      : "/clip.mp4"
+  }
+}

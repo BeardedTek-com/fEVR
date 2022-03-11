@@ -1,0 +1,51 @@
+#!/usr/bin/python
+
+# Define config.json contents via dict
+config = {}
+config['config'] = "/var/www/data/config/config.json"
+config['fevr'] = {}
+config['frigate'] = {}
+config['fevr']['base'] = "/var/www/"
+config['fevr']['db'] = "/var/www/data/db/fEVR.sqlite"
+config['fevr']['debug'] = "true"
+config['fevr']['html'] = "/var/www/html"
+config['fevr']['title'] = "My Home"
+config['frigate']['apiEventPath'] = "/api/events/"
+config['frigate']['clipPath'] = "/clip.mp4"
+config['frigate']['snapPath'] = "/snapshot.jpg"
+config['frigate']['url'] = "http://frigate.local:5000"
+
+# setup command line arguments
+import argparse
+parser = argparse.ArgumentParser()
+parser.add_argument('debug', type=str)
+parser.add_argument('title', type=str)
+parser.add_argument('frigate', type=str)
+args = parser.parse_args()
+
+# change values according to user input
+config['fevr']['debug'] = args.debug
+config['fevr']['title'] = args.title
+config['frigate']['url'] = args.frigate
+
+# write config.json to file
+with open(config['config'], "w+") as file:
+    import json
+    file.write(json.dumps(config, indent=2,sort_keys=True))
+n=0
+
+# Check if database exsists (and at least the size of the blank.sqlite)
+from os.path import exists
+from os.path import getsize
+db = config['fevr']['db']
+dbPathExists = False
+dbTooSmall = False
+if exists(db):
+    dbPathExists = True
+    if getsize(db) < 24576:
+        dbTooSmall = True
+if not dbPathExists or dbTooSmall:
+    from shutil import copy
+    from os import chown
+    copy("/var/www/default/fEVR.sqlite",db)
+    chown(db,100,101)
