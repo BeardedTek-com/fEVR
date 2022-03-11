@@ -106,9 +106,9 @@ class fevr:
             action = ""
         index = index.replace("##ACTION##",action)
         if self.errorMsg:
-            index = index.replace("##ERRORMSG##",self.errorMsg)
+            index = index.replace("#ERRORMSG#",self.errorMsg)
         else:
-            index = index.replace("##ERRORMSG##","")
+            index = index.replace("#ERRORMSG#","")
 
         print(index)
 
