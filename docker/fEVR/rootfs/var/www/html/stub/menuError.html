@@ -1,26 +1,31 @@
             <dialog id='frigateErr' class='menuItem subitem'>
-                <span>
-                    We are sorry, but your frigate server is unreachable at the moment.<br/>
-                    If you sure it is up and running, please update your configuration:
-                </span>
-                <form id="webConfig" action="webconfig.py">
-                    <label for="title">base directory:</label>
-                    <input id="title" name="title" type="text" value="Home"/><br/>
-                    <input name="base" type="hidden" value="/var/www/"/>
-                    <input name="html" type="hidden" value="/var/www/html/"/>
-                    <input name="db" type="hidden" value="/var/www/data/db/fEVR.sqlite"/>
-                    <label for="debug">debug:</label>
-                    <input id="debug" name="debug" type="text" value="false"/><br/>
-                    <label for="url">frigate url:</label>
-                    <input id="url" name="url" type="text" value="http://frigate.local:5000"/><br/>
-                    <input name="apiEventPath" type="hidden" value="/api/events/"/><br/>
-                    <input name="snapPath" type="hidden" value="/snapshot.jpg"/><br/>
-                    <input name="clipPath" type="hidden" value="/clip.mp4"/><br/>
-                    <button onclick="document.querySelector('#webConfig').submit();" type="button" id="finish" class="enabled">Update Config</button>
-
-                </form>
-
+                <div class="configError">
+                    Your frigate server is unreachable at the moment.<br/>
+                    Please update your configuration.
+                </div>
+                <div class="form">
+                    <form id="webConfig" action="webconfig.py">
+                        <input name="home" type="hidden" value="Home"/><br/>
+                        <input name="base" type="hidden" value="/var/www/"/>
+                        <input name="html" type="hidden" value="/var/www/html/"/>
+                        <input name="db" type="hidden" value="/var/www/data/db/fEVR.sqlite"/>
+                        <div class='formContent'>
+                            frigate url:<br/>
+                            <input id="url" name="url" type="text" value="http://frigate.local:5000"/><br/>
+                            debug:<br/>
+                            <input id="debug" name="debug" type="text" value="false"/><br/>
+                        </div>
+                        <input name="apiEventPath" type="hidden" value="/api/events/"/><br/>
+                        <input name="snapPath" type="hidden" value="/snapshot.jpg"/><br/>
+                        <input name="clipPath" type="hidden" value="/clip.mp4"/><br/>
+                        <div class="WCfooter">
+                            <div class="WCfooter-left">
+                                <button onclick="document.querySelector('#frigateErr').close();" type="button" id="finish" class="enabled">It's Okay</button>
+                            </div>
+                            <div class="WCfooter-right">
+                                <button onclick="document.querySelector('#webConfig').submit();" type="button" id="finish" class="enabled">Update Config</button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
             </dialog>
-            <script>
-                document.querySelector('#frigateErr').showModal()
-            </script>

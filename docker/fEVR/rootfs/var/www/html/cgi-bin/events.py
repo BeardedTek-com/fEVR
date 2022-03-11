@@ -78,7 +78,7 @@ class events:
     def noEvents(self):
         if os.path.isfile(stub):
             with open(stub) as eventStub:
-                url = "../config.html"
+                url = "?action=config"
                 thumbURL = "../img/not_available.jpg"
                 caption = "No Events Found"
                 data = eventStub.read()

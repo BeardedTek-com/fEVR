@@ -52,7 +52,7 @@ class fevr:
         url = ""
         if self.getAction == "config":
             ext = ".html"
-            self.script += "<script>document.querySelector('#frigateErr').close()</script>\n"
+            self.script += "<script>document.querySelector('#frigateErr').showModal()</script>\n"
             url = "../"
         url += f"{self.getAction}{ext}"
         for action in actions:
@@ -73,18 +73,20 @@ class fevr:
             menuCamera = self.getStub(f"{self.stub}/menuCamera.html")
             menuObject = self.getStub(f"{self.stub}/menuObject.html")
             menu=""
-            if not fConfig.error:
+            if fConfig.error or self.action == "config":
+                self.script += "<script>document.querySelector('#frigateErr').close()</script>\n"
+                #menuError = self.getStub(f"{self.stub}/menuError.html")
+                #index = index.replace('##MENU##',"")
+                #index = index.replace("##ERROR##",menuError)
+            else:
+                menuError = self.getStub(f"{self.stub}/menuError.html")
                 for camera in fConfig.cameras:
                     menu+=f"{menuCamera}\n"
                     for object in fConfig.cameras[camera]['objects']:
                         menu+=f"{menuObject.replace('#OBJECT#',object)}"
                     menu = menu.replace("#CAMERA#",camera)
                 index = index.replace('##MENU##',menu)
-                index = index.replace("##ERROR##","")
-            else:
-                menuError = self.getStub(f"{self.stub}/menuError.html")
-                index = index.replace('##MENU##',"")
-                index = index.replace("##ERROR##",menuError)
+                index = index.replace("##ERROR##",menuError) 
             index = index.replace('#FRIGATE#',frigateURL)
             return index
 
