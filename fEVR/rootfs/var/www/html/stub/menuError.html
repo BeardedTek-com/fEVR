@@ -1,9 +1,25 @@
             <dialog id='frigateErr' class='menuItem subitem'>
                 <span>
                     We are sorry, but your frigate server is unreachable at the moment.<br/>
-                    If you sure it is up and running, please 
-                    <a onclick='closeError("frigateErr","config");' href='?action=config'>update your configuration</a>
+                    If you sure it is up and running, please update your configuration:
                 </span>
+                <form id="webConfig" action="webconfig.py">
+                    <label for="title">base directory:</label>
+                    <input id="title" name="title" type="text" value="Home"/><br/>
+                    <input name="base" type="hidden" value="/var/www/"/>
+                    <input name="html" type="hidden" value="/var/www/html/"/>
+                    <input name="db" type="hidden" value="/var/www/data/db/fEVR.sqlite"/>
+                    <label for="debug">debug:</label>
+                    <input id="debug" name="debug" type="text" value="false"/><br/>
+                    <label for="url">frigate url:</label>
+                    <input id="url" name="url" type="text" value="http://frigate.local:5000"/><br/>
+                    <input name="apiEventPath" type="hidden" value="/api/events/"/><br/>
+                    <input name="snapPath" type="hidden" value="/snapshot.jpg"/><br/>
+                    <input name="clipPath" type="hidden" value="/clip.mp4"/><br/>
+                    <button onclick="document.querySelector('#webConfig').submit();" type="button" id="finish" class="enabled">Update Config</button>
+
+                </form>
+
             </dialog>
             <script>
                 document.querySelector('#frigateErr').showModal()
