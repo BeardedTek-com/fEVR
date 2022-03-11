@@ -6,19 +6,13 @@ RUN apk --no-cache add apache2 libxml2-dev apache2-utils py3-pip py3-pillow git 
     pip install pytz && \
     pip install python-dateutil && \
     pip install requests && \
-    pip install sqlite_web && \
-    rm -rf /var/www/logs
+    pip install sqlite_web
 
 # Copy root filesystem
 COPY rootfs /
 
 # get latest version of fEVR, enable CGI Environment, set permissions, and cleanup files
-RUN git clone -b v0.4 https://github.com/beardedtek-com/fevr && mv fevr/app/* /var/www/ \
- && mkdir /var/www/logs && touch /var/www/logs/debug.log \
- && mv /var/www/db/fEVR.blank.sqlite /var/www/db/fEVR.sqlite \
- && mv /var/www/config/config-example.json /var/www/config/config.json \
- && bash /enable_cgi.sh \
- && chown -R 100:101 /var/www \
+RUN chmod +x /opt/fevr/setup/enable_cgi && /opt/fevr/setup/enable_cgi \
+ && chown -R 100:1000 /var/www \
  && chmod -R 0770 /var/www \
- && chmod +x /writeConfig \
-  && rm -rf /fevr
+ && chmod -R 0770 /opt/fevr
