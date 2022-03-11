@@ -1,19 +1,19 @@
 version: '3'
 services:
-  tailscale:                                    # Provides tailscale functionality for the stack
-    build:                                      # By default it uses the 192.168.204.0/24 network
-      context: ./tailscale               # Start tailscale once the container is up:
-      dockerfile: Dockerfile                    # docker-compose exec tailscale tailscale up --advertise-routes=192.168.2.204/24 --accept-routes
-    image: beardedtek-com/tailscale:v0.4        # This will provide you with the Authorization URL to sign into tailscale.
-    container_name: tailscale                   # If you don't have an account, its simple and free to signup.
+  tailscale:                                      # Provides tailscale functionality for the stack
+    build:                                        # By default it uses the 192.168.204.0/24 network
+      context: ./tailscale                        # Start tailscale once the container is up:
+      dockerfile: Dockerfile                      # docker-compose exec tailscale tailscale up --advertise-routes=192.168.2.204/24 --accept-routes
+    image: ghcr.io/beardedtek-com/tailscale:v0.4  # This will provide you with the Authorization URL to sign into tailscale.
+    container_name: tailscale                     # If you don't have an account, its simple and free to signup.
     restart: unless-stopped 
     volumes:
       - ./vol/tailscale/data:/data
-      - ./vol/tailscale/var_lib:/var/lib        # Required for tailscale
-      - /dev/net/tun:/dev/net/tun               # Required for tailscale
+      - ./vol/tailscale/var_lib:/var/lib          # Required for tailscale
+      - /dev/net/tun:/dev/net/tun                 # Required for tailscale
     cap_add:
-      - net_admin                               # Required for tailscale
-      - sys_module                              # Required for tailscale
+      - net_admin                                 # Required for tailscale
+      - sys_module                                # Required for tailscale
     networks:
       beardnet:
         ipv4_address: 192.168.204.253
@@ -22,11 +22,11 @@ services:
     build:
       context: ./fEVR
       dockerfile: Dockerfile
-    image: beardedtek-com/fevr:v0.4
+    image: ghcr.io/beardedtek-com/fevr:v0.4
     container_name: fevr
     restart: unless-stopped
     privileged: true
-    depends_on:                                 # Comment this out if you don't want to run tailscale.
+    depends_on:                                   # Comment this out if you don't want to run tailscale.
       - tailscale
     environment:
       FEVR_DEBUG: "true"
@@ -39,12 +39,12 @@ services:
       beardnet:
         ipv4_address: 192.168.204.1
     volumes:
-#     - ./vol/fevr/data/:/var/www/data           # OPTIONAL: expose /var/www/data folder which contains the SQLite database and config.json files
-     - ./vol/fevr/events:/var/www/html/events   # OPTIONAL: save events to a local folder
-#     - nfsvolume:/var/www/html/events          # OPTIONAL: save events to an NFS share
+#     - ./vol/fevr/data/:/var/www/data            # OPTIONAL: expose /var/www/data folder which contains the SQLite database and config.json files
+     - ./vol/fevr/events:/var/www/html/events     # OPTIONAL: save events to a local folder
+#     - nfsvolume:/var/www/html/events            # OPTIONAL: save events to an NFS share
 
 networks:
-  beardnet:                                     # Network definition for our tailscale network
+  beardnet:                                       # Network definition for our tailscale network
     driver: bridge
     ipam:
       config:
@@ -52,9 +52,9 @@ networks:
           gateway: 192.168.204.254
 
 #volumes:
-#  nfsvolume:                                   # VOLUME DEFINITION FOR NFS share
+#  nfsvolume:                                     # VOLUME DEFINITION FOR NFS share
 #    driver_opts:
 #      type: "nfs"
-#      o: "addr=<your_nas_ip>,nfsvers=4"        # Make sure to change to your NFS server's address
-#      # o: "addr=<your_nas_ip>,rw,nfsvers=4"   # SOME NFS SHARES REQUIRE THIS!!!
+#      o: "addr=<your_nas_ip>,nfsvers=4"          # Make sure to change to your NFS server's address
+#      # o: "addr=<your_nas_ip>,rw,nfsvers=4"     # SOME NFS SHARES REQUIRE THIS!!!
 #      device: ":/path/to/your/nfs/share"
