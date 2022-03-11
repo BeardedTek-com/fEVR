@@ -54,14 +54,15 @@ class fevr:
             ext = ".html"
             self.script += "<script>document.querySelector('#frigateErr').showModal()</script>\n"
             url = "../"
-        url += f"{self.getAction}{ext}"
-        for action in actions:
-            if action == self.getAction:
-                if actions[action]:
-                    for value in actions[action]:
-                        if self.input.getvalue(value):
-                            url += f"{value}={self.input.getvalue(value)}&"
-        self.script += f"<script>document.getElementById('contentFrame').src = '{url}';</script>\n"
+        else:
+            url += f"{self.getAction}{ext}"
+            for action in actions:
+                if action == self.getAction:
+                    if actions[action]:
+                        for value in actions[action]:
+                            if self.input.getvalue(value):
+                                url += f"{value}={self.input.getvalue(value)}&"
+            self.script += f"<script>document.getElementById('contentFrame').src = '{url}';</script>\n"
     def mainPage(self):
         from config import Config
         from frigateConfig import frigateConfig
@@ -74,7 +75,7 @@ class fevr:
             menuObject = self.getStub(f"{self.stub}/menuObject.html")
             menu=""
             if fConfig.error or self.action == "config":
-                self.script += "<script>document.querySelector('#frigateErr').close()</script>\n"
+                self.script += "<script>document.querySelector('#frigateErr').showModal()</script>\n"
                 #menuError = self.getStub(f"{self.stub}/menuError.html")
                 #index = index.replace('##MENU##',"")
                 #index = index.replace("##ERROR##",menuError)
