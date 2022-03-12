@@ -1,0 +1,17 @@
+#!/bin/sh
+# enable ip forwarding
+echo 'net.ipv4.ip_forward = 1' | tee -a /etc/sysctl.conf 2> /dev/null
+echo 'net.ipv6.conf.all.forwarding = 1' | tee -a /etc/sysctl.conf 2> /dev/null
+sysctl -p /etc/sysctl.conf
+
+# While loop to make sure tailscaled has started
+tailscale_status=""
+while [ tailscale_status != "tailscaled" ]; do
+    tailscale_status=$(ps | grep tailscaled | grep -v grep | awk '{print $4}')
+done
+# Wait a couple seconds to make sure its all the way up
+sleep 5
+
+# Start tailscale
+tailscale up --advertise-routes="$DOCKER_SUBNET" --accept-routes 2> /tmp/auth &
+echo "Tailscale Authorization URL: $authURL"
