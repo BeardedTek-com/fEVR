@@ -116,10 +116,15 @@ class events:
     def getEvents(self,count=False,selectors=False,order=False):
         wheres = ""
         if selectors:
+            wheres += """WHERE """
+            num = 1
             for key in selectors:
                 self.error.execute(selectors[key],src=self.script)
                 self.error.execute(f"COUNT: {count}",src=self.script)
-                wheres += f"""WHERE {key}='{selectors[key]}'"""
+                if num > 1:
+                    wheres += """AND """
+                wheres += f"""{key}='{selectors[key]}' """
+                num += 1
         sql = """SELECT * FROM events """
         if wheres:
             sql += wheres
