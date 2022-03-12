@@ -1,9 +1,9 @@
 version: '3'
 services:
   tailscale:                                      # Provides tailscale functionality for the stack
-    #build:                                        # By default it uses the 192.168.204.0/24 network
-    #  context: ./docker/tailscale                        # Start tailscale once the container is up:
-    #  dockerfile: Dockerfile                      # docker-compose exec tailscale tailscale up --advertise-routes=192.168.2.204/24 --accept-routes
+    #build:                                       # By default it uses the 192.168.100.0/24 network
+    #  context: ./docker/tailscale                # Start tailscale once the container is up:
+    #  dockerfile: Dockerfile                     # docker-compose exec tailscale tailscale up --advertise-routes=192.168.100/24 --accept-routes
     image: ghcr.io/beardedtek-com/tailscale:v0.4  # This will provide you with the Authorization URL to sign into tailscale.
     container_name: tailscale                     # If you don't have an account, its simple and free to signup.
     restart: unless-stopped 
@@ -16,7 +16,7 @@ services:
       - sys_module                                # Required for tailscale
     networks:
       beardnet:
-        ipv4_address: 192.168.204.253
+        ipv4_address: 192.168.100.253
     privileged: true
   fevr:
     #build:
@@ -37,7 +37,7 @@ services:
       SQLITE_WEB_PORT: "5081"
     networks:
       beardnet:
-        ipv4_address: 192.168.204.1
+        ipv4_address: 192.168.100.1
     volumes:
 #     - ./vol/fevr/data/:/var/www/data            # OPTIONAL: expose /var/www/data folder which contains the SQLite database and config.json files
      - ./vol/fevr/events:/var/www/html/events     # OPTIONAL: save events to a local folder
@@ -48,8 +48,8 @@ networks:
     driver: bridge
     ipam:
       config:
-        - subnet: 192.168.204.0/24
-          gateway: 192.168.204.254
+        - subnet: 192.168.100.0/24
+          gateway: 192.168.100.254
 
 #volumes:
 #  nfsvolume:                                     # VOLUME DEFINITION FOR NFS share
