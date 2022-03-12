@@ -7,4 +7,4 @@
 # Declare variables
 
 ## Run your program
-exec /data/startup.sh
+exec /data/startup.sh 1>&2
