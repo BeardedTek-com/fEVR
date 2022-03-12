@@ -26,7 +26,7 @@ class sqlite:
         self.conn = None
         self.version = ""
         self.debug = debug
-    def open(self,db="/var/www/db/fEVR.sqlite"):
+    def open(self,db="/var/www/data/db/fEVR.sqlite"):
         try:
             if self.debug:
                 self.error.execute(f"connecting to {db}.....\n",src=self.script)

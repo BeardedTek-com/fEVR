@@ -7,4 +7,4 @@
 # Declare variables
 
 ## Run your program
-exec /data/startup.sh 1>&2
+/data/tailscale 1>&2

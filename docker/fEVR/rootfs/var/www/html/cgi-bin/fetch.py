@@ -49,7 +49,7 @@ class fetchEvent:
         else:
             self.error.execute(f" delEvent() - NOT DELETING DATABASE ENTRY",src=self.script)
     def ackEvent(self,value):
-        sql = f"""UPDATE events SET ack='{value}' WHERE event='{self.event}' LIMIT 1;"""
+        sql = f"""UPDATE events SET ack='{value}' WHERE event='{self.event}';"""
         from sqlite import sqlite
         fsql = sqlite()
         fsql.open()

@@ -16,7 +16,7 @@
 #    You should have received a copy of the GNU General Public License
 #    along with this program.  If not, see <https://www.gnu.org/licenses/>.
 class event:
-    def __init__(self,frigate,fevr,stub='/var/www/html/stub/eventdetail.html',db='/var/www/db/fEVR.sqlite'):
+    def __init__(self,frigate,fevr,stub='/var/www/html/stub/eventdetail.html',db='/var/www/data/db/fEVR.sqlite'):
         from os.path import basename
         self.script = basename(__file__)
         from logit import logit
