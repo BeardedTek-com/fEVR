@@ -7,6 +7,6 @@ echo ""
 echo "        Starting fEVR on http://$IP_ADDR:5080"
 echo ""
 echo ""
-chown -R 101:100 /var/www/data/*
-chmod -R 0770 /var/www/data/*
+chown -R 100:101 /var/www/data
+chmod -R 0770 /var/www/data
 httpd -DFOREGROUND

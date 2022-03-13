@@ -1,6 +1,14 @@
             <div id='#CAMERA#' class='menuItem menuspace'>
-                <a onclick='clickItem("#CAMERA#");' target='contentFrame' href='events.py?count=10&camera=#CAMERA#'>#CAMERA#</a>
+                <a onclick='expandMenu("##CAMERA#-menu");' target='contentFrame'>#CAMERA#</a>
             </div>
-            <div id='#CAMERA#live' class='menuItem subitem'>
-                <a onclick='clickItem("#CAMERA# Live");'target="_blank" href='#FRIGATE#/api/#CAMERA#?h=720&bbox=1&motion=1'>live</a>
+            <div id="#CAMERA#-menu" class="submenu">
+                <div id='#CAMERA#-live' class='menuItem subitem'>
+                    <a onclick='clickItem("#CAMERA# Live");'target="_blank" href='#FRIGATE#/api/#CAMERA#?h=720&bbox=1&motion=1'>live</a>
+                </div>
+                <div id='#CAMERA#-10' class='menuItem subitem'>
+                    <a onclick='clickItem("#CAMERA# Live");'target="_blank" href='events.py?count=10&camera=#CAMERA#'>all objects</a>
+                </div>
+                <div id='#CAMERA#space' class='menuItem subitem menuspace'>
+                </div>
+                #CAMERAOBJECTS#
             </div>

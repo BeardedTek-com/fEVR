@@ -27,7 +27,16 @@ function hideMenu(){
     menu = document.querySelector("#menu");
     hideElement(menu,'menuOpen');
 }
-
+function expandMenu(target){
+    menu = document.querySelector(target)
+    if (menu.classList.contains('submenu-show')){
+        menu.classList.remove('submenu-show')
+    }
+    else
+    {
+        menu.classList.add('submenu-show')
+    }
+}
 document.onclick = function (e) {
     if (e.target.id !== 'menu') {
         if (e.target.offsetParent && e.target.offsetParent.id !== 'menu')

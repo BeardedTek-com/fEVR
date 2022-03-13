@@ -64,19 +64,30 @@ class fevr:
                             if self.input.getvalue(value):
                                 url += f"{value}={self.input.getvalue(value)}&"
             self.script += f"<script>document.getElementById('contentFrame').src = '{url}';</script>\n"
+    def getCameraMenus(self,fConfig):
+        menuCamera = self.getStub(f"{self.stub}/menuCamera.html")
+        menuObject = self.getStub(f"{self.stub}/menuObject.html")
+        fullCameraMenu = ""
+        for camera in fConfig.cameras:
+            cameraMenu=f"{menuCamera}\n"
+            cameraObjects =""
+            for object in fConfig.cameras[camera]['objects']:
+                cameraObjects+=f"{menuObject.replace('#OBJECT#',object)}"
+            cameraMenu = cameraMenu.replace("#CAMERAOBJECTS#",cameraObjects)
+            cameraMenu = cameraMenu.replace("#CAMERA#",camera)
+            fullCameraMenu += cameraMenu
+        return fullCameraMenu
     def mainPage(self):
-        menu=""
         frigateURL=""
         index = self.getStub(f"{self.stub}/index.html")
         from config import Config
         from frigateConfig import frigateConfig
         myConfig = Config()
+        menu=""
         if myConfig:
             try:
                 frigateURL = myConfig.config['frigate']['url']
                 fConfig = frigateConfig(frigateURL)
-                menuCamera = self.getStub(f"{self.stub}/menuCamera.html")
-                menuObject = self.getStub(f"{self.stub}/menuObject.html")
                 menu=""
                 if fConfig.error or self.action == "config":
                     self.script += "<script>document.querySelector('#frigateErr').showModal()</script>\n"
@@ -86,12 +97,7 @@ class fevr:
                     #index = index.replace('##MENU##',"")
                     #index = index.replace("##ERROR##",menuError)
                 else:
-                    for camera in fConfig.cameras:
-                        menu+=f"{menuCamera}\n"
-                        for object in fConfig.cameras[camera]['objects']:
-                            menu+=f"{menuObject.replace('#OBJECT#',object)}"
-                        menu = menu.replace("#CAMERA#",camera)
-                
+                    menu = self.getCameraMenus(fConfig)
             except:
                 errmsg = "\nCouldn't get frigate's URL.  Looks like the permissions are wonky."
                 try:
