@@ -31,7 +31,40 @@ The easiest and recommended method of install is docker-compose.
 ```
 cp template.env .env
 ```
-- Edit .env file and bring the stack up:
+- Edit .env file and
+```
+# Set Docker Bridge Network Variables
+NETWORK_NAME="beardnet"
+NETWORK_SUBNET="192.168.100.0/24"
+NETWORK_GATEWAY="192.168.100.254"
+
+
+# Set Tailscale Container Variables
+TAILSCALE_IP="192.168.100.253"
+TAILSCALE_IMAGE="beardedtek-com/tailscale:v0.4-devel"
+TAILSCALE_CONTAINER_NAME="tailscale-devel"
+TAILSCALE_CONTEXT="/home/localadmin/Documents/GitHub/fEVR/docker/tailscale/"
+TAILSCALE_DATA="/home/localadmin/Documents/GitHub/fEVR/vol/tailscale/data"
+TAILSCALE_VAR_LIB="/home/localadmin/Documents/GitHub/fEVR/vol/tailscale/var_lib"
+TAILSCALE_COMMAND="/opt/tailscale/tailscale"
+
+
+# Set fEVR Container Variables
+FEVR_IP="192.168.100.1"
+FEVR_IMAGE=beardedtek-com/fevr:v0.4-devel
+FEVR_CONTAINER_NAME="fevr-devel"
+FEVR_CONTEXT="/home/localadmin/Documents/GitHub/fEVR/docker/fEVR/"
+FEVR_DEBUG="true"
+FEVR_TITLE="Home"
+FRGIGATE_URL="http://192.168.2.240:5000"
+
+
+# OPTIONAL NAS Variables
+NAS_IP="192.168.2.240"
+NAS_EVENTS="/export/fevr"
+NAS_DATA="/export/fevr_data"
+```
+- Bring the stack up:
 ```
 sudo docker-compose up -d
 ```
@@ -111,14 +144,6 @@ volumes:
       o: "addr=${NAS_IP},nfsvers=4"            # Make sure to change to your NFS server's address
       # o: "addr=<your_nas_ip>,rw,nfsvers=4"     # SOME NFS SHARES REQUIRE THIS!!!
       device: ":${NAS_DATA}"
-
-#volumes:
-#  nfsvolume:                                     # VOLUME DEFINITION FOR NFS share
-#    driver_opts:
-#      type: "nfs"
-#      o: "addr=<your_nas_ip>,nfsvers=4"          # Make sure to change to your NFS server's address
-#      # o: "addr=<your_nas_ip>,rw,nfsvers=4"     # SOME NFS SHARES REQUIRE THIS!!!
-#      device: ":/path/to/your/nfs/share"
 ```
 
 - Configure Home Assistant Automation to feed fevr with data:
