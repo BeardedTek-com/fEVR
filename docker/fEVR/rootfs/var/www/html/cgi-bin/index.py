@@ -65,33 +65,67 @@ class fevr:
                                 url += f"{value}={self.input.getvalue(value)}&"
             self.script += f"<script>document.getElementById('contentFrame').src = '{url}';</script>\n"
     def mainPage(self):
+        menu=""
+        frigateURL=""
+        index = self.getStub(f"{self.stub}/index.html")
         from config import Config
         from frigateConfig import frigateConfig
         myConfig = Config()
         if myConfig:
-            frigateURL = myConfig.config['frigate']['url']
-            fConfig = frigateConfig(frigateURL)
-            index = self.getStub(f"{self.stub}/index.html")
-            menuCamera = self.getStub(f"{self.stub}/menuCamera.html")
-            menuObject = self.getStub(f"{self.stub}/menuObject.html")
-            menu=""
-            if fConfig.error or self.action == "config":
-                self.script += "<script>document.querySelector('#frigateErr').showModal()</script>\n"
-                index = index.replace('##ACTION##',self.script)
-                self.errorMsg = "Your frigate server is unreachable at the moment.<br/>"
-                #menuError = self.getStub(f"{self.stub}/menuError.html")
-                #index = index.replace('##MENU##',"")
-                #index = index.replace("##ERROR##",menuError)
-            else:
-                for camera in fConfig.cameras:
-                    menu+=f"{menuCamera}\n"
-                    for object in fConfig.cameras[camera]['objects']:
-                        menu+=f"{menuObject.replace('#OBJECT#',object)}"
-                    menu = menu.replace("#CAMERA#",camera)
-            index = index.replace('##MENU##',menu)
+            try:
+                frigateURL = myConfig.config['frigate']['url']
+                fConfig = frigateConfig(frigateURL)
+                menuCamera = self.getStub(f"{self.stub}/menuCamera.html")
+                menuObject = self.getStub(f"{self.stub}/menuObject.html")
+                menu=""
+                if fConfig.error or self.action == "config":
+                    self.script += "<script>document.querySelector('#frigateErr').showModal()</script>\n"
+                    index = index.replace('##ACTION##',self.script)
+                    self.errorMsg = "Your frigate server is unreachable at the moment.<br/>"
+                    #menuError = self.getStub(f"{self.stub}/menuError.html")
+                    #index = index.replace('##MENU##',"")
+                    #index = index.replace("##ERROR##",menuError)
+                else:
+                    for camera in fConfig.cameras:
+                        menu+=f"{menuCamera}\n"
+                        for object in fConfig.cameras[camera]['objects']:
+                            menu+=f"{menuObject.replace('#OBJECT#',object)}"
+                        menu = menu.replace("#CAMERA#",camera)
+                
+            except:
+                errmsg = "\nCouldn't get frigate's URL.  Looks like the permissions are wonky."
+                try:
+                    import os
+                    mode=0o770
+                    path="/var/www/data"
+                    for root, dirs, files in os.walk(path):
+                        for d in dirs:
+                            os.chown(os.path.join(root,d),'100','101')
+                            os.chmod(os.path.join(root, d), mode)
+                            for f in files:
+                                os.chown(os.path.join(root,f),'100','101')
+                                os.chmod(os.path.join(root, f), mode)
+                    errmsg = "\nYou lucky dog.  fEVR took care of it for you!!!"
+                except:
+                    index = index.replace('##MENU##','Config Error\nUpdate settings.')
+                    from os import environ
+                    imgName=environ.get('FEVR_CONTAINER_NAME',"fevr")
+                    errmsg =  f"\n\
+                                Whoops!  fEVR can't take care of this one for you.\n\
+                                Please run the following command:\n\
+                                docker-compose exec {imgName} chown -R 100:101 /var/www/data && chmod -R 0770 /var/www/data"
+                self.error.execute(errmsg,self.script)
+            if not menu:
+                menu = " <div class='menuitem menuspace'>\n\
+                            CONFIG ERROR<br/>\n\
+                            SEE SYSTEM LOGS<br/>\n\
+                            <a href=?action=config>UPDATE SETTINGS</a>\n\
+                        </div>"
+                frigateURL = "?action=config"
             menuError = self.getStub(f"{self.stub}/menuError.html")
-            index = index.replace("##ERROR##",menuError) 
+            index = index.replace('##MENU##',menu)
             index = index.replace('#FRIGATE#',frigateURL)
+            index = index.replace("##ERROR##",menuError) 
             return index
 
     def execute(self):

@@ -18,7 +18,7 @@
 import json
 import sys
 class rest:
-    def __init__(self,frigate):
+    def __init__(self,frigate,db="/var/www/data/db/fEVR.sqlite"):
         from os.path import basename
         self.script = basename(__file__)
         from logit import logit
@@ -27,6 +27,7 @@ class rest:
         self.sql = ""
         self.debug = ""
         self.frigate = frigate
+        self.db = db
     def load_json(self,src="POST",file=None):
         if src == 'POST':
             self.input = json.loads(sys.stdin.read())
@@ -118,7 +119,7 @@ def main():
     if isEvent != 20:
         sql = fRest.json2sql()
         fRest.error.execute(f"Event SQL: {sql}",src=fRest.script)
-        hpsql = sqlite()
+        hpsql = sqlite(db=fRest.db)
         hpsql.open("/var/www/data/db/fEVR.sqlite")
         fRest.error.execute(f"Execute SQL: {hpsql.execute(sql)}",src=fRest.script)
         fRest.error.execute("Event Loaded",src=fRest.script)

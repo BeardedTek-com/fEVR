@@ -21,6 +21,7 @@ parser = argparse.ArgumentParser()
 parser.add_argument('debug', type=str)
 parser.add_argument('title', type=str)
 parser.add_argument('frigate', type=str)
+parser.add_argument('loopit', type=str)
 args = parser.parse_args()
 
 # change values according to user input
@@ -49,3 +50,9 @@ if not dbPathExists or dbTooSmall:
     from os import chown
     copy("/var/www/default/fEVR.sqlite",db)
     chown(db,100,101)
+
+if args.loopit == "true" or "yes" or "1":
+    from time import sleep
+    x=0
+    while x:
+        sleep(600)

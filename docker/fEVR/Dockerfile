@@ -16,4 +16,6 @@ COPY rootfs /
 RUN chmod +x /opt/fevr/setup/enable_cgi && /opt/fevr/setup/enable_cgi \
  && chown -R 100:1000 /var/www \
  && chmod -R 0770 /var/www \
- && chmod -R 0770 /opt/fevr
+ && chmod -R 0770 /opt/fevr \
+ && chown root:101 /opt/fevr/setup/dbsetperms \
+ && chmod u+s /opt/fevr/setup/dbsetperms

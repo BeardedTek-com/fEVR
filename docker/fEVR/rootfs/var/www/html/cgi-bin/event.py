@@ -44,8 +44,8 @@ class event:
         from sqlite import sqlite
         SQL = f"""SELECT * FROM events WHERE event='{self.id}' ORDER BY event DESC LIMIT 1"""
         self.error.execute(SQL,src=self.script)
-        hpsql = sqlite()
-        hpsql.open(self.db)
+        hpsql = sqlite(db=self.db)
+        hpsql.open()
         items = hpsql.retrieve(SQL)
         for row in items:
             event={}

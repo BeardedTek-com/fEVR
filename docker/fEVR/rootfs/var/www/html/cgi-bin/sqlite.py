@@ -18,7 +18,8 @@
 import sqlite3
 from sqlite3 import Error
 class sqlite:
-    def __init__(self,debug=False):
+    def __init__(self,debug=False,db="/var/www/data/db/fEVR.sqlite"):
+        self.db = db
         from os.path import basename
         self.script = basename(__file__)
         from logit import logit
@@ -26,11 +27,17 @@ class sqlite:
         self.conn = None
         self.version = ""
         self.debug = debug
-    def open(self,db="/var/www/data/db/fEVR.sqlite"):
+        self.fatalerror =  f"\n\
+        ############################### FATAL ERROR ###############################\n\
+        \n\
+        ##MESSAGE##\
+        \n\
+        ###########################################################################"
+    def open(self):
         try:
             if self.debug:
-                self.error.execute(f"connecting to {db}.....\n",src=self.script)
-            self.conn = sqlite3.connect(db)
+                self.error.execute(f"connecting to {self.db}.....\n",src=self.script)
+            self.conn = sqlite3.connect(self.db)
         except Error as e:
             if self.debug:
                 self.error.execute(e,src=self.script)
@@ -54,12 +61,30 @@ class sqlite:
             self.error.execute(retval,src=self.script)
             return retval
     
-    def retrieve(self,sql):
-        cursor = self.conn.cursor()
+    def retrieve(self,sql,count=0):
         try:
-            cursor.execute(sql)
+            cursor = self.conn.cursor()
+            try:
+                cursor.execute(sql)
+                records = cursor.fetchall()
+                cursor.close
+                return records
+            except:
+                self.error.execute(f"No results returned from {self.db}", self.script)
+                return []
         except:
-            return []
-        records = cursor.fetchall()
-        cursor.close
-        return records
+            msg =f"Permissions improperly set on {self.db}"
+            try:
+                import subprocess
+                data = subprocess.check_output("/opt/fevr/setup/dbsetperms '/var/www/data/db'", shell=True)
+                self.error.exeture(data,self.script)
+            except:
+                from os import environ
+                imgName=environ.get('FEVR_CONTAINER_NAME',"fevr")
+                msg += f"\n Cannot automatically set permissions. Please run the following command on your host:\n\
+                         docker exec -it {imgName} chown -R 100:101 /var/www/data && chmod -R 0770 /var/www/data"
+            finally:
+                errmsg = self.fatalerror.replace("##MESSAGE##",msg)
+
+            self.error.execute(errmsg, self.script)
+        
