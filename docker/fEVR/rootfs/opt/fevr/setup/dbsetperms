@@ -1,0 +1,8 @@
+#!/bin/bash
+if [ "$1" == "/var/www/db/*" || "$1" == "/var/www/data/config/*" ]; then
+    echo "Setting Permissions recursively in $1"
+    chown -R 100:101 $1
+    chmod -R 0770 /var/www/data/db
+else
+    echo "Uh uh uh, you didn't say the magic word!"
+fi

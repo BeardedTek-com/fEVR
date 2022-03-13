@@ -17,7 +17,7 @@
 #    along with this program.  If not, see <https://www.gnu.org/licenses/>.
 import os
 class fetchEvent:
-    def __init__(self,frigate,event,debug=False,thumbSize=180,location='/var/www/html/events/'):
+    def __init__(self,frigate,event,debug=False,thumbSize=180,location='/var/www/html/events/',db="/var/www/data/db/fEVR.sqlite"):
         from os.path import basename
         self.script = basename(__file__)
         from logit import logit
@@ -34,6 +34,7 @@ class fetchEvent:
         self.default = "/var/www/default/"
         self.Return = {}
         self.Return['event'] = self.event
+        self.db = db
     def delEvent(self,db=True):
         import shutil
         path = f"{self.location}{self.event}"
@@ -43,7 +44,7 @@ class fetchEvent:
             sql = f"""DELETE FROM events WHERE event='{self.event}';"""
             self.error.execute(f"delEvent() - {sql}",src=self.script)
             from sqlite import sqlite
-            fsql = sqlite()
+            fsql = sqlite(db=self.db)
             fsql.open()
             self.error.execute(f" delEvent() - {fsql.execute(sql)}",src=self.script)
         else:

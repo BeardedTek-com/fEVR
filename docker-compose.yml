@@ -32,15 +32,19 @@ services:
     environment:
       FRIGATE_URL: "${FRIGATE_URL:-http://frigate.local:5000}"
       FEVR_DEBUG: "${FRIGATE_DEBUG:-true}"
+      FEVR_IP: ${FEVR_IP:-192.168.100.1}
+      FEVR_PORT: ${FEVR_PORT:-5080}
+      FEVR_CONTAINER_NAME: ${FEVR_CONTAINER_NAME:-fevr}
     privileged: true
-    command: /opt/fevr/startup/writeConfig "${FEVR_DEBUG:-true}" "${FEVR_TITLE:-Home}" "${FRIGATE_URL:-http://frigate.local:5000}"
+    #command: /opt/fevr/startup/writeConfig "${FEVR_DEBUG:-true}" "${FEVR_TITLE:-Home}" "${FRIGATE_URL:-http://frigate.local:5000}" "true"
     networks:
       beardnet:
         ipv4_address: ${FEVR_IP:-192.168.100.1}
     volumes:
-     - ./vol/fevr/data/:/var/www/data            # OPTIONAL: expose /var/www/data folder which contains the SQLite database and config.json files
-     - ./vol/fevr/events:/var/www/html/events    # OPTIONAL: save events to a local folder
+     #- ./vol/fevr/data/:/var/www/data            # OPTIONAL: expose /var/www/data folder which contains the SQLite database and config.json files
+     #- ./vol/fevr/events:/var/www/html/events    # OPTIONAL: save events to a local folder
      - nfsevents:/var/www/html/events            # OPTIONAL: save events to an NFS share
+     - nfsdata:/var/www/data
 
 networks:
   beardnet:                     # Network definition for our tailscale network
@@ -54,12 +58,12 @@ volumes:
   nfsevents:                                     # VOLUME DEFINITION FOR NFS share
     driver_opts:
       type: "nfs"
-      o: "addr=<${NAS_IP}>,nfsvers=4"            # Make sure to change to your NFS server's address
+      o: "addr=${NAS_IP},nfsvers=4"            # Make sure to change to your NFS server's address
       # o: "addr=<your_nas_ip>,rw,nfsvers=4"     # SOME NFS SHARES REQUIRE THIS!!!
       device: ":${NAS_EVENTS}"
   nfsdata:                                       # VOLUME DEFINITION FOR NFS share
     driver_opts:
       type: "nfs"
-      o: "addr=<${NAS_IP}>,nfsvers=4"            # Make sure to change to your NFS server's address
+      o: "addr=${NAS_IP},nfsvers=4"            # Make sure to change to your NFS server's address
       # o: "addr=<your_nas_ip>,rw,nfsvers=4"     # SOME NFS SHARES REQUIRE THIS!!!
       device: ":${NAS_DATA}"

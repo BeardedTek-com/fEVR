@@ -16,12 +16,21 @@
 #    You should have received a copy of the GNU General Public License
 #    along with this program.  If not, see <https://www.gnu.org/licenses/>.
 class logit:
-    def __init__(self,logfile="/var/www/logs/debug.log"):
+    def __init__(self,logfile="/var/www/logs/debug.log",debug=False):
         self.logfile = logfile
+        from os import environ
+        self.debug = False
+        if environ.get('FEVR_DEBUG', 'false').lower() == "true" or debug == True:
+            self.debug = True
+
     def execute(self,msg,src='fEVR',level='debug',logpath='/var/www/logs'):
         from time import time
         self.logtime = "{:.4f}".format(time())
         self.logfile = f"{logpath}/{level}.log"
-        logentry = f"{self.logtime} {str(msg)}\n"
+        logentry = f"{self.logtime} {str(msg)}"
         with open(self.logfile,"a+") as logFile:
             logFile.write(f"[ {src:15}] {logentry}")
+        self.to_stderr(f"[ {src:15}] {logentry}")
+    def to_stderr(self, *a):
+        import sys
+        print(*a, file=sys.stderr)

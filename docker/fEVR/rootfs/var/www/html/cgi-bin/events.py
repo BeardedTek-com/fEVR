@@ -137,8 +137,8 @@ class events:
             sql += f""" LIMIT {str(count)};"""
         from fetch import fetchEvent
         from sqlite import sqlite
-        fsqlite = sqlite()
-        fsqlite.open(self.fevr['db'])
+        fsqlite = sqlite(db=self.fevr['db'])
+        fsqlite.open()
         self.error.execute(sql,src=self.script)
         items = fsqlite.retrieve(sql)
         self.error.execute(f"# ITEMS: {len(items)}",src=self.script)
