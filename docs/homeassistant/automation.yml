@@ -1,0 +1,71 @@
+alias: fEVR Backyard Person Alert
+description: fEVR Object Detection Alerts
+trigger:
+  - platform: mqtt
+    topic: frigate/events
+condition:
+  - condition: template
+    value_template: '{{ trigger.payload_json["type"] == "end" }}'
+  - condition: template
+    value_template: |-
+      {{
+      trigger.payload_json["after"]["label"] == "person"
+      }}
+  - condition: template
+    value_template: |-
+      {{
+      trigger.payload_json["after"]["top_score"] > 0.76
+      }}
+  - condition: template
+    value_template: |-
+      {{
+      trigger.payload_json["after"]["camera"] == "backyard"
+      }}
+action:
+  - service: rest_command.fevr
+    data:
+      debug: 'yes'
+      event: '{{trigger.payload_json[''after''][''id'']}}'
+      camera: '{{trigger.payload_json[''after''][''camera'']}}'
+      type: '{{trigger.payload_json[''after''][''label'']}}'
+      clip: '{{trigger.payload_json[''after''][''has_clip'']}}'
+      snap: '{{trigger.payload_json[''after''][''has_snapshot'']}}'
+      score: '{{trigger.payload_json[''after''][''top_score'']}}'
+      updated: '{{as_timestamp(now())}}'
+  - choose:
+      - conditions:
+          - condition: state
+            state: 'off'
+            entity_id: input_boolean.fevrbackyardanimal
+        sequence:
+          - service: notify.mobile_app_sg20plus
+            data:
+              message: '{{ trigger.payload_json["after"]["label"] | title }} Detected'
+              data:
+                notification_icon: mdi:cctv
+                ttl: 0
+                priority: high
+                sticky: true
+                actions:
+                  - action: URI
+                    title: fEVR
+                    uri: https://fevr.local:5080/?action=event&id={{trigger.payload_json['after']['id']}}
+                image: >-
+                  /api/frigate/notifications/{{trigger.payload_json['after']['id']}}/snapshot.jpg?bbox=1
+                tag: '{{trigger.payload_json["after"]["id"]}}'
+                alert_once: true
+          - service: input_boolean.turn_on
+            data: {}
+            target:
+              entity_id: input_boolean.fevrbackyardanimal
+          - delay:
+              hours: 0
+              minutes: 0
+              seconds: 30
+              milliseconds: 0
+          - service: input_boolean.turn_off
+            data: {}
+            target:
+              entity_id: input_boolean.fevrbackyardperson
+    default: []
+mode: single

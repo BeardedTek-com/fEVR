@@ -1,0 +1,13 @@
+#!/bin/bash
+
+# Get Environment Variable and set defaults if they're not set
+SQLW_START="${SQLITE_WEB_ENABLE:-true}"
+SQLW_PORT="${SQLITE_WEB_PORT:-5081}"
+
+if $SQLW_START == 'true' then
+    sqlite_web -p $SQLW_PORT -H 0.0.0.0 -x /var/www/db/fEVR.sqlite | grep "* Running on" > sqlite_web.info
+    sqlitewinfo = `cat sqlite_web.info`
+    echo "sqlite_web running on port $SQLWPORT".
+else
+    echo "sqlite_web disabled. Set env var SQLITE_WEB_ENABLE='true' to enable."
+fi
