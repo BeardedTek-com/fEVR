@@ -85,8 +85,19 @@ a:hover{
 .menuItem{
     padding-right: 1em;
 }
+.menuItem a:hover{
+    cursor: pointer;
+}
 .subitem{
     padding-left: 0.5em;
+}
+.submenu{
+    height: 0;
+    transition: height 1s ease;
+    overflow: hidden;
+}
+.submenu-show{
+    height: auto;
 }
 #frigateErr{
     position: absolute;

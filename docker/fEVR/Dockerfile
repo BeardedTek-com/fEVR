@@ -7,6 +7,7 @@ RUN apk --no-cache add apache2 libxml2-dev apache2-utils py3-pip py3-pillow git 
     pip install python-dateutil && \
     pip install requests && \
     pip install sqlite_web && \
+    pip install css-html-js-minify && \
     rm -rf /var/www/logs
 
 # Copy root filesystem
@@ -19,3 +20,4 @@ RUN chmod +x /opt/fevr/setup/enable_cgi && /opt/fevr/setup/enable_cgi \
  && chmod -R 0770 /opt/fevr \
  && chown root:101 /opt/fevr/setup/dbsetperms \
  && chmod u+s /opt/fevr/setup/dbsetperms
+# && /opt/fevr/setup/minify
