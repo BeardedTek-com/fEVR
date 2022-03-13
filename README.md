@@ -26,7 +26,11 @@ fEVR works along side of [frigate](https://frigate.video) and [home assistant](h
 ## Install
 The easiest and recommended method of install is docker-compose.
 - Included is a container running tailscale to securely access fEVR.  This is not 100% necessary, but far more secure.
-- Edit [docker-compose.yml](./docker-compose.yml) and bring the stack up:
+- Create .env
+```
+cp template.env .env
+```
+- Edit [.env file](template.env)] and bring the stack up:
 ```
 sudo docker-compose up -d
 ```
@@ -37,66 +41,75 @@ sudo docker-compose exec tailscale tailscale up --advertise-routes=192.168.100.0
 - Follow the Auth URL and either add to your existing account or create a new one.  Its free and easy to use.
 
 ```yml
-version: '3'
+version: '2.4'
 services:
   tailscale:                                      # Provides tailscale functionality for the stack
-    #build:                                       # By default it uses the 192.168.100.0/24 network
-    #  context: ./docker/tailscale                # Start tailscale once the container is up:
-    #  dockerfile: Dockerfile                     # docker-compose exec tailscale tailscale up --advertise-routes=192.168.100.0/24 --accept-routes
-    image: ghcr.io/beardedtek-com/tailscale:v0.4  # This will provide you with the Authorization URL to sign into tailscale.
-    container_name: tailscale                     # If you don't have an account, its simple and free to signup.
+    build:                                        # By default it uses the 192.168.100.0/24 network
+      context: ${TAILSCALE_CONTEXT}               # Start tailscale once the container is up:
+      dockerfile: Dockerfile                      # docker-compose exec tailscale tailscale up --advertise-routes=192.168.100/24 --accept-routes
+                                                  # This will provide you with the Authorization URL to sign into tailscale.
+    image: ${TAILSCALE_IMAGE:-ghcr.io/beardedtek-com/tailscale:main}
+    container_name: ${TAILSCALE_CONTAINER_NAME:-tailscale}
     restart: unless-stopped 
     volumes:
-      - ./vol/tailscale/data:/data
-      - ./vol/tailscale/var_lib:/var/lib          # Required for tailscale
+      - ${TAILSCALE_DATA}
+      - ${TAILSCALE_VAR_LIB}                      # Required for tailscale
       - /dev/net/tun:/dev/net/tun                 # Required for tailscale
     cap_add:
       - net_admin                                 # Required for tailscale
       - sys_module                                # Required for tailscale
-    networks:
-      beardnet:
-        ipv4_address: 192.168.100.253
-    privileged: true
-  fevr:
-    #build:
-    #  context: ./docker/fEVR
-    #  dockerfile: Dockerfile
-    image: ghcr.io/beardedtek-com/fevr:v0.4
-    container_name: fevr
-    restart: unless-stopped
-    privileged: true
-    depends_on:                                   # Comment this out if you don't want to run tailscale.
-      - tailscale
     environment:
-      FEVR_DEBUG: "true"
-      FEVR_TITLE: "Home"
-      FEVR_PORT: "5080"
-      FRIGATE_URL: "http://192.168.2.240:5000"
-      SQLITE_WEB_ENABLE: "true"
-      SQLITE_WEB_PORT: "5081"
+      DOCKER_SUBNET: ${NETWORK_SUBNET:-192.168.100.0/24}
     networks:
       beardnet:
-        ipv4_address: 192.168.100.1
+        ipv4_address: ${TAILSCALE_IP:-192.168.100.253}
+    privileged: true
+    command: ${TAILSCALE_COMMAND:-/opt/tailscale/tailscale}
+  fevr:
+    build:
+      context: ${FEVR_CONTEXT}
+      dockerfile: Dockerfile
+    image: ${FEVR_IMAGE:-ghcr.io/beardedtek-com/fevr:main}
+    container_name: ${FEVR_CONTAINER_NAME:-fevr}
+    restart: unless-stopped
+    environment:
+      FRIGATE_URL: "${FRIGATE_URL:-http://frigate.local:5000}"
+      FEVR_DEBUG: "${FRIGATE_DEBUG:-true}"
+      FEVR_IP: ${FEVR_IP:-192.168.100.1}
+      FEVR_PORT: ${FEVR_PORT:-5080}
+      FEVR_CONTAINER_NAME: ${FEVR_CONTAINER_NAME:-fevr}
+    privileged: true
+    #command: /opt/fevr/startup/writeConfig "${FEVR_DEBUG:-true}" "${FEVR_TITLE:-Home}" "${FRIGATE_URL:-http://frigate.local:5000}" "true"
+    networks:
+      beardnet:
+        ipv4_address: ${FEVR_IP:-192.168.100.1}
     volumes:
-#     - ./vol/fevr/data/:/var/www/data            # OPTIONAL: expose /var/www/data folder which contains the SQLite database and config.json files
-     - ./vol/fevr/events:/var/www/html/events     # OPTIONAL: save events to a local folder
-#     - nfsvolume:/var/www/html/events            # OPTIONAL: save events to an NFS share
+     #- ./vol/fevr/data/:/var/www/data            # OPTIONAL: expose /var/www/data folder which contains the SQLite database and config.json files
+     #- ./vol/fevr/events:/var/www/html/events    # OPTIONAL: save events to a local folder
+     - nfsevents:/var/www/html/events            # OPTIONAL: save events to an NFS share
+     - nfsdata:/var/www/data
 
 networks:
-  beardnet:                                       # Network definition for our tailscale network
+  beardnet:                     # Network definition for our tailscale network
     driver: bridge
     ipam:
       config:
-        - subnet: 192.168.204.0/24
-          gateway: 192.168.100.254
+        - subnet: ${SUBNET:-192.168.100.0/24}
+          gateway: ${GATEWAY:-192.168.100.254}
 
-#volumes:
-#  nfsvolume:                                     # VOLUME DEFINITION FOR NFS share
-#    driver_opts:
-#      type: "nfs"
-#      o: "addr=<your_nas_ip>,nfsvers=4"          # Make sure to change to your NFS server's address
-#      # o: "addr=<your_nas_ip>,rw,nfsvers=4"     # SOME NFS SHARES REQUIRE THIS!!!
-#      device: ":/path/to/your/nfs/share"
+volumes:
+  nfsevents:                                     # VOLUME DEFINITION FOR NFS share
+    driver_opts:
+      type: "nfs"
+      o: "addr=${NAS_IP},nfsvers=4"            # Make sure to change to your NFS server's address
+      # o: "addr=<your_nas_ip>,rw,nfsvers=4"     # SOME NFS SHARES REQUIRE THIS!!!
+      device: ":${NAS_EVENTS}"
+  nfsdata:                                       # VOLUME DEFINITION FOR NFS share
+    driver_opts:
+      type: "nfs"
+      o: "addr=${NAS_IP},nfsvers=4"            # Make sure to change to your NFS server's address
+      # o: "addr=<your_nas_ip>,rw,nfsvers=4"     # SOME NFS SHARES REQUIRE THIS!!!
+      device: ":${NAS_DATA}"
 ```
 
 - Configure Home Assistant Automation to feed fevr with data:
