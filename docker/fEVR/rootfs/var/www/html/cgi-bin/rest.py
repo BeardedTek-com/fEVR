@@ -120,7 +120,7 @@ def main():
         sql = fRest.json2sql()
         fRest.error.execute(f"Event SQL: {sql}",src=fRest.script)
         hpsql = sqlite(db=fRest.db)
-        hpsql.open("/var/www/data/db/fEVR.sqlite")
+        hpsql.open()
         fRest.error.execute(f"Execute SQL: {hpsql.execute(sql)}",src=fRest.script)
         fRest.error.execute("Event Loaded",src=fRest.script)
     else:
