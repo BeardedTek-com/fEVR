@@ -40,6 +40,7 @@ class event:
         dt_utc = datetime.strptime(dt_str,format)
         dt_utc = dt_utc.replace(tzinfo=pytz.UTC)
         return dt_utc.astimezone(pytz.timezone('America/Anchorage'))
+
     def getEvent(self):
         from sqlite import sqlite
         SQL = f"""SELECT * FROM events WHERE event='{self.id}' ORDER BY event DESC LIMIT 1"""
@@ -76,13 +77,16 @@ class event:
         time = datetime.fromtimestamp(int(self.id.split('.')[0]))
         ftime = str(self.convertTZ(str(time))).rsplit('-')
         self.event['time'] = f"{ftime[0]}-{ftime[1]}-{ftime[2]}"
+        if self.event['ack'] != "true" and self.event['ack'] != 'false':
+            fetch.ackEvent('true')
+            self.event['ack'] = 'true'
         if self.event['ack'] == "true":
-            newClass = "newhidden"
-            ackAction = "Unacknowledge"
+            newClass = "hidden"
+            ackAction = "Mark Unseen"
             ackLink = f"?id={self.id}&action=unack"
         else:
             newClass= ""
-            ackAction = "Acknowledge"
+            ackAction = "Mark Seen"
             ackLink = f"?id={self.id}&action=ack"
         refreshLink = f"?id={self.id}&action=refreshEvent"
         delLink = f"?id={self.id}&action=delEvent"
@@ -110,7 +114,7 @@ class event:
                 elif self.action == "unack":
                     from fetch import fetchEvent
                     fetch = fetchEvent(self.frigate,self.id)
-                    fetch.ackEvent('')
+                    fetch.ackEvent('false')
                     view = f"<script>location.href='?id={self.id}';</script>"
                 else:
                     view = ""

@@ -25,25 +25,38 @@ class events:
         self.error = logit()
         self.getOptions()
         self.noResults = False
+        self.getFilterValues()
+
     def getOptions(self):
         import cgi
         fieldStorage = cgi.FieldStorage()
-        self.count=""
-        self.order=""
-        self.selectors={}
-        self.extraOptions={}
-        for key in fieldStorage.keys():
-            item = fieldStorage.getvalue(key)
-            if key == 'count':
-                self.count = item
-            elif key == 'order':
-                self.order = item
+        self.input = fieldStorage
+        self.selectors={"count":"","order":"","camera":"","type":"","time":"","score":""}
+        for key in self.input.keys():
+            for filter in self.selectors:
+                if key == filter:
+                    self.selectors[filter] = fieldStorage.getvalue(key)
+
+    def getFilterValues(self):
+        self.currentFilters = {}
+        for param in ['count','camera','type','score','time']:
+            if param in self.input:
+                if param == 'score':
+                    score = self.input.getvalue(param)
+                    if score != "0":
+                        if len(score) > 3:
+                            score = score[2:4]
+                        else:
+                            score = score[2:]
+                            if int(score) < 10:
+                                score = int(score)*10
+                    self.currentFilters[param] = score
+                    self.error.execute(f"SCORE: {score}",src=self.script)
+                else:
+                    self.currentFilters[param] = self.input.getvalue(param)
             else:
-                for field in ['camera','type','ack','clip','snap','score']:
-                    if key == field:
-                        self.selectors[key] = item
-                    else:
-                        self.extraOptions[key] = item
+                self.currentFilters[param] = "none"
+
     def getEvent(self,event,thumbSize=180,location='/var/www/html/events/'):
         eventPATH = f"{location}{event['id']}"
         snapPATH = f"{eventPATH}{self.frigate['snap']}"
@@ -60,6 +73,7 @@ class events:
             self.resizeImg(snapPATH,thumbPATH,thumbSize)
             clip = requests.get(clipURL, allow_redirects=True)
             open(clipPATH,'wb').write(clip.content)
+
     def resizeImg(self,img,thumbPATH,height=180,ratio=(16/9)):
         # Resizes an image from the filesystem
         size = (int((height*ratio)),height)
@@ -67,6 +81,7 @@ class events:
         picture = CompressImage.open(img)
         thumb = picture.resize(size)
         thumb.save(thumbPATH,"JPEG",optimize=True)
+
     def convertTZ(self,dt_str):
         from datetime import datetime
         from dateutil import tz
@@ -75,6 +90,7 @@ class events:
         dt_utc = datetime.strptime(dt_str,format)
         dt_utc = dt_utc.replace(tzinfo=pytz.UTC)
         return dt_utc.astimezone(pytz.timezone('America/Anchorage'))
+
     def noEvents(self):
         if os.path.isfile(stub):
             with open(stub) as eventStub:
@@ -88,6 +104,7 @@ class events:
                 data = data.replace('##NEW##','')
         if data:
             return data
+
     def generateEventDiv(self,event):
         from datetime import datetime
         time = datetime.fromtimestamp(int(event['id'].split('.')[0]))
@@ -96,45 +113,81 @@ class events:
         if os.path.isfile(stub):
             with open(stub) as eventStub:
                 if str(event['ack']).lower() != "true":
-                    newMarker = "NEW"
+                    newClass = "new"
                 else:
-                    newMarker = ""
+                    newClass = "hidden"
                 url = f"event.py?id={event['id']}"
                 thumbURL = f"../events/{event['id']}/thumb.jpg"
-                caption = f"{event['time']}<br/>\n {event['type']} detected in {event['camera']}"
+                score = event['score']
+                if len(score) > 3:
+                    score = score[2:4]
+                else:
+                    score = event[2:]
+                    if score < 10:
+                        score = int(score)*10
                 data = eventStub.read()
-                data = data.replace('##EVENT_URL##',url)
-                data = data.replace('##EVENT_IMG##',thumbURL)
-                data = data.replace('##EVENT_CAPTION##',caption)
-                data = data.replace('##NEW##',newMarker)
+                data = data.replace('##URL##',url)
+                data = data.replace('##IMG##',thumbURL)
+                data = data.replace('##CAMERA##',event['camera'])
+                data = data.replace('##OBJECT##', event['type'])
+                data = data.replace('##SCORE##',f"{score}%")
+                data = data.replace('##TIME##',event['time'][:-6])
+                data = data.replace('##NEW##',newClass)
         if data:
             return data
+
     def getStub(self,stub):
         if os.path.isfile(stub):
             with open(stub) as Stub:
                 return Stub.read()
-    def getEvents(self,count=False,selectors=False,order=False):
-        wheres = ""
-        if selectors:
-            wheres += """WHERE """
-            num = 1
-            for key in selectors:
-                self.error.execute(selectors[key],src=self.script)
-                self.error.execute(f"COUNT: {count}",src=self.script)
-                if num > 1:
-                    wheres += """AND """
-                wheres += f"""{key}='{selectors[key]}' """
-                num += 1
-        sql = """SELECT * FROM events """
+
+    def getEvents(self,selectors):
+        sql = "SELECT * FROM events"
+        wheres = []
+        where = ""
+        sort = """ ORDER BY id DESC"""
+        limit = 10
+        for key in selectors:
+            value=selectors[key]
+            if value:
+                if key == "count":
+                    limit = value
+                elif key == "sort":
+                    if value == "newest":
+                        sort = """ ORDER BY id DESC"""
+                    elif value == "oldest":
+                        sort = """ ORDER BY id ASC"""
+                elif key == "score":
+                    wheres.append(f"""{key}>{value}""")
+                elif key == "time":
+                    import datetime
+                    time = datetime.datetime.fromtimestamp(value)
+                    if value[-1] == "d":
+                        time = time - datetime.timedelta(days=int(value.replace(value[-1],'')))
+                    elif value[-1] == "h":
+                        time = time - datetime.timedelta(hours=int(value.replace(value[-1],'')))
+                    elif value[-1] == "w":
+                        time = time - datetime.timedelta(weeks=int(value.replace(value[-1],'')))
+                    elif value[-1] == "y":
+                        days = int(value.replace(value[-1],'')) * 365
+                        time = time - datetime.timedelta(days=days)
+                        wheres.append(f"""{key}>{time}""")
+                else:
+                    wheres.append(f"""{key}='{value}'""")
         if wheres:
-            sql += wheres
-        if order:
-            if order['field'] and order['direction']:
-                sql += f"""ORDER BY {order['field']} {order['direction']}"""
+            x = 0
+            for n in wheres:
+                if x == 0:
+                    where = "WHERE "
+                else:
+                    where += " AND "
+                where += n
+                x+=1
+        if int(limit) > 0:
+            where += f"{sort} LIMIT {limit}"
         else:
-            sql += """ORDER BY event DESC"""
-        if count:
-            sql += f""" LIMIT {str(count)};"""
+            where += f"{sort} LIMIT 10"
+        sql = f"""SELECT * FROM events {where};"""
         from fetch import fetchEvent
         from sqlite import sqlite
         fsqlite = sqlite(db=self.fevr['db'])
@@ -158,11 +211,11 @@ class events:
         if len(items) < 1:
             self.noResults = True
         return data
+
     def execute(self):
         from config import Config
         fconfig = Config()
         print('content-type: text/html; charset=UTF-8\n\n')
-        print()
         if fconfig.exists:
             self.debug = fconfig.debug
             self.config = fconfig.config
@@ -170,15 +223,16 @@ class events:
             self.fevr = self.config['fevr']
             self.error.execute(self.frigate,src=self.script)
             self.error.execute(self.fevr,src=self.script)
-            content = self.getEvents(self.count,self.selectors,self.order)
+            content = self.getEvents(self.selectors)
         else:
             content = self.getStub("/var/www/html/config.html")
-        
         if self.noResults:
             content = self.noEvents()
-
         header = self.getStub("/var/www/html/stub/eventsHeader.html")
         footer = self.getStub("/var/www/html/stub/eventsFooter.html")
+        from filter import eventFilter
+        filters = eventFilter(self.frigate['url'],self.currentFilters)
+        header = header.replace('##FILTERS##',filters.filters)
         print(f"{header}{content}{footer}")
 
 def main():
