@@ -1,5 +1,8 @@
 function filterEvents(){
     count = document.getElementById('countSelect').value
+    if (count == ''){
+        count = 'all'
+    }
     camera = document.getElementById('camSelect').value
     object = document.getElementById('objSelect').value
     scores = +document.getElementById('scoreSelect').value.replace("%", "")/100

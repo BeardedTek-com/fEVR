@@ -36,9 +36,18 @@ class events:
             for filter in self.selectors:
                 if key == filter:
                     self.selectors[filter] = fieldStorage.getvalue(key)
-        self.count = int(self.selectors['count'])
-        self.page = int(self.selectors['page'])
-        self.offset = self.page * self.count - self.count
+        if self.selectors['count'] == 'all':
+            self.noLimit = True
+            self.page = 1
+            self.count = 1
+            self.offset = 0
+        else:
+            if self.selectors['count'] == '':
+              self.count = 10
+              self.selectors['count'] = '10'
+            self.count = int(self.selectors['count'])
+            self.page = int(self.selectors['page'])
+            self.offset = self.page * self.count - self.count
                 
     def getFilterValues(self):
         self.currentFilters = {}
@@ -151,6 +160,8 @@ class events:
                         sort = """ ORDER BY id DESC"""
                     elif value == "oldest":
                         sort = """ ORDER BY id ASC"""
+                    else:
+                        sort = """ ORDER BY id DESC"""
                 elif key == "score":
                     wheres.append(f"""{key}>{value}""")
                 elif key == "time":
@@ -173,7 +184,8 @@ class events:
                         wheres.append(f"""{key}>{ftime}""")
                 else:
                     if key != "page":
-                        wheres.append(f"""{key}='{value}'""")
+                        if not self.noLimit:
+                            wheres.append(f"""{key}='{value}'""")
         if wheres:
             x = 0
             for n in wheres:
@@ -183,11 +195,16 @@ class events:
                     where += " AND "
                 where += n
                 x+=1
-        if int(limit) > 0:
+        if limit == 'all':
+          offset = ''
+        else:  
+          if int(limit) > 0:
             where += f"{sort} LIMIT {limit}"
-        else:
+          else:
             where += f"{sort} LIMIT 10"
-        sql = f"""SELECT * FROM events {where} OFFSET {self.offset};"""
+          offset = f" OFFSET {self.offset}"
+          offset = ''
+        sql = f"""SELECT * FROM events {where}{offset};"""
         from fetch import fetchEvent
         from sqlite import sqlite
         fsqlite = sqlite(db=self.fevr['db'])

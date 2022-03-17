@@ -205,32 +205,37 @@ class eventFilter:
         return SelectStub
 
     def Pager(self):
-        curPage = int(self.selectors['page'])
-        self.page = curPage
-        self.countPerPage = int(self.selectors['count'])
-        from math import ceil
-        pageCount = ceil(int(self.numRecords)/self.countPerPage)
-        curPageOutput = f"<span class='pager'>{curPage} of {pageCount}</span>"
-        nextPageOutput = "<span class='pager disabled'>next</span>"
-        prevPageOutput = "<span class='pager disabled'>prev</span>"
-        if self.recordCount > int(self.currentFilters['page']):
-            pageCounter = pageCount
-            baseURL = "?"
-            for selector in self.selectors:
-                if selector != 'page':
-                    baseURL += f"{selector}={self.selectors[selector]}&"
-            self.pager = []
-            self.pager.append('PAD ZERO')
-            pageNum = 0
-            
-            while pageCounter > 0:
-                pageNum += 1
-                self.pager.append(f"<span class='pager'><a href='{baseURL}page={pageNum}'>#PAGE#</a>")
-                pageCounter -= 1
-            if curPage > 1:
-                prevPage = curPage - 1
-                prevPageOutput = self.pager[prevPage].replace('#PAGE#','prev')
-            nextPage = curPage + 1
-            if nextPage <= pageCount:
-                nextPageOutput = self.pager[nextPage].replace('#PAGE#','next')
+        if self.selectors['count'] == 'all':
+            curPageOutput = f"<span class='pager'>1 of 1</span>"
+            nextPageOutput = "<span class='pager disabled'>next</span>"
+            prevPageOutput = "<span class='pager disabled'>prev</span>"
+        else:
+            curPage = int(self.selectors['page'])
+            self.page = curPage
+            self.countPerPage = int(self.selectors['count'])
+            from math import ceil
+            pageCount = ceil(int(self.numRecords)/self.countPerPage)
+            curPageOutput = f"<span class='pager'>{curPage} of {pageCount}</span>"
+            nextPageOutput = "<span class='pager disabled'>next</span>"
+            prevPageOutput = "<span class='pager disabled'>prev</span>"
+            if self.recordCount > int(self.currentFilters['page']):
+                pageCounter = pageCount
+                baseURL = "?"
+                for selector in self.selectors:
+                    if selector != 'page':
+                        baseURL += f"{selector}={self.selectors[selector]}&"
+                self.pager = []
+                self.pager.append('PAD ZERO')
+                pageNum = 0
+                
+                while pageCounter > 0:
+                    pageNum += 1
+                    self.pager.append(f"<span class='pager'><a href='{baseURL}page={pageNum}'>#PAGE#</a>")
+                    pageCounter -= 1
+                if curPage > 1:
+                    prevPage = curPage - 1
+                    prevPageOutput = self.pager[prevPage].replace('#PAGE#','prev')
+                nextPage = curPage + 1
+                if nextPage <= pageCount:
+                    nextPageOutput = self.pager[nextPage].replace('#PAGE#','next')
         return f"{prevPageOutput} {curPageOutput} {nextPageOutput}"
