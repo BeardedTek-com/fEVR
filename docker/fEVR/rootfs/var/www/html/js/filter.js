@@ -4,6 +4,6 @@ function filterEvents(){
     object = document.getElementById('objSelect').value
     scores = +document.getElementById('scoreSelect').value.replace("%", "")/100
     times = document.getElementById('timeSelect').value
-    url = "?count="+count+"&camera="+camera+"&type="+object+"&score="+scores+"&times="+times;
+    url = "?count="+count+"&camera="+camera+"&type="+object+"&score="+scores+"&time="+times;
     location.href=url;
 }

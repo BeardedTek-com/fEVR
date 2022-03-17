@@ -17,25 +17,34 @@
 #    along with this program.  If not, see <https://www.gnu.org/licenses/>.
 class frigateConfig:
     def __init__(self,frigateURL):
-        self.error = False
+        from os.path import basename
+        self.script = basename(__file__)
+        from logit import logit
+        self.error = logit()
+        self.frigateError = False
         self.url = frigateURL
         self.configAPI = "/api/config"
         self.cameras = {}
         self.getConfig()
-        if not self.error:
+        if not self.frigateError:
             self.getCameras()
+            self.error.execute(f"{self.cameras}",src=self.script)
     def getConfig(self):
         try:
             configURL = f"{self.url}{self.configAPI}"
             import requests
+            self.error.execute(f"Contacting frigate: {configURL}",src=self.script)
             frigateConfig = requests.get(configURL, timeout=5, allow_redirects=True)
             import json
             self.frigateConfig = json.loads(frigateConfig.content)
+            self.error.execute(f"Contacting frigate: {configURL} - OK",src=self.script)
         except:
-            self.error = True
+            self.error.execute(f"Contacting frigate: {configURL} - ERROR",src=self.script)
+            self.frigateError = True
     def getCameras(self):
         for camera in self.frigateConfig['cameras']:
+            self.error.execute(f"{camera}",src=self.script)
             self.cameras[camera] = {}
             self.cameras[camera]['objects'] = []
             for object in self.frigateConfig['cameras'][camera]['record']['events']['objects']:
-                self.cameras[camera]['objects'].append(object)
+                self.cameras[camera]['objects'].append(object)   

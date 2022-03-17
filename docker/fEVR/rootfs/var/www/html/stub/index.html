@@ -36,7 +36,7 @@
                 <div id='frigate' class='menuItem menuspace'>
                     <a target='_blank' href='#FRIGATE#'>my frigate</a>
                     <div id='logs' class='menuItem menuspace'>
-                        <a onclick='clickItem("config");' href='?action=config'>settings</a>
+                        <a onclick='modalAction("open","frigateErr"); hideMenu();'>settings</a>
                     </div>
                     <div id='logs' class='menuItem menuspace'>
                         <a onclick='clickItem("Logs");' target='contentFrame' href='logs.py?type=debug'>logs</a>

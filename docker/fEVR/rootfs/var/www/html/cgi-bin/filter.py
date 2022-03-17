@@ -12,8 +12,8 @@ class eventFilter:
         self.currentFilters = currentFilters
         self.filterOptions =    {   "count":  ["10","20","50","100"],
                                     "score":["60","70","80","90"],
-                                    "time": ["1h","2h","6h","12h","1d","1w","1m"],
-                                    "sort": ["newest first","oldest first"]
+                                    "time": ["1h","2h","6h","12h","1d","1w","1m","1y"],
+                                    "sort": ["CAMERA ASC","CAMERA DESC","OBJECT ASC","OBJECT DESC","SCORE ASC","SCORE DESC","TIME ASC","TIME DESC"]
                                 }
         self.filters = ""
         #self.filters = self.cameras + self.objects
@@ -50,7 +50,7 @@ class eventFilter:
             i += 1
 
     def Cameras(self):
-        SelectStub = "<select class='filterselect text-light-accent' name='camSelect' id='camSelect'>\n#CAMERAS#</select>\n"
+        SelectStub = "<select onchange='filterEvents();' class='filterselect text-light-accent border-dark bg-dark-accent' name='camSelect' id='camSelect'>\n#CAMERAS#</select>\n"
         OptionStub = "\t<option value='#CAMERA#' selected>#CAMERA#</option>\n"
         Options = ""
         self.objects = []
@@ -69,10 +69,12 @@ class eventFilter:
         if isthereone == 0:
             Options += OptionStub.replace('#CAMERA#','all cameras')
             Options = Options.replace("value='all cameras'", "value=''")
+        else:
+            Options += OptionStub.replace("'#CAMERA#' selected>#CAMERA#","''>all cameras")
         return SelectStub.replace('#CAMERAS#',Options)
 
     def Objects(self):
-        SelectStub = "<select class='filterselect text-light-accent' name='objSelect' id='objSelect'>\n#OBJECTS#</select>\n"
+        SelectStub = "<select onchange='filterEvents();' class='filterselect text-light-accent border-dark bg-dark-accent' name='objSelect' id='objSelect'>\n#OBJECTS#</select>\n"
         OptionStub = "\t<option value='#OBJECT#' selected>#OBJECT#</option>\n"
         Options = ""
         isthereone = 0
@@ -84,10 +86,13 @@ class eventFilter:
         if isthereone == 0:
             Options += OptionStub.replace('#OBJECT#','all objects')
             Options = Options.replace("value='all objects'", "value=''")
+        else:
+            Options += OptionStub.replace("'#OBJECT#' selected>#OBJECT#","''>all objects")
+
         return SelectStub.replace('#OBJECTS#',Options)
 
     def Sort(self):
-        SelectStub = "<select class='filterselect text-light-accent' name='objSelect' id='objSelect'>\n#SORTS#</select>\n"
+        SelectStub = "<select onchange='filterEvents();' class='filterselect text-light-accent border-dark bg-dark-accent' name='objSelect' id='objSelect'>\n#SORTS#</select>\n"
         OptionStub = "\t<option value='#SORT#' selected>#SORT#</option>\n"
         Options = ""
         isthereone = 0
@@ -98,10 +103,12 @@ class eventFilter:
             isthereone += selected['true']
         if isthereone == 0:
             Options = Options.replace("value='newest first'", "value='newest first' selected")
+        else:
+            Options += OptionStub.replace("'#SORTS#' selected>#SORTS#","''>sort by")
         return SelectStub.replace('#SORTS#',Options)
 
     def Score(self,Filter):
-        SelectStub = "<select class='filterselect text-light-accent' name='#TYPE#Select' id='#TYPE#Select'>\n#FILTERS#</select>\n"
+        SelectStub = "<select onchange='filterEvents();' class='filterselect text-light-accent border-dark bg-dark-accent' name='#TYPE#Select' id='#TYPE#Select'>\n#FILTERS#</select>\n"
         OptionStub = "\t<option value='#FILTER#' selected>#FILTER#%</option>\n"
         Options = ""
         isthereone = 0
@@ -115,13 +122,15 @@ class eventFilter:
             Options += OptionStub.replace('#FILTER#','all #TYPE#s')
             Options = Options.replace("value='all #TYPE#s'", "value='0'")
             Options = Options.replace("selected>all #TYPE#s%","selected>all #TYPE#s")
+        else:
+            Options += OptionStub.replace("'#FILTER#' selected>#FILTER#","''>all #TYPE#s")
         Options = Options.replace("#TYPE#",Filter)
         SelectStub = SelectStub.replace("#FILTERS#",Options)
         SelectStub = SelectStub.replace("#TYPE#",Filter)
         return SelectStub
 
     def Other(self,Filter):
-        SelectStub = "<select class='filterselect text-light-accent' name='#TYPE#Select' id='#TYPE#Select'>\n#FILTERS#</select>\n"
+        SelectStub = "<select onchange='filterEvents();' class='filterselect text-light-accent border-dark bg-dark-accent' name='#TYPE#Select' id='#TYPE#Select'>\n#FILTERS#</select>\n"
         OptionStub = "\t<option value='#FILTER#' selected>#FILTER#</option>\n"
         Options = ""
         isthereone = 0
@@ -133,6 +142,8 @@ class eventFilter:
         if isthereone == 0:
             Options += OptionStub.replace('#FILTER#','all #TYPE#s')
             Options = Options.replace("value='all #TYPE#s'", "value=''")
+        else:
+            Options += OptionStub.replace("'#FILTER#' selected>#FILTER#","''>all #TYPE#s")
         Options = Options.replace("#TYPE#",Filter)
         SelectStub = SelectStub.replace("#FILTERS",Options)
         SelectStub = SelectStub.replace("#TYPE#",Filter)

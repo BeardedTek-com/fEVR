@@ -192,6 +192,16 @@ input[type=text] {
     border-radius: 0.4em;
     font-size: 1.1em;
 }
+#webConfig select{
+    width: 100%;
+    padding: 0.5em 1em;
+    margin: 0.5em 0;
+    box-sizing: border-box;
+    border: 2px solid rgb(22, 38, 126);
+    border-radius: 0.4em;
+    font-size: 1.1em;
+    background: white;
+}
 @media screen and (max-width: 1439px) {
     .menu{
         max-width: fit-content;

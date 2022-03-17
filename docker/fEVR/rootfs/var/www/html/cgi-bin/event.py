@@ -32,14 +32,18 @@ class event:
         self.db = db
         self.event = self.getEvent()
         self.referrer = ""
-    def convertTZ(self,dt_str):
+    def convertTZ(self,dt_str,clock):
         from datetime import datetime
         from dateutil import tz
         import pytz
         format = "%Y-%m-%d %H:%M:%S"
         dt_utc = datetime.strptime(dt_str,format)
         dt_utc = dt_utc.replace(tzinfo=pytz.UTC)
-        return dt_utc.astimezone(pytz.timezone('America/Anchorage'))
+        if clock == '12':
+            outformat = "%Y-%m-%d %-I:%M:%S %p"
+        else:
+            outformat = "%-m/%-d/%y %H:%M:%S"
+        return dt_utc.astimezone(pytz.timezone('America/Anchorage')).strftime(outformat)
 
     def getEvent(self):
         from sqlite import sqlite
@@ -75,7 +79,7 @@ class event:
         import os
         from datetime import datetime
         time = datetime.fromtimestamp(int(self.id.split('.')[0]))
-        ftime = str(self.convertTZ(str(time))).rsplit('-')
+        ftime = str(self.convertTZ(str(time),self.fevr['clock'])).rsplit('-')
         self.event['time'] = f"{ftime[0]}-{ftime[1]}-{ftime[2]}"
         if self.event['ack'] != "true" and self.event['ack'] != 'false':
             fetch.ackEvent('true')

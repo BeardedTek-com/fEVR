@@ -82,14 +82,20 @@ class events:
         thumb = picture.resize(size)
         thumb.save(thumbPATH,"JPEG",optimize=True)
 
-    def convertTZ(self,dt_str):
+    def convertTZ(self,dt_str,clock):
         from datetime import datetime
         from dateutil import tz
         import pytz
         format = "%Y-%m-%d %H:%M:%S"
         dt_utc = datetime.strptime(dt_str,format)
         dt_utc = dt_utc.replace(tzinfo=pytz.UTC)
-        return dt_utc.astimezone(pytz.timezone('America/Anchorage'))
+        dt = dt_utc.astimezone(pytz.timezone('America/Anchorage'))
+        if clock == '12':
+            outformat = "%-m/%-d/%y %-I:%M:%S%p"
+        else:
+            outformat = "%-m/%-d/%y %H:%M:%S"
+        outTime = dt.strftime(outformat).lower()
+        return outTime
 
     def noEvents(self):
         if os.path.isfile(stub):
@@ -108,8 +114,7 @@ class events:
     def generateEventDiv(self,event):
         from datetime import datetime
         time = datetime.fromtimestamp(int(event['id'].split('.')[0]))
-        ftime = str(self.convertTZ(str(time)))
-        event['time'] = ftime[ftime.index('-')+1:]
+        event['time'] = str(self.convertTZ(str(time),self.fevr['clock']))
         if os.path.isfile(stub):
             with open(stub) as eventStub:
                 if str(event['ack']).lower() != "true":
@@ -131,7 +136,7 @@ class events:
                 data = data.replace('##CAMERA##',event['camera'])
                 data = data.replace('##OBJECT##', event['type'])
                 data = data.replace('##SCORE##',f"{score}%")
-                data = data.replace('##TIME##',event['time'][:-6])
+                data = data.replace('##TIME##',event['time'])
                 data = data.replace('##NEW##',newClass)
         if data:
             return data
@@ -160,18 +165,23 @@ class events:
                 elif key == "score":
                     wheres.append(f"""{key}>{value}""")
                 elif key == "time":
-                    import datetime
-                    time = datetime.datetime.fromtimestamp(value)
+                    from datetime import datetime, timedelta
+                    import time
+                    ctime = datetime.fromtimestamp(time.time())
+                    valueInt = int(value[:-1])
                     if value[-1] == "d":
-                        time = time - datetime.timedelta(days=int(value.replace(value[-1],'')))
+                        ftime = ctime - timedelta(days=valueInt)
                     elif value[-1] == "h":
-                        time = time - datetime.timedelta(hours=int(value.replace(value[-1],'')))
+                        ftime = ctime - timedelta(hours=valueInt)
                     elif value[-1] == "w":
-                        time = time - datetime.timedelta(weeks=int(value.replace(value[-1],'')))
+                        ftime = ctime - timedelta(weeks=valueInt)
                     elif value[-1] == "y":
-                        days = int(value.replace(value[-1],'')) * 365
-                        time = time - datetime.timedelta(days=days)
-                        wheres.append(f"""{key}>{time}""")
+                        valueInt = valueInt * 365
+                        ftime = ctime - timedelta(days=valueInt)
+                    if ftime != ctime:
+                        ftime = datetime.timestamp(ftime)
+                        self.error.execute(f"TIME: {key}>{ftime}",src=self.script)
+                        wheres.append(f"""{key}>{ftime}""")
                 else:
                     wheres.append(f"""{key}='{value}'""")
         if wheres:
