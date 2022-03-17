@@ -14,7 +14,7 @@ class eventFilter:
         self.currentFilters = currentFilters
         self.filterOptions =    {   "count":  ["10","20","50","100"],
                                     "score":["60","70","80","90"],
-                                    "time": ["1h","2h","6h","12h ","1d","1w","1m","1y"],
+                                    "time": ["1h","2h","6h","12h","1d","1w","1m","1y"],
                                     "sort": ["CAMERA ASC","CAMERA DESC","OBJECT ASC","OBJECT DESC","SCORE ASC","SCORE DESC","TIME ASC","TIME DESC"]
                                 }
         self.filters = ""
@@ -24,13 +24,13 @@ class eventFilter:
         sql = f"""SELECT COUNT(*) from events"""
         wheres = {}
         for key in ['camera','type','score']:
-            if self.currentFilters[key] != 'none':
+            if self.currentFilters[key] != '':
                 if key == 'score':
                     wheres[key] = f"""{key}>{self.currentFilters[key]}"""
                 else:
                     wheres[key] = f"""{key}='{self.currentFilters[key]}'"""
                 
-        if self.currentFilters['time'] != 'none':
+        if self.currentFilters['time'] != '':
             value = self.currentFilters['time']
             from datetime import datetime, timedelta
             import time
@@ -48,7 +48,7 @@ class eventFilter:
             if ftime != ctime:
                 ftime = datetime.timestamp(ftime)
                 self.error.execute(f"TIME: {key}>{ftime}",src=self.script)
-                wheres.append(f""" time > {ftime}""")
+                wheres['time'] = f""" time > {ftime}"""
         n = 0
         for key in wheres:
             if n != 0:
@@ -61,8 +61,9 @@ class eventFilter:
         from sqlite import sqlite
         fsqlite = sqlite()
         fsqlite.open()
-        self.error.execute(sql,src=self.script)
         query = fsqlite.count(sql)
+        self.error.execute(f"COUNT SQL: {sql}",src=self.script)
+        self.error.execute(f"RESULTS : {query}",src=self.script)
         if str(query)[0:1] != "E":
             self.numRecords = int(query)
         else:

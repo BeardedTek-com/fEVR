@@ -24,6 +24,7 @@ class events:
         self.error = logit()
         self.getOptions()
         self.noResults = False
+        self.defaultFilters = {"count":"10","camera":"","type":"","score":"0","time":"","page":"1"}
         self.getFilterValues()
 
     def getOptions(self):
@@ -38,26 +39,15 @@ class events:
         self.count = int(self.selectors['count'])
         self.page = int(self.selectors['page'])
         self.offset = self.page * self.count - self.count
-
+                
     def getFilterValues(self):
         self.currentFilters = {}
-        for param in ['count','camera','type','score','time','page']:
-            if param in self.input:
-                if param == 'score':
-                    score = self.input.getvalue(param)
-                    if score != "0":
-                        if len(score) > 3:
-                            score = score[2:4]
-                        else:
-                            score = score[2:]
-                            if int(score) < 10:
-                                score = int(score)*10
-                    self.currentFilters[param] = score
-                    self.error.execute(f"SCORE: {score}",src=self.script)
-                else:
-                    self.currentFilters[param] = self.input.getvalue(param)
-            else:
-                self.currentFilters[param] = "none"
+        # self.defaultFilterValues holds the required querystring parameters see self.__init__(self)
+        for key in self.defaultFilters:
+            self.currentFilters[key] = self.defaultFilters[key]
+            # if the querystring value is set, override the default.
+            if self.input.getvalue(key) is not None:
+                self.currentFilters[key] = self.input.getvalue(key)
 
     def getEvent(self,event,thumbSize=180,location='/var/www/html/events/'):
         eventPATH = f"{location}{event['id']}"
@@ -152,6 +142,8 @@ class events:
         for key in selectors:
             value=selectors[key]
             if value:
+                if isinstance(value, str):
+                    value = value.strip()
                 if key == "count":
                     limit = value
                 elif key == "sort":
