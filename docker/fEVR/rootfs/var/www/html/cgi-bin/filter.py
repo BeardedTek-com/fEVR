@@ -185,8 +185,12 @@ class eventFilter:
         return SelectStub
 
     def Other(self,Filter):
-        SelectStub = "<span class='fieldSpan'><select onchange='filterEvents();' class='filterselect text-light-accent border-dark bg-dark-accent' name='#TYPE#Select' id='#TYPE#Select'>\n#FILTERS#</select></span>\n"
-        OptionStub = "\t<option value='#FILTER#' selected>#FILTER#</option>\n"
+        if Filter == 'count':
+            SelectStub = "<span class='fieldSpan'><select onchange='filterEvents();' class='filterselect text-light-accent border-dark bg-dark-accent' name='#TYPE#Select' id='#TYPE#Select'>\n#FILTERS#</select></span>\n"
+            OptionStub = "\t<option value='#FILTER#' selected>#FILTER#/page</option>\n"
+        else:
+            SelectStub = "<span class='fieldSpan'><select onchange='filterEvents();' class='filterselect text-light-accent border-dark bg-dark-accent' name='#TYPE#Select' id='#TYPE#Select'>\n#FILTERS#</select></span>\n"
+            OptionStub = "\t<option value='#FILTER#' selected>#FILTER#</option>\n"
         Options = ""
         isthereone = 0
         for filter in self.filterOptions[Filter]:

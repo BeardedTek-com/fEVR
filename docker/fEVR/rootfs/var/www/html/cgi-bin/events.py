@@ -24,6 +24,7 @@ class events:
         self.error = logit()
         self.getOptions()
         self.noResults = False
+        self.noLimit = False
         self.defaultFilters = {"count":"10","camera":"","type":"","score":"0","time":"","page":"1"}
         self.getFilterValues()
 
