@@ -310,6 +310,7 @@ select:active{
 }
 select:hover{
     background-color: rgb(74, 74, 78);
+
 }
 .countFilter{
     width: 2.5em;

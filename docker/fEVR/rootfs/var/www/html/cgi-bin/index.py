@@ -73,6 +73,7 @@ class fevr:
                         for value in actions[action]:
                             if self.input.getvalue(value):
                                 url += f"{value}={self.input.getvalue(value)}&"
+
             self.jscript += f"<script>document.getElementById('contentFrame').src = '{url}';</script>\n"
     def getCameraMenus(self):
         menuCamera = self.getStub(f"{self.stub}/menuCamera.html")
@@ -109,14 +110,13 @@ class fevr:
             clock = f"{clock12.replace('selected ','')} {clock24}"
         self.settingsMenu = self.settingsMenu.replace('##clock##',clock)
 
-        
-
     def mainPage(self):
         index = self.getStub(f"{self.stub}/index.html")
         
         menu=""
         if self.myConfig:
             try:
+
                 menu=""
                 if self.fConfig.frigateError or self.action == "config":
                     self.jscript += "<script>document.querySelector('#frigateErr').showModal()</script>\n"
