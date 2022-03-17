@@ -60,7 +60,17 @@ class sqlite:
             self.close()
             self.error.execute(retval,src=self.script)
             return retval
-    
+    def count(self,sql):
+        e = ""
+        try:
+            exe = self.conn.execute(sql)
+            cnt = exe.fetchone()
+            return cnt[0]
+        except Error as e:
+            return f"ERROR: {str(e).split(':')}"
+        finally:
+            self.close()
+
     def retrieve(self,sql,count=0):
         try:
             cursor = self.conn.cursor()

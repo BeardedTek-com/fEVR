@@ -16,7 +16,6 @@
 #    You should have received a copy of the GNU General Public License
 #    along with this program.  If not, see <https://www.gnu.org/licenses/>.
 import os
-stub='../stub/event.html'
 class events:
     def __init__(self):
         from os.path import basename
@@ -31,15 +30,18 @@ class events:
         import cgi
         fieldStorage = cgi.FieldStorage()
         self.input = fieldStorage
-        self.selectors={"count":"","order":"","camera":"","type":"","time":"","score":""}
+        self.selectors={"count":"","order":"","camera":"","type":"","time":"","score":"","page":1}
         for key in self.input.keys():
             for filter in self.selectors:
                 if key == filter:
                     self.selectors[filter] = fieldStorage.getvalue(key)
+        self.count = int(self.selectors['count'])
+        self.page = int(self.selectors['page'])
+        self.offset = self.page * self.count - self.count
 
     def getFilterValues(self):
         self.currentFilters = {}
-        for param in ['count','camera','type','score','time']:
+        for param in ['count','camera','type','score','time','page']:
             if param in self.input:
                 if param == 'score':
                     score = self.input.getvalue(param)
@@ -98,14 +100,14 @@ class events:
         return outTime
 
     def noEvents(self):
-        if os.path.isfile(stub):
-            with open(stub) as eventStub:
-                url = "?action=config"
+        if os.path.isfile(self.noEventStub):
+            with open(self.noEventStub) as eventStub:
+                url = "?"
                 thumbURL = "../img/not_available.jpg"
                 caption = "No Events Found"
                 data = eventStub.read()
-                data = data.replace('##EVENT_URL##',url)
-                data = data.replace('##EVENT_IMG##',thumbURL)
+                data = data.replace('##URL##',url)
+                data = data.replace('##IMG##',thumbURL)
                 data = data.replace('##EVENT_CAPTION##',caption)
                 data = data.replace('##NEW##','')
         if data:
@@ -115,8 +117,8 @@ class events:
         from datetime import datetime
         time = datetime.fromtimestamp(int(event['id'].split('.')[0]))
         event['time'] = str(self.convertTZ(str(time),self.fevr['clock']))
-        if os.path.isfile(stub):
-            with open(stub) as eventStub:
+        if os.path.isfile(self.eventStub):
+            with open(self.eventStub) as eventStub:
                 if str(event['ack']).lower() != "true":
                     newClass = "new"
                 else:
@@ -124,12 +126,7 @@ class events:
                 url = f"event.py?id={event['id']}"
                 thumbURL = f"../events/{event['id']}/thumb.jpg"
                 score = event['score']
-                if len(score) > 3:
-                    score = score[2:4]
-                else:
-                    score = event[2:]
-                    if score < 10:
-                        score = int(score)*10
+                score = int(float(score)*100)
                 data = eventStub.read()
                 data = data.replace('##URL##',url)
                 data = data.replace('##IMG##',thumbURL)
@@ -183,7 +180,8 @@ class events:
                         self.error.execute(f"TIME: {key}>{ftime}",src=self.script)
                         wheres.append(f"""{key}>{ftime}""")
                 else:
-                    wheres.append(f"""{key}='{value}'""")
+                    if key != "page":
+                        wheres.append(f"""{key}='{value}'""")
         if wheres:
             x = 0
             for n in wheres:
@@ -197,7 +195,7 @@ class events:
             where += f"{sort} LIMIT {limit}"
         else:
             where += f"{sort} LIMIT 10"
-        sql = f"""SELECT * FROM events {where};"""
+        sql = f"""SELECT * FROM events {where} OFFSET {self.offset};"""
         from fetch import fetchEvent
         from sqlite import sqlite
         fsqlite = sqlite(db=self.fevr['db'])
@@ -218,7 +216,9 @@ class events:
             fetchevent = fetchEvent(self.frigate,event['id'])
             fetchevent.execute()
             data += self.generateEventDiv(event)
-        if len(items) < 1:
+        self.recordCount = len(items)
+        self.error.execute(f"# items found: {self.recordCount}",src=self.script)
+        if self.recordCount < 1:
             self.noResults = True
         return data
 
@@ -231,18 +231,23 @@ class events:
             self.config = fconfig.config
             self.frigate = self.config['frigate']
             self.fevr = self.config['fevr']
+            self.stubs = f"{self.fevr['base']}html/stub"
+            self.eventStub = f"{self.stubs}/event.html"
+            self.noEventStub = f"{self.stubs}/noEvent.html"
             self.error.execute(self.frigate,src=self.script)
             self.error.execute(self.fevr,src=self.script)
             content = self.getEvents(self.selectors)
         else:
-            content = self.getStub("/var/www/html/config.html")
+            content = self.getStub(f"self.fevr['base']html/config.html")
         if self.noResults:
             content = self.noEvents()
-        header = self.getStub("/var/www/html/stub/eventsHeader.html")
-        footer = self.getStub("/var/www/html/stub/eventsFooter.html")
+        header = self.getStub(f"{self.stubs}/eventsHeader.html")
+        footer = self.getStub(f"{self.stubs}/eventsFooter.html")
         from filter import eventFilter
-        filters = eventFilter(self.frigate['url'],self.currentFilters)
-        header = header.replace('##FILTERS##',filters.filters)
+        filters = eventFilter(self.frigate['url'],self.currentFilters,self.recordCount,self.selectors)
+        Filters = filters.filters
+        Filters += filters.pager
+        header = header.replace('##FILTERS##',Filters)
         print(f"{header}{content}{footer}")
 
 def main():

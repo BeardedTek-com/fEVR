@@ -89,7 +89,6 @@ class fevr:
         return fullCameraMenu
     
     def genSettings(self):
-        self.error.execute(f"genSettings() <- self.myConfig: {self.myConfig}",src=self.script)
         self.settingsMenu = self.getStub(f"{self.stub}/menuError.html")
         self.settingsMenu = self.settingsMenu.replace('##base##',self.myConfig['fevr']['base'])
         self.settingsMenu = self.settingsMenu.replace('##db##',self.myConfig['fevr']['db'])
@@ -186,7 +185,6 @@ class fevr:
             action = ""
         index = index.replace("##ACTION##",action)
         index = index.replace("##ERROR##",self.settingsMenu)
-        self.error.execute(self.settingsMenu,src=self.script)
 
         print(index)
 
