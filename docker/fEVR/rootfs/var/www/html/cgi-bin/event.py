@@ -79,8 +79,7 @@ class event:
         import os
         from datetime import datetime
         time = datetime.fromtimestamp(int(self.id.split('.')[0]))
-        ftime = str(self.convertTZ(str(time),self.fevr['clock'])).rsplit('-')
-        self.event['time'] = f"{ftime[0]}-{ftime[1]}-{ftime[2]}"
+        self.event['time'] = str(self.convertTZ(str(time),self.fevr['clock']))
         if self.event['ack'] != "true" and self.event['ack'] != 'false':
             fetch.ackEvent('true')
             self.event['ack'] = 'true'
