@@ -1,0 +1,44 @@
+<html>
+    <head>
+        <link rel="stylesheet" src="css/events.css"/>
+        <style>
+            #testContainer{
+                height: 200%;
+                background: rgb(2,0,36);
+                background: linear-gradient(45deg, rgba(2,0,36,1) 0%, rgba(9,9,121,1) 35%, rgba(0,212,255,1) 66%);
+                overflow: scroll;
+            }
+        </style>
+    </head>
+    <body>
+        <div id="filterContainer" class="text-light-accent">
+            <div id="eventsFilterCount" class="eventsFilter" text-light-accent'>
+                <select name="cameraSelector" id="cameraSelector">
+                    <option selected value="all">all cameras</option>
+                    <option value="driveway">driveway</option>
+                    <option value="backyard">backyard</option>
+                </select>
+                <select name="objectSelector" id="objectSelector">
+                    <option selected value="all">all objects</option>
+                    <option value="person">person</option>
+                    <option value="animal">animal</option>
+                    <option value="vehicle">vehicle</option>
+                </select>
+                <select name="countSelector" id="countSelector">
+                    <option selected value="default"># per page</option>
+                    <option value="25">25</option>
+                    <option value="50">50</option>
+                    <option value="100">100</option>
+                </select>
+                <select name="timeSelector" id="timeSelector">
+                    <option selected value="all">all time</option>
+                    <option value="day">one day</option>
+                    <option value="week">one week</option>
+                    <option value="month">one month</option>
+                    <option value="year">one year</option>
+                </select>
+            </div>
+        </div>
+        <div id='container'>
+    </body>
+</html>

@@ -1,29 +1,33 @@
             <dialog id='frigateErr' class='menuItem subitem'>
                 <div class="configError">
-                    #ERRORMSG#<br/>
+                    ##ERRMSG##
                     Update your configuration.
                 </div>
                 <div class="form">
                     <form id="webConfig" action="webconfig.py">
-                        <input name="home" type="hidden" value="Home"/><br/>
-                        <input name="base" type="hidden" value="/var/www/"/>
-                        <input name="html" type="hidden" value="/var/www/html/"/>
-                        <input name="db" type="hidden" value="/var/www/data/db/fEVR.sqlite"/>
+                        <input name="title" type="hidden" value="##TITLE##"/><br/>
+                        <input name="base" type="hidden" value="##base##"/>
+                        <input name="html" type="hidden" value="##html##"/>
+                        <input name="db" type="hidden" value="##db##"/>
                         <div class='formContent'>
                             frigate url:<br/>
-                            <input id="url" name="url" type="text" value="http://frigate.local:5000"/><br/>
+                            <input id="url" name="url" type="text" value="##url##"/><br/>
                             debug:<br/>
-                            <input id="debug" name="debug" type="text" value="false"/><br/>
+                            <input id="debug" name="debug" type="text" value="##debug##"/><br/>
+                            clock format:<br/>
+                            <select id="clock" name="clock">
+                                ##clock##
+                            </select>
                         </div>
                         <input name="apiEventPath" type="hidden" value="/api/events/"/><br/>
                         <input name="snapPath" type="hidden" value="/snapshot.jpg"/><br/>
                         <input name="clipPath" type="hidden" value="/clip.mp4"/><br/>
                         <div class="WCfooter">
                             <div class="WCfooter-left">
-                                <button onclick="document.querySelector('#frigateErr').close();" type="button" id="finish" class="enabled">It's Okay</button>
+                                <button onclick="document.querySelector('#frigateErr').close();" type="button" id="finish" class="enabled">Cancel</button>
                             </div>
                             <div class="WCfooter-right">
-                                <button onclick="document.querySelector('#webConfig').submit();" type="button" id="finish" class="enabled">Update Config</button>
+                                <button onclick="document.querySelector('#webConfig').submit();" type="button" id="finish" class="enabled">Update</button>
                             </div>
                         </div>
                     </form>

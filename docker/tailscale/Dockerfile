@@ -13,5 +13,5 @@ RUN apk --no-cache add tailscale \
  && sysctl -p /etc/sysctl.conf
 
 # Start tailscaled
-CMD /data/tailscale
+CMD /opt/tailscale/tailscale
 ENTRYPOINT tailscaled

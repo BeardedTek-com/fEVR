@@ -6,6 +6,14 @@ function hideElement(target,targetClass){
     target.classList.remove(targetClass);
 }
 
+function modalAction(action,id){
+    target = document.getElementById(id)
+    switch(action){
+        case "open": target.showModal(); break;
+        case "close": target.close();
+    }
+}
+
 function slideElement(target,targetClass){
 
     target.style.transition = "width 500ms ease"

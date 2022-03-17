@@ -19,7 +19,12 @@ class displog:
     def __init__(self):
         import cgi
         self.input = cgi.FieldStorage()
-        self.type = self.input.getvalue('type')
+        self.type=""
+        for val in ['debug','info','error']:
+            if val == self.input.getvalue('type'):
+                self.type = self.input.getvalue('type')
+        if not self.type:
+            self.type = "debug"
         from os.path import basename
         self.script = basename(__file__)
         from logit import logit

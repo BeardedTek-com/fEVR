@@ -17,17 +17,27 @@
 #    along with this program.  If not, see <https://www.gnu.org/licenses/>.
 class fevr:
     def __init__(self):
+        from os.path import basename
+        self.script = basename(__file__)
         from logit import logit
         self.error = logit()
         import cgi
         self.getAction = ""
-        self.script = ""
+        self.jscript = ""
         self.input = cgi.FieldStorage()
         self.errorMsg = ""
+        self.fatalErrorMsg = ""
         if self.input.getvalue('action'):
             self.getAction = self.input.getvalue('action')
             self.action()
         self.stub = "/var/www/html/stub"
+        # Get our configuration
+        from config import Config
+        myConfig = Config()
+        self.myConfig = myConfig.config
+        from frigateConfig import frigateConfig
+        self.error.execute(f"execute() : frigateConfig('{self.myConfig['frigate']['url']}')", src=self.script)
+        self.fConfig = frigateConfig(self.myConfig['frigate']['url'])
         self.execute()
 
     def getStub(self,stub):
@@ -49,11 +59,11 @@ class fevr:
     def action(self):
         actions = {"event":['id','count'],"config":False}
         ext = ".py?"
-        self.script = ""
+        self.jscript = ""
         url = ""
         if self.getAction == "config":
             ext = ".html"
-            self.script += "<script>document.querySelector('#frigateErr').showModal()</script>\n"
+            self.jscript += "<script>document.querySelector('#frigateErr').showModal()</script>\n"
             url = "../"
         else:
             url += f"{self.getAction}{ext}"
@@ -63,41 +73,57 @@ class fevr:
                         for value in actions[action]:
                             if self.input.getvalue(value):
                                 url += f"{value}={self.input.getvalue(value)}&"
-            self.script += f"<script>document.getElementById('contentFrame').src = '{url}';</script>\n"
-    def getCameraMenus(self,fConfig):
+
+            self.jscript += f"<script>document.getElementById('contentFrame').src = '{url}';</script>\n"
+    def getCameraMenus(self):
         menuCamera = self.getStub(f"{self.stub}/menuCamera.html")
         menuObject = self.getStub(f"{self.stub}/menuObject.html")
         fullCameraMenu = ""
-        for camera in fConfig.cameras:
+        for camera in self.fConfig.cameras:
             cameraMenu=f"{menuCamera}\n"
             cameraObjects =""
-            for object in fConfig.cameras[camera]['objects']:
+            for object in self.fConfig.cameras[camera]['objects']:
                 cameraObjects+=f"{menuObject.replace('#OBJECT#',object)}"
             cameraMenu = cameraMenu.replace("#CAMERAOBJECTS#",cameraObjects)
             cameraMenu = cameraMenu.replace("#CAMERA#",camera)
             fullCameraMenu += cameraMenu
         return fullCameraMenu
+    
+    def genSettings(self):
+        self.settingsMenu = self.getStub(f"{self.stub}/menuError.html")
+        self.settingsMenu = self.settingsMenu.replace('##base##',self.myConfig['fevr']['base'])
+        self.settingsMenu = self.settingsMenu.replace('##db##',self.myConfig['fevr']['db'])
+        self.settingsMenu = self.settingsMenu.replace('##debug##',self.myConfig['fevr']['debug'])
+        self.settingsMenu = self.settingsMenu.replace('##html##',self.myConfig['fevr']['html'])
+        self.settingsMenu = self.settingsMenu.replace('##title##',self.myConfig['fevr']['title'])
+        self.settingsMenu = self.settingsMenu.replace('##apiEventPath##',self.myConfig['frigate']['apiEventPath'])
+        self.settingsMenu = self.settingsMenu.replace('##clipPath##',self.myConfig['frigate']['clipPath'])
+        self.settingsMenu = self.settingsMenu.replace('##snapPath##',self.myConfig['frigate']['snapPath'])
+        self.settingsMenu = self.settingsMenu.replace('##url##',self.myConfig['frigate']['url'])
+        clock12 = "<option selected value='12'>12 Hour (am/pm)</option>\n"
+        clock24 = "<option selected value='24'>24 Hour ('military time')</option>\n"
+        if self.myConfig['fevr']['clock'] == '12':
+            clock = f"{clock12} {clock24.replace('selected ','')}"
+        elif self.myConfig['fevr']['clock'] == '24':
+            clock = f"{clock12.replace('selected ','')} {clock24}"
+        else:
+            clock = f"{clock12.replace('selected ','')} {clock24}"
+        self.settingsMenu = self.settingsMenu.replace('##clock##',clock)
+
     def mainPage(self):
-        frigateURL=""
         index = self.getStub(f"{self.stub}/index.html")
-        from config import Config
-        from frigateConfig import frigateConfig
-        myConfig = Config()
+        
         menu=""
-        if myConfig:
+        if self.myConfig:
             try:
-                frigateURL = myConfig.config['frigate']['url']
-                fConfig = frigateConfig(frigateURL)
+
                 menu=""
-                if fConfig.error or self.action == "config":
-                    self.script += "<script>document.querySelector('#frigateErr').showModal()</script>\n"
-                    index = index.replace('##ACTION##',self.script)
+                if self.fConfig.frigateError or self.action == "config":
+                    self.jscript += "<script>document.querySelector('#frigateErr').showModal()</script>\n"
+                    index = index.replace('##ACTION##',self.jscript)
                     self.errorMsg = "Your frigate server is unreachable at the moment.<br/>"
-                    #menuError = self.getStub(f"{self.stub}/menuError.html")
-                    #index = index.replace('##MENU##',"")
-                    #index = index.replace("##ERROR##",menuError)
                 else:
-                    menu = self.getCameraMenus(fConfig)
+                    menu = self.getCameraMenus()
             except:
                 errmsg = "\nCouldn't get frigate's URL.  Looks like the permissions are wonky."
                 try:
@@ -113,13 +139,15 @@ class fevr:
                                 os.chmod(os.path.join(root, f), mode)
                     errmsg = "\nYou lucky dog.  fEVR took care of it for you!!!"
                 except:
-                    index = index.replace('##MENU##','Config Error\nUpdate settings.')
                     from os import environ
                     imgName=environ.get('FEVR_CONTAINER_NAME',"fevr")
                     errmsg =  f"\n\
                                 Whoops!  fEVR can't take care of this one for you.\n\
                                 Please run the following command:\n\
                                 docker-compose exec {imgName} chown -R 100:101 /var/www/data && chmod -R 0770 /var/www/data"
+                    self.jscript += "<script>document.querySelector('#frigateErr').showModal()</script>\n"
+                    index = index.replace('##ACTION##',self.jscript)
+                    self.errorMsg = "Your frigate server is unreachable at the moment.<br/>"
                 self.error.execute(errmsg,self.script)
             if not menu:
                 menu = " <div class='menuitem menuspace'>\n\
@@ -127,28 +155,36 @@ class fevr:
                             SEE SYSTEM LOGS<br/>\n\
                             <a href=?action=config>UPDATE SETTINGS</a>\n\
                         </div>"
-                frigateURL = "?action=config"
-            menuError = self.getStub(f"{self.stub}/menuError.html")
+                self.jscript += "<script>document.querySelector('#frigateErr').showModal()</script>\n"
+                index = index.replace('##ACTION##',self.jscript)
+                self.fatalErrorMsg = "Something went wrong.  See system logs or talk to your IT guy!.<br/>\n"
             index = index.replace('##MENU##',menu)
-            index = index.replace('#FRIGATE#',frigateURL)
-            index = index.replace("##ERROR##",menuError) 
+            index = index.replace('#FRIGATE#',self.myConfig['frigate']['url'])
+            if self.fatalErrorMsg:
+                index = index.replace("##ERROR##", self.fatalErrorMsg)
+            else:
+                index = index.replace("##ERROR##",self.settingsMenu)
+                if self.errorMsg:
+                    index = index.replace("##ERRMSG##",self.errorMsg)
+                else:
+                    index = index.replace("##ERRMSG##",'')
             return index
 
     def execute(self):
+        
+        # Generate our settings dialog
+        self.genSettings()
         # Print the headers    
         index = self.header()
         #Print the page out
         index += self.mainPage()
         # If there's an action, do it.
-        if self.script:
-            action = self.script
+        if self.jscript:
+            action = self.jscript
         else:
             action = ""
         index = index.replace("##ACTION##",action)
-        if self.errorMsg:
-            index = index.replace("#ERRORMSG#",self.errorMsg)
-        else:
-            index = index.replace("#ERRORMSG#","")
+        index = index.replace("##ERROR##",self.settingsMenu)
 
         print(index)
 

@@ -41,7 +41,7 @@ class webConfig:
         self.webconfig = {}
         self.webconfig['fevr'] = {}
         self.webconfig['frigate'] = {}
-        for var in ('title', 'base','html','db','debug'):
+        for var in ('title', 'base','html','db','debug','clock'):
             self.webconfig['fevr'][var] = self.input.getvalue(var)
         for var in ('url','apiEventPath','snapPath','clipPath'):
             self.webconfig['frigate'][var] = str(self.input.getvalue(var))

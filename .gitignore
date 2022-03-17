@@ -3,6 +3,6 @@
 /app/html/cgi-bin/__pycache__
 /app/html/events/**
 .env
-
+__pycache__
 !/default/config.json
 !/default/fEVR.sqlite

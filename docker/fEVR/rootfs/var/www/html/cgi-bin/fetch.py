@@ -38,7 +38,11 @@ class fetchEvent:
     def delEvent(self,db=True):
         import shutil
         path = f"{self.location}{self.event}"
-        shutil.rmtree(path)
+        import re
+        if re.match(r'\d{10}.\d{5}-\w{6}',self.event):
+            shutil.rmtree(path)
+        else:
+            self.error.execute(f"delEvent(): {self.event} is not a valid event.  Someone is trying to do something silly silly!!!",src=self.script)
         if db:
             self.error.execute(f" delEvent() - DELETING DATABASE ENTRY",src=self.script)
             sql = f"""DELETE FROM events WHERE event='{self.event}';"""

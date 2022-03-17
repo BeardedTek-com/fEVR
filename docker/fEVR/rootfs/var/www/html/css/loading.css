@@ -69,7 +69,6 @@
   transition: opacity 1900ms linear;
 }
 #container{
-  opacity: 0;
   -webkit-transition: opacity 1900ms linear;
   transition: opacity 1900ms linear;
 }

@@ -3,6 +3,7 @@
         <link rel='stylesheet' href='../css/events.css'>
         <link rel='stylesheet' href='../css/colors.css'>
         <link rel='stylesheet' href='../css/loading.css'>
+        <script type='text/javascript' src="../js/filter.js"></script>
         <title>Events</title>
     </head>
     <body>
@@ -12,14 +13,10 @@
             <div class='border-light-accent'></div>
             <div class='border-light-accent'></div>
         </div>
-        <div id="filterContainer" class="text-light-accent">
-            <div id="eventsFilterCount" class="eventsFilter" text-light-accent'>
-                <span class='countFilterTitle'>Count:</span>
-                <span class='countFilter'><a href="?count=10">10</a></span>
-                <span class='countFilter'><a href="?count=20">20</a></span>
-                <span class='countFilter'><a href="?count=50">50</a></span>
-                <span class='countFilter'><a href="?count=100">100</a></span>
-                <span class='countFilter'><a href="?">all</a></span>
-            </div>
+        <div id="filterContainer" class='eventsFilter text-light-accent'>
+            ##FILTERS##
         </div>
-        <div id='container' class='eventsContainer hidden text-light-accent'>
+        <div id='container' class='eventsContainer hidden text-light-accent'
+            style='opacity:0;-webkit-transition: opacity 1900ms linear;transition: opacity 1900ms linear;'>
+                    
+                <div id='container' class='eventsContainer text-light-accent'>

@@ -29,7 +29,7 @@ class logit:
         self.logfile = f"{logpath}/{level}.log"
         logentry = f"{self.logtime} {str(msg)}"
         with open(self.logfile,"a+") as logFile:
-            logFile.write(f"[ {src:15}] {logentry}")
+            logFile.write(f"[ {src:15}] {logentry}\n")
         self.to_stderr(f"[ {src:15}] {logentry}")
     def to_stderr(self, *a):
         import sys
