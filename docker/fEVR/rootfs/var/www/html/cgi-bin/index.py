@@ -116,10 +116,10 @@ class fevr:
         menu=""
         if self.myConfig:
             try:
-
                 menu=""
                 if self.fConfig.frigateError or self.action == "config":
-                    self.jscript += "<script>document.querySelector('#frigateErr').showModal()</script>\n"
+                    jscript = self.getStub(f"{self.stub}modals.js")
+                    self.jscript += f"<script>{self.jscript}</script>\n"
                     index = index.replace('##ACTION##',self.jscript)
                     self.errorMsg = "Your frigate server is unreachable at the moment.<br/>"
                 else:
