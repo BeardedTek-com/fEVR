@@ -1,0 +1,100 @@
+#!/usr/bin/python3
+from paho.mqtt import client as mqtt_client
+class fevrMQTT:
+    def __init__(self,broker,port,topics,username='',password=''):
+        from random import randint
+        import socket
+        hostname = socket.gethostname()
+        self.broker = broker
+        self.port = port
+        self.topics = topics
+        self.clientID = f"fevr-{hostname}-{randint(0,100)}"
+        self.username = username
+        self.password = password
+        self.run()
+    def connect_mqtt(self) -> mqtt_client:
+        def on_connect(client, userdata, flags, rc):
+            if rc == 0:
+                print(f"Connected to {self.broker}:{self.port} as {self.clientID}")
+                print(f"Subscribed to:{self.topics}".replace('[','\t').replace(']','').replace(', ','\t').replace("'",""))
+            else:
+                print("Failed to connect, return code %d", rc)
+        client = mqtt_client.Client(self.clientID)
+        if self.username and self.password:
+            client.username_pw_set(self.username, self.password)
+        client.on_connect = on_connect
+        client.connect(self.broker, self.port)
+        return client
+    
+    def processMsg(self,msg,topic):
+        from json import loads
+        if topic == 'frigate/available':
+            print('frigate is online')
+        elif 'frigate' in topic:
+            msg = loads(msg)
+            for key in msg:
+                if key == 'backyard' or key == 'driveway':
+                    print(f"{key}:")
+                    print(f"\tCamera FPS: {msg[key]['camera_fps']}")
+                    print(f"\tDetection FPS: {msg[key]['detection_fps']}")
+                    print(f"\tProcess FPS: {msg[key]['process_fps']}")
+                    print(f"\tSkipped FPS: {msg[key]['skipped_fps']}")
+                if key == 'detectors':
+                    for detector in msg[key]:
+                        for d in msg[key][detector]:
+                            print(f"{detector}:")
+                            print(f"\t{d}: {msg[key][detector][d]}:")
+                if key == 'service':
+                    from math import floor
+                    print('Frigate Information:')
+                    print(f"\tVersion: {msg[key]['version']}")
+                    uptime = msg[key]['uptime']
+                    uptimeM = floor(uptime/60)
+                    uptimeS = uptime - (uptimeM*60)
+                    uptimeH=floor(uptimeM/60)
+                    uptimeM = floor(uptimeM - (uptimeH*60))
+                    uptimeD=floor(uptimeH/24)
+                    uptimeH = floor(uptimeH - (uptimeD*24))
+
+                    if 1 > uptimeD:
+                        uptimeD = 0
+                    uptimeStr = f"Uptime: {uptimeD} days, {uptimeH} hours, {uptimeM} minutes and {uptimeS} seconds."
+                    print(f"\t{uptimeStr}")
+        elif topic == 'frigate/events':
+            from json import loads
+            event = loads(msg)
+            type = event['type']
+            after = event['after']
+            before = event['before']
+            if type == 'end':
+                label = after['label']
+                score = after['score']
+                camera = after['camera']
+                print(f"{label}({score}) detected in {camera}.")
+                
+        else:
+            print(f"{topic}:{msg}")
+
+
+    def subscribe(self, client: mqtt_client):
+        def on_message(client, userdata, msg):
+            ## This is where our code goes to do what we want when a message is received
+            ## print(f"Received `{msg.payload.decode()}` from `{msg.topic}` topic")
+            self.processMsg(msg.payload.decode(),msg.topic)
+
+
+
+        for topic in self.topics:
+            client.subscribe(topic)
+        client.on_message = on_message
+    def run(self):
+        self.client = self.connect_mqtt()
+        self.subscribe(self.client)
+        self.client.loop_forever()
+if __name__ == '__main__':
+    broker = '192.168.2.245'
+    port = 1883
+    username = ''
+    password = ''
+    topics = ['frigate/+']
+    fevrmqtt = fevrMQTT(broker,port,topics)
