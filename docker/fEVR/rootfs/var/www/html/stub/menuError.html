@@ -1,4 +1,4 @@
-            <dialog id='frigateErr' class='menuItem subitem'>
+            <dialog id='frigateErr' class='menuItem subitem hidden'>
                 <div class="configError">
                     ##ERRMSG##
                     Update your configuration.
@@ -24,7 +24,7 @@
                         <input name="clipPath" type="hidden" value="/clip.mp4"/><br/>
                         <div class="WCfooter">
                             <div class="WCfooter-left">
-                                <button onclick="document.querySelector('#frigateErr').close();" type="button" id="finish" class="enabled">Cancel</button>
+                                <button onclick="modalAction('close','frigateErr');" type="button" id="finish" class="enabled">Cancel</button>
                             </div>
                             <div class="WCfooter-right">
                                 <button onclick="document.querySelector('#webConfig').submit();" type="button" id="finish" class="enabled">Update</button>
