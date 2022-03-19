@@ -1,0 +1,4 @@
+#!/bin/bash
+
+# Get Environment Variables
+/opt/fevr/startup/mqtt_client

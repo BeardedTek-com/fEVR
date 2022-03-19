@@ -1,9 +1,9 @@
 version: '2.4'
 services:
   tailscale:                                                          # Provides tailscale functionality for the stack
-#    build:                                                           # By default it uses the 192.168.100.0/24 network
-#      context: ${TAILSCALE_CONTEXT}                                  # Start tailscale once the container is up:
-#      dockerfile: Dockerfile                                         # docker-compose exec tailscale tailscale up --advertise-routes=192.168.100/24 --accept-routes
+    build:                                                           # By default it uses the 192.168.100.0/24 network
+      context: ${TAILSCALE_CONTEXT}                                  # Start tailscale once the container is up:
+      dockerfile: Dockerfile                                         # docker-compose exec tailscale tailscale up --advertise-routes=192.168.100/24 --accept-routes
                                                                       # This will provide you with the Authorization URL to sign into tailscale.
     image: ${TAILSCALE_IMAGE:-ghcr.io/beardedtek-com/tailscale:main}
     container_name: ${TAILSCALE_CONTAINER_NAME:-tailscale}
@@ -24,9 +24,9 @@ services:
     privileged: true
     command: ${TAILSCALE_COMMAND:-/opt/tailscale/tailscale}
   fevr:
-#    build:
-#      context: ${FEVR_CONTEXT}
-#      dockerfile: Dockerfile
+    build:
+      context: ${FEVR_CONTEXT}
+      dockerfile: Dockerfile
     image: ${FEVR_IMAGE:-ghcr.io/beardedtek-com/fevr:main}
     container_name: ${FEVR_CONTAINER_NAME:-fevr-devel}
     restart: unless-stopped
