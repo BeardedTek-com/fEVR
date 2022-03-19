@@ -9,8 +9,31 @@ function hideElement(target,targetClass){
 function modalAction(action,id){
     target = document.getElementById(id)
     switch(action){
-        case "open": target.showModal(); break;
-        case "close": target.close();
+        case "open": modalActionOpen(id); break;
+        case "close": modalActionClose(id);
+    }
+}
+function modalActionOpen(id){
+    var ua = navigator.userAgent.toLowerCase(); 
+    if (ua.indexOf('safari') != -1) { 
+        if (ua.indexOf('chrome') > -1) {
+            document.getElementById(id).classList.remove('hidden')
+            document.getElementById(id).showModal()
+        } else {
+            document.getElementById(id).classList.remove('hidden')
+            document.getElementById(id).style="height: 80vh; width: 90vw; margin-left: 5vw; margin-top: 10vh;"
+        }
+    }
+}
+function modalActionClose(id){
+    var ua = navigator.userAgent.toLowerCase(); 
+    if (ua.indexOf('safari') != -1) { 
+        if (ua.indexOf('chrome') > -1) {
+            document.getElementById(id).classList.add('hidden')
+            document.getElementById(id).close()
+        } else {
+            document.getElementById(id).classList.add('hidden')
+        }
     }
 }
 
