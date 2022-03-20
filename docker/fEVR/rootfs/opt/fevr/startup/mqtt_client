@@ -147,10 +147,10 @@ class fevrMQTT:
         return client
     
     def processMsg(self,msg,topic):
-        from json import loads
+        from json import loads, dumps
         if topic == 'frigate/available':
             self.error.execute('frigate is online',src=self.script)
-        elif 'frigate' in topic:
+        if 'stats' in topic:
             msg = loads(msg)
             for key in msg:
                 if key == 'backyard' or key == 'driveway':
@@ -180,8 +180,9 @@ class fevrMQTT:
                         uptimeD = 0
                     uptimeStr = f"Uptime: {uptimeD} days, {uptimeH} hours, {uptimeM} minutes and {uptimeS} seconds."
                     self.error.execute(f"\t{uptimeStr}",src=self.script)
-        elif topic == 'frigate/events':
+        if 'event' in topic:
             from json import loads
+            from math import floor
             event = loads(msg)
             type = event['type']
             after = event['after']
@@ -193,15 +194,13 @@ class fevrMQTT:
                 event_time = event_id[:-7]
                 import time
                 timeformat = "%-m/%-d/%y %H:%M:%S"
-                datetime = time.strftime(timeformat,time.localtime(event_time))
-                self.error.execute(f"[ {datetime} ] {event_id}:{type}({score}) detected in {camera}.",src=self.script)
+                #datetime = time.strftime(timeformat,time.localtime(floor(int(event_time))))
+                self.error.execute(f"[ {event_time} ] {event_id}:{type}({score}) detected in {camera}.",src=self.script)
                 sql = f"""INSERT INTO events ('event','camera','type','score','time')\
                           VALUES('{event_id}','{camera}','{type}','{score}',{event_time}');"""
                 msql = sqlite()
                 self.error.execute(f"[ {time.strftime(timeformat,time.localtime())} ] {msql.execute(sql)}",src=self.script)
-        else:
-            self.error.execute(f"{topic}:{msg}",src=self.script)
-
+                self.error.execute(msql.execute(sql),src=self.script)
 
     def subscribe(self, client: mqtt_client):
         def on_message(client, userdata, msg):
