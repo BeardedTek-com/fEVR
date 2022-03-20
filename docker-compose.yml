@@ -1,5 +1,31 @@
 version: '2.4'
 services:
+  mqtt:
+    image: eclipse-mosquitto:latest
+    container_name: mqtt
+    restart: unless-stopped
+    networks:
+      beardnet:
+        ipv4_address: ${MQTT_IP:-192.168.200.5}
+    volumes:
+      - ./vol/mqtt/config/mosquitto.conf:/mosquitto/config/mosquitto.conf
+      - ./vol/mqtt/data:/mosquitto/data
+      - ./vol/mqtt/log:/mosquitto/log
+  frigate:
+    image: blakeblackshear/frigate:0.10.1-amd64
+    container_name: frigate
+    restart: unless-stopped
+    devices:
+      - /dev/dri/renderD128
+    networks:
+      beardnet:
+        ipv4_address: ${FRIGATE_IP:-192.168.200.4}
+    volumes:
+      - /etc/localtime:/etc/localtime:ro
+      - ./vol/frigate/config/config.yml:/config/config.yml
+      #- ./vol/frigate/media:/media/frigate
+      - ./vol/frigate/sample.mp4:/sample.mp4
+      - /dev/dri:/dev/dri
   tailscale:                                                          # Provides tailscale functionality for the stack
     build:                                                           # By default it uses the 192.168.100.0/24 network
       context: ${TAILSCALE_CONTEXT}                                  # Start tailscale once the container is up:
@@ -40,13 +66,13 @@ services:
     networks:
       beardnet:
         ipv4_address: ${FEVR_IP:-192.168.200.2}
-    volumes:
-     #- ./vol/fevr/data/:/var/www/data                              # OPTIONAL: expose /var/www/data folder which contains the SQLite database and config.json files
+    #volumes:
+     #- ./vol/fevr/data:/var/www/data                              # OPTIONAL: expose /var/www/data folder which contains the SQLite database and config.json files
      #- ./vol/fevr/events:/var/www/html/events                      # OPTIONAL: save events to a local folder
-     - nfsevents:/var/www/html/events                               # OPTIONAL: save events to an NFS share
-     - nfsdata:/var/www/data
-     - ./vol/fevr/data:/data
-     - ./vol/fevr/events:/events
+     #- nfsevents:/var/www/html/events                               # OPTIONAL: save events to an NFS share
+     #- nfsdata:/var/www/data
+     #- ./vol/fevr/data:/data
+     #- ./vol/fevr/events:/events
 networks:
   beardnet:                                                         # Network definition for our tailscale network
     driver: bridge
@@ -55,16 +81,16 @@ networks:
         - subnet: ${NETWORK_SUBNET:-192.168.200.0/24}
           gateway: ${NETWORK_GATEWAY:-192.168.200.1}
 
-volumes:
-  nfsevents:                                                        # VOLUME DEFINITION FOR NFS share
-    driver_opts:
-      type: "nfs"
-      o: "addr=${NAS_IP},nfsvers=4"                                 # Make sure to change to your NFS server's address
-      # o: "addr=<your_nas_ip>,rw,nfsvers=4"                        # SOME NFS SHARES REQUIRE THIS!!!
-      device: ":${NAS_EVENTS}"
-  nfsdata:                                                          # VOLUME DEFINITION FOR NFS share
-    driver_opts:
-      type: "nfs"
-      o: "addr=${NAS_IP},nfsvers=4"                                 # Make sure to change to your NFS server's address
-      # o: "addr=<your_nas_ip>,rw,nfsvers=4"                        # SOME NFS SHARES REQUIRE THIS!!!
-      device: ":${NAS_DATA}"
+#volumes:
+#  nfsevents:                                                        # VOLUME DEFINITION FOR NFS share
+#    driver_opts:
+#      type: "nfs"
+#      o: "addr=${NAS_IP},nfsvers=4"                                 # Make sure to change to your NFS server's address
+#      # o: "addr=<your_nas_ip>,rw,nfsvers=4"                        # SOME NFS SHARES REQUIRE THIS!!!
+#      device: ":${NAS_EVENTS}"
+#  nfsdata:                                                          # VOLUME DEFINITION FOR NFS share
+#    driver_opts:
+#      type: "nfs"
+#      o: "addr=${NAS_IP},nfsvers=4"                                 # Make sure to change to your NFS server's address
+#      # o: "addr=<your_nas_ip>,rw,nfsvers=4"                        # SOME NFS SHARES REQUIRE THIS!!!
+#      device: ":${NAS_DATA}"

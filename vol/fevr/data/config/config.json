@@ -5,12 +5,13 @@
     "db": "/var/www/data/db/fEVR.sqlite",
     "debug": "true",
     "html": "/var/www/html",
-    "title": "Home"
+    "title": "Home",
+    "clock": 12
   },
   "frigate": {
     "apiEventPath": "/api/events/",
     "clipPath": "/clip.mp4",
     "snapPath": "/snapshot.jpg",
-    "url": "http://192.168.2.240:5000"
+    "url": "http://192.168.200.4:5000"
   }
 }

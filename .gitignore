@@ -6,3 +6,5 @@
 __pycache__
 !/default/config.json
 !/default/fEVR.sqlite
+media
+vol
