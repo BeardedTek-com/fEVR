@@ -1,0 +1,86 @@
+mqtt:
+  host: 192.168.200.5
+detectors:
+  cpu1:
+    type: cpu
+    num_threads: 1
+model:
+  labelmap:
+    15: animal
+    16: animal
+    17: animal
+    18: animal
+    19: animal
+    20: animal
+    21: animal
+    22: animal
+    23: animal
+    24: animal
+birdseye:
+  enabled: False
+logger:
+  default: info
+  logs:
+    frigate.event: debug
+detect:
+  fps: 5
+  width: 768
+  height: 432
+  max_disappeared: 5
+objects:
+  track:
+    - person
+    - car
+    - animal
+record:
+  enabled: True
+  retain:
+    days: 0
+    mode: motion
+  events:
+    max_seconds: 15
+    pre_capture: 0
+    post_capture: 0
+    objects:
+      - person
+      - car
+      - animal
+    retain:
+      default: 5
+      mode: motion
+snapshots:
+  enabled: True
+  bounding_box: True
+  retain:
+    default: 10
+    objects:
+      person: 30
+      car: 30
+      animal: 30
+cameras:
+  sample:
+    ffmpeg:
+      inputs:
+        - path: rtsp://192.168.2.87:8888/mystream
+          roles:
+            - record
+            - detect
+      output_args:
+        rtmp: -c copy -f flv
+    objects:
+      track:
+        - person
+        - animal
+        - car
+      filters:
+        animal:
+          min_score: 0.70
+          threshold: 0.73
+        person:
+          min_score: 0.70
+          threshold: 0.73
+    mqtt:
+      enabled: True
+      bounding_box: True
+      crop: False
+      quality: 70
