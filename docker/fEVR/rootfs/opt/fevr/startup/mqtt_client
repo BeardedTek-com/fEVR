@@ -137,7 +137,7 @@ class fevrMQTT:
                 var = default
             return var 
         self.broker = str(noneCheck(getenv('MQTT_BROKER_URL'),'192.168.2.245'))
-        self.port = str(noneCheck(getenv('MQTT_BROKER_PORT'),'1883'))
+        self.port = int(noneCheck(getenv('MQTT_BROKER_PORT'),'1883'))
         self.username = str(noneCheck(getenv('MQTT_USER'),''))
         self.password = str(noneCheck(getenv('MQTT_PASS'),''))
         topics = noneCheck(getenv('MQTT_TOPICS'),'frigate/+')
