@@ -70,6 +70,7 @@ class sqlite:
         retval = []
         e = ""
         try:
+            self.open()
             exe = self.conn.execute(sql)
             if self.debug:
                 self.error.execute(f"Executed SQL: {sql}",src=self.script)
@@ -196,8 +197,7 @@ class fevrMQTT:
                 timeformat = "%-m/%-d/%y %H:%M:%S"
                 #datetime = time.strftime(timeformat,time.localtime(floor(int(event_time))))
                 self.error.execute(f"[ {event_time} ] {event_id}:{type}({score}) detected in {camera}.",src=self.script)
-                sql = f"""INSERT INTO events ('event','camera','type','score','time')\
-                          VALUES('{event_id}','{camera}','{type}','{score}',{event_time}');"""
+                sql = f"""INSERT INTO events ('event','camera','type','score','time') VALUES('{event_id}','{camera}','{type}','{score}','{event_time}');"""
                 msql = sqlite()
                 self.error.execute(f"[ {time.strftime(timeformat,time.localtime())} ] {msql.execute(sql)}",src=self.script)
                 self.error.execute(msql.execute(sql),src=self.script)
