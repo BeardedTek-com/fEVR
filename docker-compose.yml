@@ -50,8 +50,6 @@ services:
      #- ./vol/fevr/events:/var/www/html/events                      # OPTIONAL: save events to a local folder
      - nfsevents:/var/www/html/events                               # OPTIONAL: save events to an NFS share
      - nfsdata:/var/www/data
-     - ./vol/fevr/data:/data
-     - ./vol/fevr/events:/events
 networks:
   beardnet:                                                         # Network definition for our tailscale network
     driver: bridge
