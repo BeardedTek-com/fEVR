@@ -36,6 +36,11 @@ services:
       FEVR_IP: 192.168.200.2
       FEVR_PORT: ${FEVR_PORT:-5080}
       FEVR_CONTAINER_NAME: ${FEVR_CONTAINER_NAME:-fevr}
+      MQTT_BROKER_URL: ${MQTT_BROKER_URL:-192.168.2.245}
+      MQTT_BROKER_PORT: ${MQTT_BROKER_PORT:-1883}
+      MQTT_USER: ${MQTT_USER:-}
+      MQTT PASS: ${MQTT_PASS:-}
+      MQTT_TOPICS: ${MQTT_TOPICS:-'frigate/+'}
     privileged: true
     networks:
       beardnet:

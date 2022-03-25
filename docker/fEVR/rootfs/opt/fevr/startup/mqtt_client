@@ -214,9 +214,30 @@ class fevrMQTT:
         self.subscribe(self.client)
         self.client.loop_forever()
 if __name__ == '__main__':
-    broker = '192.168.2.245'
-    port = 1883
-    username = ''
-    password = ''
-    topics = ['frigate/+']
-    fevrmqtt = fevrMQTT(broker,port,topics)
+    error = logit()
+    from os import getenv
+    mqttOpts = {}
+    opts = {"broker":"MQTT_BROKER_URL",
+            "port":"MQTT_BROKER_PORT",
+            "username":"MQTT_USER",
+            "password":"MQTT_PASS",
+            "topics": "MQTT_TOPICS"}
+    for opt in opts:
+        mqttOpts[opt] = getenv(opts[opt])
+        if mqttOpts[opt] == None:
+            mqttOpts[opt] = ''
+        else:
+            if opt == 'topics':
+                topics = []
+                topicList = mqttOpts['topics'].split(',',10)
+                x=0
+                for topic in topicList:
+                    if x == 10:
+                        error.execute(f"Topic Limit Exceeded. Topics included: {topics}",src='mqtt_client')
+                        break
+                    else:
+                        topics.append(topic)
+                        x+=1
+                mqttOpts[opt] = topics
+    error.execute((f"fevrMQTT({mqttOpts['broker']},{mqttOpts['port']},{mqttOpts['topics']},username={mqttOpts['username']},password={mqttOpts['password']})"),src='mqtt_client')
+    fevrMQTT(mqttOpts['broker'],mqttOpts['port'],mqttOpts['topics'],username=mqttOpts['username'],password=mqttOpts['password'])
