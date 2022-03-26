@@ -136,7 +136,7 @@ class fevrMQTT:
             if var == None:
                 var = default
             return var 
-        self.broker = str(noneCheck(getenv('MQTT_BROKER_URL'),'192.168.2.245'))
+        self.broker = str(noneCheck(getenv('MQTT_BROKER_URL'),'192.168.0.5'))
         self.port = int(noneCheck(getenv('MQTT_BROKER_PORT'),'1883'))
         self.username = str(noneCheck(getenv('MQTT_USER'),''))
         self.password = str(noneCheck(getenv('MQTT_PASS'),''))
@@ -166,9 +166,9 @@ class fevrMQTT:
     
     def processMsg(self,msg,topic):
         from json import loads, dumps
-        if topic == 'frigate/available':
+        if 'available' in topic:
             self.error.execute('frigate is online',src=self.script)
-        if 'stats' in topic:
+        elif 'stats' in topic:
             msg = loads(msg)
             for key in msg:
                 if key == 'backyard' or key == 'driveway':
@@ -198,7 +198,7 @@ class fevrMQTT:
                         uptimeD = 0
                     uptimeStr = f"Uptime: {uptimeD} days, {uptimeH} hours, {uptimeM} minutes and {uptimeS} seconds."
                     self.error.execute(f"\t{uptimeStr}",src=self.script)
-        if 'event' in topic:
+        elif 'event' in topic:
             from json import loads
             from math import floor
             event = loads(msg)
