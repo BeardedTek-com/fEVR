@@ -120,7 +120,7 @@ class sqlite:
             self.error.execute(errmsg, self.script)
         
 class fevrMQTT:
-    def __init__(self,):
+    def __init__(self):
         from random import randint
         import socket
         self.script = 'mqtt_client'
@@ -132,11 +132,13 @@ class fevrMQTT:
 
     def getEnvVars(self):
         from os import getenv
+        
         def noneCheck(var,default):
             if var == None:
                 var = default
-            return var 
-        self.broker = str(noneCheck(getenv('MQTT_BROKER_URL'),'192.168.0.5'))
+            return var
+
+        self.broker = str(noneCheck(getenv('MQTT_BROKER_URL'),'192.168.100.5'))
         self.port = int(noneCheck(getenv('MQTT_BROKER_PORT'),'1883'))
         self.username = str(noneCheck(getenv('MQTT_USER'),''))
         self.password = str(noneCheck(getenv('MQTT_PASS'),''))
