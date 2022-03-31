@@ -29,11 +29,9 @@ If you find value in this, please give back.  Filing a [bug report, suggestion o
 - fEVR stores, sorts, and makes browsing frigate events a snap.
 
 ## Support
-For further support, please visit:
-
-[The Official fEVR.video website](https://fevr.video)
-
-[Our Discussion on Github](https://github.com/BeardedTek-com/fEVR/discussions)
+- [The Official fEVR.video website](https://fevr.video)
+- [Our Discussion on Github](https://github.com/BeardedTek-com/fEVR/discussions)
+- [File an Issue on Github](https://github.com/BeardedTek-com/fEVR/issues)
 
 
 ### Cloud Instances of fEVR
