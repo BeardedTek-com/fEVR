@@ -22,16 +22,6 @@ condition:
       trigger.payload_json["after"]["camera"] == "backyard"
       }}
 action:
-  - service: rest_command.fevr
-    data:
-      debug: 'yes'
-      event: '{{trigger.payload_json[''after''][''id'']}}'
-      camera: '{{trigger.payload_json[''after''][''camera'']}}'
-      type: '{{trigger.payload_json[''after''][''label'']}}'
-      clip: '{{trigger.payload_json[''after''][''has_clip'']}}'
-      snap: '{{trigger.payload_json[''after''][''has_snapshot'']}}'
-      score: '{{trigger.payload_json[''after''][''top_score'']}}'
-      updated: '{{as_timestamp(now())}}'
   - choose:
       - conditions:
           - condition: state

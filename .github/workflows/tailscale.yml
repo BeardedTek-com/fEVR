@@ -7,7 +7,7 @@ name: Create and publish beardedtek-com/tailscale Docker image
 
 on:
   push:
-    branches: ['main','v0.4']
+    branches: ['main','v0.5']
 
 env:
   REGISTRY: ghcr.io
