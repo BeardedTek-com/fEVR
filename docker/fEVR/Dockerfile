@@ -7,6 +7,7 @@ RUN apk --no-cache add apache2 libxml2-dev apache2-utils py3-pip py3-pillow git 
     pip install python-dateutil && \
     pip install requests && \
     pip install sqlite_web && \
+    pip install paho-mqtt && \
     rm -rf /var/www/logs
 
 # Copy root filesystem

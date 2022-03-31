@@ -11,6 +11,6 @@
     "apiEventPath": "/api/events/",
     "clipPath": "/clip.mp4",
     "snapPath": "/snapshot.jpg",
-    "url": "http://192.168.2.240:5000"
+    "url": "http://frigate.local:5000"
   }
 }
