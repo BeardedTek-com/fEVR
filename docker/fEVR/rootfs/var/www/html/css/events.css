@@ -346,6 +346,7 @@ select:hover{
       backdrop-filter: blur(3px) contrast(0.5);
     }
     .details {
+        background-color: rgba(244, 244, 250, 0.2);
         -webkit-backdrop-filter: blur(3px) contrast(0.5);
         backdrop-filter: blur(3px) contrast(0.5);
       }
