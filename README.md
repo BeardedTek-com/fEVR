@@ -3,8 +3,7 @@
 fEVR works along side of [frigate](https://frigate.video) and [home assistant](https://www.home-assistant.io/) to collect video and snapshots of objects detected using your existing camera systems.
 
 ## Notable Mentions
-<a href="https://selfhosted.show/67"><img src="https://assets.fireside.fm/file/fireside-images/podcasts/images/7/7296e34a-2697-479a-adfb-ad32329dd0b0/cover_small.jpg?v=2" style="height:45px;"></a>
-<a href="https://linuxunplugged.com/451"><img src="https://assets.fireside.fm/file/fireside-images/podcasts/images/f/f31a453c-fa15-491f-8618-3f71f1d565e5/cover_small.jpg?v=3" style="height:45px;"></a>
+<a href="https://selfhosted.show/67"><img src="https://assets.fireside.fm/file/fireside-images/podcasts/images/7/7296e34a-2697-479a-adfb-ad32329dd0b0/cover_small.jpg?v=2" style="height:3em;"></a> <a href="https://linuxunplugged.com/451"><img src="https://assets.fireside.fm/file/fireside-images/podcasts/images/f/f31a453c-fa15-491f-8618-3f71f1d565e5/cover_small.jpg?v=3" style="height:3dm;"></a>
 
 ## [Value 4 Value](https://www.entrepreneurability.nl/value-for-value-model/?lang=en)
 If you find value in this, please give back.  Filing a [bug report, suggestion or feature request](https://github.com/BeardedTek-com/fEVR/issues/new/choose), a high five, share us on social media, a kind note, or even a donation goes a long way to making the upkeep of open source software more enjoyable for the community as a whole.
