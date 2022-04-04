@@ -5,9 +5,7 @@
 - [Home Assistant](https://home-assistant.io)
 - [frigate](https://frigate.video)
 
-# Unsupported Installation Methods
-
-## Currently unsupported methods of installation
+# Unsupported Installation Methods:
 
 If you have experience in any of these, please feel free to jump in and create documentation
 
@@ -16,7 +14,7 @@ If you have experience in any of these, please feel free to jump in and create d
 - TrueNAS Scale
 - TrueNAS Core
 
-# Officially Supported Installation Method
+# Officially Supported Installation Method:
 
 ## docker-compose
 
