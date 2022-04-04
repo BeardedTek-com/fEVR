@@ -27,7 +27,7 @@ cp template.env .env
 nano .env
 ```
 
-- Edit .env file and
+- Edit .env file
 
 ```
 # Bridge Network Details
