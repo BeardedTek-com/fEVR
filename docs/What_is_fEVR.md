@@ -1,3 +1,20 @@
+# Open Source Software
+
+Following the Unix/Linux Pipe Philosophy, fEVR builds upon state of the art open source technology
+- [Tensorflow](tensorflow.org)
+  - Most commercial object detection systems use Tensorflow as its base.
+  - Requires extensive knowledge of programming to adapt it for your own use
+- [Frigate](https://frigate.video)
+  - Builds upon Tensorflow and makes tuning object detection easy for the masses
+  - Requires extensive research to get a config.yml file generated
+- fEVR
+  - Provides an interface to easily configure Frigate
+  - Easily view events
+  - Easily share events with family, friends
+  - Provide law enforcement with a downloadable link with an auto expiring password (coming soon)
+  - Secure remote viewing using [Tailscale](https://tailscale.com)
+  - Secure login system (coming soon)
+
 # What is an EVR?
 
 EVR is a new term for a smarter camera system.  Security Cameras have evolved over the years.
@@ -26,23 +43,6 @@ EVR is a new term for a smarter camera system.  Security Cameras have evolved ov
   - EVR: 1-2 days continuous and 1 year of object recording
     - Full 1080p resolution with very little compression which makes for a better image and longer retention
       - Can see details such as license plates, hair color, clothing, tattoos, etc
-
-# Open Source Software
-
-Following the Unix/Linux Pipe Philosophy, fEVR builds upon state of the art open source technology
-- [Tensorflow](tensorflow.org)
-  - Most commercial object detection systems use Tensorflow as its base.
-  - Requires extensive knowledge of programming to adapt it for your own use
-- [Frigate](https://frigate.video)
-  - Builds upon Tensorflow and makes tuning object detection easy for the masses
-  - Requires extensive research to get a config.yml file generated
-- fEVR
-  - Provides an interface to easily configure Frigate
-  - Easily view events
-  - Easily share events with family, friends
-  - Provide law enforcement with a downloadable link with an auto expiring password (coming soon)
-  - Secure remote viewing using [Tailscale](https://tailscale.com)
-  - Secure login system (coming soon)
 
 # Cost
 
