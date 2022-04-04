@@ -9,11 +9,11 @@ Following the Unix/Linux Pipe Philosophy, fEVR builds upon state of the art open
     - Builds upon Tensorflow and makes tuning object detection easy for the masses
     - Requires extensive research to get a config.yml file generated
 - fEVR:
-    - Provides an interface to easily configure Frigate
+    - Secure remote viewing using [Tailscale](https://tailscale.com)
     - Easily view events
     - Easily share events with family, friends
+    - Provides an interface to easily configure Frigate (coming soon)
     - Provide law enforcement with a downloadable link with an auto expiring password (coming soon)
-    - Secure remote viewing using [Tailscale](https://tailscale.com)
     - Secure login system (coming soon)
 
 # What is an EVR?
@@ -48,6 +48,7 @@ EVR is a new term for a smarter camera system.  Security Cameras have evolved ov
 # Cost
 
 Security cameras that support object detection natively without the cloud are expensive.
+
 - Hikvision:
     - 1080p AcuSense cameras start at $150 each
     - AcuSense DVR (required if you want to save data easily) start at $450 used
@@ -56,7 +57,6 @@ Security cameras that support object detection natively without the cloud are ex
     - 1080p Smart Deterrence cameras start at $130 each
     - N Series NVR: $300
     - Cost for 4 camera system: $950
-
 - fEVR + Wyze:
     - Wyze Cam v3: $35
     - fEVR box: $299.99 (projected price)
