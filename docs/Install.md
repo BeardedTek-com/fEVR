@@ -5,7 +5,7 @@
 - [Home Assistant](https://home-assistant.io)
 - [frigate](https://frigate.video)
 
-# Installation: Unsupported
+# Unsupported Installation Methods
 
 ## Currently unsupported methods of installation
 
@@ -16,9 +16,9 @@ If you have experience in any of these, please feel free to jump in and create d
 - TrueNAS Scale
 - TrueNAS Core
 
-# Installation: docker-compose
+# Officially Supported Installation Method
 
-## Officialy supported method of installation
+## docker-compose
 
 - Included is a container running tailscale to securely access fEVR.  This is not 100% necessary, but far more secure.
 
