@@ -5,10 +5,20 @@
 - [Home Assistant](https://home-assistant.io)
 - [frigate](https://frigate.video)
 
+# Installation: Unsupported
 
-# Installation
+## Currently unsupported methods of installation
 
-The easiest and recommended method of install is docker-compose.
+If you have experience in any of these, please feel free to jump in and create documentation
+
+- Portainer
+- UnRAID
+- TrueNAS Scale
+- TrueNAS Core
+
+# Installation: docker-compose
+
+## Officialy supported method of installation
 
 - Included is a container running tailscale to securely access fEVR.  This is not 100% necessary, but far more secure.
 
@@ -77,3 +87,4 @@ sudo docker-compose exec tailscale tailscale up --advertise-routes=192.168.200.0
 ```
 
 - Follow the Auth URL and either add to your existing account or create a new one.  Its free and easy to use.
+
