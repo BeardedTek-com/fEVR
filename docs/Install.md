@@ -1,3 +1,11 @@
+# Requirements:
+
+- [docker](https://docker.com)
+- [docker-compose](https://docs.docker.com/compose/)
+- [Home Assistant](https://home-assistant.io)
+- [frigate](https://frigate.video)
+
+
 # Installation
 
 The easiest and recommended method of install is docker-compose.

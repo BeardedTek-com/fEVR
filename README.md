@@ -34,7 +34,9 @@ If you find value in this, please give back.  Filing a [bug report, suggestion o
 - [See Issues for known bugs.](https://github.com/BeardedTek-com/fEVR/issues)
 
 ## Requirements:
-- [home assistant](https://home-assistant.io)
+- [docker](https://docker.com)
+- [docker-compose](https://docs.docker.com/compose/)
+- [Home Assistant](https://home-assistant.io)
 - [frigate](https://frigate.video)
 
 ## Install
