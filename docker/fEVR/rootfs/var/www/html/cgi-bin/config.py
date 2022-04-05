@@ -44,6 +44,7 @@ class Config:
         config['fevr']['debug'] = "true"
         config['fevr']['html'] = "/var/www/html"
         config['fevr']['title'] = "My Home"
+        config['fevr']['clock'] = "12"
         config['frigate']['apiEventPath'] = "/api/events/"
         config['frigate']['clipPath'] = "/clip.mp4"
         config['frigate']['snapPath'] = "/snapshot.jpg"
