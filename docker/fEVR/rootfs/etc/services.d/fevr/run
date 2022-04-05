@@ -32,4 +32,9 @@ echo "Modifying config file according to environment variables."
 /opt/fevr/startup/writeConfig "$FRIGATEDEBUG" "fEVR" "$FRIGATE_URL" "false"
 chown -R 100:101 /var/www/data
 chmod -R 0770 /var/www/data
+
+# Start mqtt_client
+/opt/fevr/startup/mqtt_client &
+
+# Start apache2
 httpd -DFOREGROUND
