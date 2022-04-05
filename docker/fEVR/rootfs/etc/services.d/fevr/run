@@ -2,11 +2,32 @@
 
 # Get Environment Variables
 FEVR_IP="${FEVR_IP:-192.168.100.1}"
+RESET_DATA_DIRS="${RESET_DATA_DIRS:-true}"
 echo ""
 echo ""
 echo "        Starting fEVR on http://$IP_ADDR:5080"
 echo ""
 echo ""
+mkdir /var/www/data/db
+mkdir /var/www/data/config
+if [ "$RESET_DATA_DIRS" == "true" ] then;
+    echo "Resetting data files.  Backups are in /var/www/data/BAK/"
+    mkdir /var/www/data/BAK/
+    mv /var/www/data/db/fEVR.sqlite /var/www/data/BAK/fEVR.sqlite
+    mv /var/www/data/config.json /var/www/data/BAK/config.json
+fi
+
+if [ ! -s /var/www/data/db/fEVR.sqlite ] then;
+    echo "Downloading new fEVR.sqlite from GitHub"
+    wget -O /var/www/data/db/fEVR.sqlite https://raw.githubusercontent.com/BeardedTek-com/fEVR/main/docker/fEVR/rootfs/var/www/data/db/fEVR.sqlite
+fi
+
+if [ ! -s /var/www/data/config/config.json ] then;
+    ehco "Downloading new config.json from GitHub"
+    wget -O /var/www/data/config/config.json https://raw.githubusercontent.com/BeardedTek-com/fEVR/main/docker/fEVR/rootfs/var/www/data/config/config.json
+fi
+echo "Modifying config file according to environment variables."
+/opt/fevr/startup/writeConfig
 chown -R 100:101 /var/www/data
 chmod -R 0770 /var/www/data
 httpd -DFOREGROUND
