@@ -39,7 +39,6 @@ services:
       MQTT_USER: ${MQTT_USER:-}
       MQTT PASS: ${MQTT_PASS:-}
       MQTT_TOPICS: ${MQTT_TOPICS:-'frigate/+'}
-      RESET_DATA_DIRS: ${RESET_DATA_DIRS:-'false'}
     privileged: true
     networks:
       beardnet:
