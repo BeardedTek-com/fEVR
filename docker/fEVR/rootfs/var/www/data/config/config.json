@@ -10,7 +10,7 @@
       "html"          : "/var/www/html",
       "db"            : "/var/www/data/db/fEVR.sqlite",
       "debug"         : "false",
-      "clock"         : "12"
+      "clock"         : 12
     },
     "frigate"         :
     {
