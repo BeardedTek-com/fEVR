@@ -3,6 +3,34 @@
 # fEVR - frigate Event Video Recorder
 fEVR works along side of [frigate](https://frigate.video) and [home assistant](https://www.home-assistant.io/) to collect video and snapshots of objects detected using your existing camera systems.
 
+# Refactoring to Flask - v0.6
+Thanks to an amazing dev named @Mikhail5555 I was show the light.
+The v0.6 branch planned improvements are
+- Rewritten in flask
+- API backend:
+  - Easily add cameras
+  - Change config
+  - Database management
+  - Event management
+- Frontend changes
+  - Shiny new UI ([fevr.video](https://fevr.video) frontend with a few modifications
+  - Support multiple frigate instances
+  - Frigate configuration wizard
+    - Including multiple instances
+    - Enable/disable sound for each camera
+    - Set sane object detection parameters
+    - Fine tuning wizard
+  - Clip sharing
+    - Auto expiring event links
+    - MP4 exporting
+    - Social sharing
+- rtsp-simple-server
+  - RTSP relay camera rtsp streams
+  - auto converts hls for high quality in browser viewing
+
+Feature requests are very valuable at this time
+All development on the v0.5 branch is halted to concentrate on these changes.  A feature parity release of the v0.5.1 release will be released first.
+
 ## Notable Mentions
 <a href="https://selfhosted.show/67"><img src="https://assets.fireside.fm/file/fireside-images/podcasts/images/7/7296e34a-2697-479a-adfb-ad32329dd0b0/cover_small.jpg?v=2" style="height:3em;"></a> <a href="https://linuxunplugged.com/451"><img src="https://assets.fireside.fm/file/fireside-images/podcasts/images/f/f31a453c-fa15-491f-8618-3f71f1d565e5/cover_small.jpg?v=3" style="height:3em;"></a>
 
