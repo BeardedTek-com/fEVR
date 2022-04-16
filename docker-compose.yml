@@ -46,6 +46,7 @@ services:
     volumes:
      - ./vol/fevr/data/:/var/www/data                              # OPTIONAL: expose /var/www/data folder which contains the SQLite database and config.json files
      - ./vol/fevr/events:/var/www/html/events                      # OPTIONAL: save events to a local folder
+     - ./vol/fevr/mqtt_client/run:/etc/services.d/mqtt_client/run  # OPTIONAL: Allows you to set the mqtt_client command line options
      #- nfsevents:/var/www/html/events                             # OPTIONAL: save events to an NFS share
      #- nfsdata:/var/www/data                                      # OPTIONAL: save conig data to an NFS share
 networks:

@@ -18,6 +18,8 @@
 import sqlite3
 from sqlite3 import Error
 from paho.mqtt import client as mqtt_client
+import argparse
+from os import getenv
 
 class logit:
     def __init__(self,logfile="/var/www/logs/debug.log",debug=False):
@@ -127,22 +129,42 @@ class fevrMQTT:
         self.error = logit(debug=True)
         hostname = socket.gethostname()
         self.clientID = f"fevr-{hostname}-{randint(0,100)}"
-        self.getEnvVars()
+        self.getVars()
         self.run()
 
-    def getEnvVars(self):
-        from os import getenv
-        
+    def getVars(self):
+        parser = argparse.ArgumentParser()
+        parser.add_argument('-H','--host',type=str,required=False)
+        parser.add_argument('-p','--port',type=int,required=False)
+        parser.add_argument('-t','--topics',type=str,required=False)
+        parser.add_argument('-u','--user',type=str,required=False)
+        parser.add_argument('-P','--password',type=str,required=False)
+        args = parser.parse_args()
+
         def noneCheck(var,default):
             if var == None:
                 var = default
             return var
-
-        self.broker = str(noneCheck(getenv('MQTT_BROKER_URL'),'192.168.100.5'))
-        self.port = int(noneCheck(getenv('MQTT_BROKER_PORT'),'1883'))
-        self.username = str(noneCheck(getenv('MQTT_USER'),''))
-        self.password = str(noneCheck(getenv('MQTT_PASS'),''))
-        topics = noneCheck(getenv('MQTT_TOPICS'),'frigate/+')
+        if args.host:
+            self.broker = args.host
+        else:
+            self.broker = str(noneCheck(getenv('MQTT_BROKER_URL'),'192.168.100.5'))
+        if args.port:
+            self.port = args.port
+        else:
+            self.port = int(noneCheck(getenv('MQTT_BROKER_PORT'),'1883'))
+        if args.user:
+            self.username = args.user
+        else:
+            self.username = str(noneCheck(getenv('MQTT_USER'),''))
+        if args.password:
+            self.password = args.password
+        else:
+            self.password = str(noneCheck(getenv('MQTT_PASS'),''))
+        if args.topics:
+            topics = args.topics
+        else:
+            topics = noneCheck(getenv('MQTT_TOPICS'),'frigate/+')
         self.topics = []
         topics = topics.split(',',5)
         count=0
