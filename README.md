@@ -1,29 +1,8 @@
-# fEVR-flask
-fEVR rebuilt for flask
-This version of fEVR is EXPERIMENTAL and under VERY HEAVY development.
+<p align="right" style="vertical-align:middle;"><a target="_blank" href="https://www.facebook.com/sharer/sharer.php?u=http%3A%2F%2Ffevr.video"><img src='https://fevr.video/img/share-fb.svg' style="height: 2em;"></a><a target="_blank" href="https://twitter.com/intent/tweet?url=http%3A%2F%2Ffevr.video&text=AI%20Object%20Detection%20with%20fEVR%20-%20frigate%20Event%20Video%20Recorder"><img src='https://fevr.video/img/share-twitter.svg' style="height: 2em;"></a><a target="_blank" href="http://pinterest.com/pin/create/button/?url=http%3A%2F%2Ffevr.video&media=&description=AI%20Object%20Detection%20with%20fEVR%20-%20frigate%20Event%20Video%20Recorder"><img src='https://fevr.video/img/share-pin.svg' style="height: 2em;"></a><a target="_blank" href="https://reddit.com/submit?url=https://fevr.video&title=AI%20Object%20Detection%20with%20fEVR%20-%20frigate%20Event%20Video%20Recorder"><img src='https://fevr.video/img/share-reddit.svg' style="height: 2em;"></a><a target="_blank" href="http://www.linkedin.com/shareArticle?mini=true&url=http%3A%2F%2Ffevr.video&title=AI%20Object%20Detection%20with%20fEVR%20-%20frigate%20Event%20Video%20Recorder"><img src='https://fevr.video/img/share-linkedin.svg' style="margin-right: 2em;height: 2em;"></a><a href="https://www.paypal.com/donate/?hosted_button_id=ZAHLQF24WAKES"><img src='https://fevr.video/img/paypal-donate.svg' style="height: 2em;"></a><a href="https://github.com/sponsors/BeardedTek-com"><img src='https://fevr.video/img/github-sponsor.svg' style="height: 2em;"></a><a href="https://tallyco.in/s/waqwip/"><img src='https://fevr.video/img/tallycoin-donate.png' style="height: 2em;"></a></p>
 
-Please assume that each new commit has breaking changes and start from scratch.
-
-# Goals
-In order to overwrite the main branch of beardedtek-com/fevr I want the following things in place:
-
-By my esitmates, I'm about 95% of the way there.  That last 5% though...
-- Event filtering functioning
-- Setup of fEVR working
-  - Adding first admin user
-  - Adding frigate url info
-  - Adding cameras
-
-
-In the future I plan to implement:
-- Full setup from scratch of:
-  - frigate
-  - rtsp-simple-server
-  - mqtt server
-
-
-# Installation:
-For now, the setup process is incomplete.  Please follow these instruction to get things up and running
+# fEVR - frigate Event Video Recorder
+fEVR works along side of [frigate](https://frigate.video) and [home assistant](https://www.home-assistant.io/) to collect video and snapshots of objects detected using your existing camera systems.
+![fEVR v0.6 Screenshot](https://user-images.githubusercontent.com/93575915/165704583-fec8e202-88b8-4ca2-9ff2-345c04da3722.png)
 
 ## Requirements:
 - Frigate fully setup and working
@@ -48,33 +27,7 @@ The default values should serve you well.
 # Changes the port fEVR runs on DEFAULT: 5090
 FEVR_PORT=5090
 # Uncomment FLASK_ENV=development to put fEVR into Debug Mode
-FLASK_ENV=development
-#####################################################################
-
-#MQTT Client Setup **REQUIRED **
-#####################################################################
-MQTT_BROKER_IP=192.168.101.3
-MQTT_BROKER_PORT=1883
-
-# If there is no user/password, leave unset
-MQTT_BROKER_USER=
-MQTT_BROKER_PASS=
-
-# Comma seperated string of MQTT topics to subscribe to.  LIMIT 5!!!
-MQTT_TOPICS="frigate/+"
-
-# API Auth Key **REQUIRED**
-# 128 character randomly generated key used for api authentication
-# To generate a key manually, login with an admin account and go to
-# the following address:
-# http(s)://<your_fevr_url>/api/auth/add/key/<name>/<ip>/<limit>
-#   - <name>: Name of your token (limit 50 characters)
-#   - <ip>  : IP address (for future use) should be set to all for now
-#   - <limt>: Limit the number of times this key can be used.
-#             This will be used in the future for one-time passwords.
-#             Set this to 0 for unlimited.
-# Example: https://fevr.local/api/auth/add/key/mqtt/all/0
-API_KEY=
+#FLASK_ENV=development
 #####################################################################
 
 #Tailscale
@@ -82,12 +35,6 @@ API_KEY=
 # Obtain Auth Key from https://login.tailscale.com/admin/authkeys
 AUTH_KEY=
 TAILSCALE_IP=192.168.101.253
-#####################################################################
-
-#####################################################################
-#                                                                   #
-#      DEFAULTS BELOW THIS LINE SHOULD NOT HAVE TO BE CHANGED       #
-#                                                                   #
 #####################################################################
 
 # Bridge Network Variables
@@ -151,24 +98,7 @@ services:
         ipv4_address: ${MQTT_CLIENT_IP:-192.168.101.2}
     volumes:
       - ./:/fevr
-    command: /fevr/app/mqtt_client -f "${FEVR_IP:-192.168.101.1}:${FEVR_PORT:-5090}" -p ${MQTT_BROKER_PORT:-1883} -t "${MQTT_TOPICS:-frigate/+}" -u "${MQTT_BROKER_USER:-}" -P "${MQTT_BROKER_PASS:-}" "${MQTT_BROKER_IP:-192.168.2.87}" ${API_KEY}
-     #usage: mqtt_client [-h] [-p PORT] [-t TOPICS] [-u USER] [-P PASSWORD] [-f FEVR] [-s] mqtt
-     #
-     #positional arguments:
-     #  mqtt                  MQTT Broker IP/FQDN **Required** (default: None)
-     #  key                   fEVR API Key        **Required** (default: None)
-     #
-     #optional arguments:
-     #  -h, --help            show this help message and exit
-     #  -p PORT, --port PORT  MQTT Port (default: 1883)
-     #  -t TOPICS, --topics TOPICS
-     #                        MQTT Topics (default: 'frigate/+')
-     #  -u USER, --user USER  MQTT Username (default: '')
-     #  -P PASSWORD, --password PASSWORD
-     #                        MQTT Password (default: '')
-     #  -f FEVR, --fevr FEVR  fEVR IP Address/FQDN (default: '192.168.101.1:5090)
-     #  -s, --https           If set uses https:// (default: http://)
-      
+    command: bash /fevr/run_mqtt_client.sh
 networks:
   fevrnet:
     driver: bridge
@@ -203,58 +133,47 @@ services:
     privileged: true
     volumes:
       - ./:/fevr
-    command: /fevr/app/mqtt_client -f "${FEVR_IP:-192.168.101.1}:${FEVR_PORT:-5090}" -p ${MQTT_BROKER_PORT:-1883} -t "${MQTT_TOPICS:-frigate/+}" -u "${MQTT_BROKER_USER:-}" -P "${MQTT_BROKER_PASS:-}" "${MQTT_BROKER_IP:-192.168.2.87}" ${API_KEY}
-     #usage: mqtt_client [-h] [-p PORT] [-t TOPICS] [-u USER] [-P PASSWORD] [-f FEVR] [-s] mqtt
-     #
-     #positional arguments:
-     #  mqtt                  MQTT Broker IP/FQDN **Required** (default: None)
-     #  key                   fEVR API Key        **Required** (default: None)
-     #
-     #optional arguments:
-     #  -h, --help            show this help message and exit
-     #  -p PORT, --port PORT  MQTT Port (default: 1883)
-     #  -t TOPICS, --topics TOPICS
-     #                        MQTT Topics (default: 'frigate/+')
-     #  -u USER, --user USER  MQTT Username (default: '')
-     #  -P PASSWORD, --password PASSWORD
-     #                        MQTT Password (default: '')
-     #  -f FEVR, --fevr FEVR  fEVR IP Address/FQDN (default: '192.168.101.1:5090)
-     #  -s, --https           If set uses https:// (default: http://)
+    command: bash /fevr/run_mqtt_client.sh
 ```
 
+Bring the system up:
+```
+docker-compose up -d
+```
 
+View the logs:
+```
+docker-compose logs -f fevr_flask fevr_mqtt
+```
+You will notice right away that fevr_mqtt will be saying:
+```
+bash: /fevr/run_mqtt_client.sh: No such file or directory
+```
+This is 100% NORMAL BEHAVIOR.  You must go through the Web UI setup to enable the mqtt_client.  Until then, It's just a pretty interface that does nothing.
 
-# Finishing setup:
-## Create Admin Account
-- Visit http(s)://<your_fevr_url>/setup
-  - Here you will create your admin account.
-- Login with the newly created admin account
+# Setup
+Procedure:
 
-## Generate API Auth Key
-This will be automated in the future
-- Click on the "beard logo" to see the menu and click on Edit Profile.
-- Scroll down and create a New API Auth Key
-  - The key provided will need to be entered into your .env file under the API Auth Key section.  This is how mqtt_client authenticates with fEVR.
-    - This keeps bad actors from accessing your camera feed and creating false events.
-
-## Inform fEVR where Frigate Resides
-This will be automated in the future
-- Visit the following links in your same web browser to setup frigate:
-```
-http://<fevr-flask-ip>:<port>/api/frigate/add/<name>/<http>/<ip>/<port>
-```
-example:
-```
-http://192.168.101.1:5090/api/frigate/add/frigate/http/192.168.101.10/5000
-```
-## Inform fEVR which camreas you have
-- Visit the following links in your same web browser to add a camera:
-  - <camera> is camera name
-  - <server> can be anything for now, this will change when Live View is implemented properly in the future.
-```
-http://<fevr-flask-ip>:<port>/api/cameras/add/<camera>/<server>
-```
-example:
-```
-http://192.168.101.1:5090/api/cameras/add/front/192.168.101.200
-```
+- Visit http(s)://<fevr_url>/setup
+- Create admin account
+- Login to new admin account
+- Visit http(s)://fevr_url>/setup AGAIN.
+- Add all of your cameras.
+  - It asks for both HLS and RTSP feeds.  Technically you don't need to enter anything but the camera name, but in a future release live view and frigate config will be enabled and will require these values
+  - Click Next
+- Configure Frigate
+  - make one entry called 'frigate' (without the quotes) with your internally accessible frigate URL
+  - make another entry called 'external' (without the quotes) with your externally accessible frigate URL
+    - This is 100% Optional.  It does, however, enable live view outside your network.
+    - If you don't have an externally accessible frigate URL, you can skip this step.
+  - Click Next
+- Configure MQTT Client
+  - You need to generate an API Auth Key to configure this step.
+    - This can be done on your profile page.  Click the Bearded Tek logo to drop down the menu and click on profile.
+    - Scroll down and fill in the fields:
+      - Name: Enter a name to remember this is for the mqtt client (mqtt_client)
+      - ipv4 Address: OPTIONAL
+      - Limit: Enter 0
+        - If anything above 0 is entered, it is a limited use key.  It can only be used that many times to authenticate with the system.  Once it has been used x amount of times, it will be disabled.
+  - Click Add and then Next
+- Other is not populated yet, There are future plans for this page, just click Next again and you'll be brought to the main interface.
