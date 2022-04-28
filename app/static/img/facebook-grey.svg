@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<svg
+   height="530.09387"
+   width="533.33331"
+   viewBox="-204.79995 -341.33325 788.85904 1357.04"
+   version="1.1"
+   id="svg25171"
+   sodipodi:docname="facebook-grey.svg"
+   inkscape:version="1.1.2 (0a00cf5339, 2022-02-04)"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:svg="http://www.w3.org/2000/svg">
+  <defs
+     id="defs25175" />
+  <sodipodi:namedview
+     id="namedview25173"
+     pagecolor="#ffffff"
+     bordercolor="#666666"
+     borderopacity="1.0"
+     inkscape:pageshadow="2"
+     inkscape:pageopacity="0.0"
+     inkscape:pagecheckerboard="0"
+     showgrid="false"
+     inkscape:zoom="0.7875"
+     inkscape:cx="265.39683"
+     inkscape:cy="266.66667"
+     inkscape:window-width="1920"
+     inkscape:window-height="1051"
+     inkscape:window-x="0"
+     inkscape:window-y="0"
+     inkscape:window-maximized="1"
+     inkscape:current-layer="svg25171" />
+  <path
+     d="m 875.51988,341.33375 c 0,-377.027 -305.64,-682.667 -682.66604,-682.667 -377.02696,0 -682.66696,305.64 -682.66696,682.667 0,340.738 249.641,623.16 575.999962,674.37305 V 538.66675 H -87.146123 v -197.333 H 86.186842 v -150.4 c 0,-171.094 101.916998,-265.6 257.853008,-265.6 74.69002,0 152.81403,13.333 152.81403,13.333 v 168 h -86.08302 c -84.80401,0 -111.25002,52.623 -111.25002,106.61 v 128.057 h 189.33304 l -30.26701,197.333 H 299.51984 V 1015.7068 C 625.87888,964.49375 875.51988,682.07175 875.51988,341.33375"
+     fill="#858b9b"
+     id="path25167" />
+  <path
+     d="m 458.58687,538.66675 30.26701,-197.333 H 299.51984 v -128.058 c 0,-53.986 26.44701,-106.609 111.25102,-106.609 h 86.08302 v -168 c 0,0 -78.12401,-13.333 -152.81403,-13.333 -155.93601,0 -257.853008,94.506 -257.853008,265.6 v 150.4 H -87.146123 v 197.333 H 86.186842 v 477.04005 a 687.805,687.805 0 0 0 106.666998,8.2929 c 36.288,0 71.90999,-2.8399 106.666,-8.2929 V 538.66675 h 159.06703"
+     fill="#ffffff"
+     id="path25169" />
+</svg>

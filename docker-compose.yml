@@ -1,70 +1,57 @@
 version: '2.4'
 services:
-  tailscale:
-#    build:                                                            # Uncomment these lines if you wish to build from source
-#      context: ${TAILSCALE_CONTEXT}                                   # Change TAILSCALE_IMAGE in the .env file to beardedtek-com/tailscale:source
-#      dockerfile: Dockerfile                                          # in order to not conflict with the official package
-    image: ${TAILSCALE_IMAGE:-ghcr.io/beardedtek-com/tailscale:main}
-    container_name: ${TAILSCALE_CONTAINER_NAME:-tailscale}
+  tailscale:      # OPTIONAL - THIS SECTION CAN BE REMOVED IF YOU DON'T WANT TO RUN TAILSCALE
+    image: tailscale/tailscale
+    container_name: fevr_tailscale
     restart: unless-stopped
+    privileged: true
     volumes:
-      - ${TAILSCALE_DATA:-./vol/tailscale/data}:/data                 # Save tailscale data so we don't start anew each time
-      - ${TAILSCALE_VAR_LIB:-./vol/tailscale/var_lib}:/var/lib        # Required for tailscale
-      - /dev/net/tun:/dev/net/tun                                     # Required for tailscale
+      - ./tailscale/varlib:/var/lib
+      - /dev/net/tun:/dev/net/tun
+      - ./run_tailscale.sh:/run.sh
     cap_add:
-      - net_admin                                                     # Required for tailscale
-      - sys_module                                                    # Required for tailscale
+      - net_admin
+      - sys_module
     environment:
-      DOCKER_SUBNET: ${NETWORK_SUBNET:-192.168.200.0/24}
+      AUTH_KEY: ${AUTH_KEY}
+      BRIDGE_SUBNET: ${BRIDGE_SUBNET:-192.168.101.0/24}
+    command: /run.sh
     networks:
-      beardnet:
-        ipv4_address: ${TAILSCALE_IP:-192.168.200.3}
-    privileged: true
-    command: ${TAILSCALE_COMMAND:-/opt/tailscale/tailscale}
+      fevrnet:
+        ipv4_address: ${TAILSCALE_IP:-192.168.101.253}
+    
   fevr:
-    build:
-      context: ${FEVR_CONTEXT}
-      dockerfile: Dockerfile
-    image: ${FEVR_IMAGE:-ghcr.io/beardedtek-com/fevr:main}
-    container_name: ${FEVR_CONTAINER_NAME:-fevr}
+    image: ghcr.io/beardedtek-com/fevr-flask:main
+    container_name: fevr
     restart: unless-stopped
-    environment:
-      FRIGATE_URL: "${FRIGATE_URL:-http://frigate.local:5000}"
-      FEVR_DEBUG: "${FRIGATE_DEBUG:-true}"
-      FEVR_IP: ${FEVR_IP:-192.168.200.2}
-      FEVR_PORT: ${FEVR_PORT:-5080}
-      FEVR_CONTAINER_NAME: ${FEVR_CONTAINER_NAME:-fevr}
-      MQTT_BROKER_URL: ${MQTT_BROKER_URL:-192.168.2.245}
-      MQTT_BROKER_PORT: ${MQTT_BROKER_PORT:-1883}
-      MQTT_USER: ${MQTT_USER:-}
-      MQTT PASS: ${MQTT_PASS:-}
-      MQTT_TOPICS: ${MQTT_TOPICS:-'frigate/+'}
     privileged: true
     networks:
-      beardnet:
-        ipv4_address: ${FEVR_IP:-192.168.200.2}
+      fevrnet:
+        ipv4_address: ${FEVR_IP:-192.168.101.1}
     volumes:
-     - ./vol/fevr/data/:/var/www/data                              # OPTIONAL: expose /var/www/data folder which contains the SQLite database and config.json files
-     - ./vol/fevr/events:/var/www/html/events                      # OPTIONAL: save events to a local folder
-     - ./vol/fevr/mqtt_client/run:/etc/services.d/mqtt_client/run  # OPTIONAL: Allows you to set the mqtt_client command line options
-     #- nfsevents:/var/www/html/events                             # OPTIONAL: save events to an NFS share
-     #- nfsdata:/var/www/data                                      # OPTIONAL: save conig data to an NFS share
+      - ./:/fevr
+    environment:
+      FLASK_ENV: ${FLASK_ENV:-}
+      FEVR_PORT: ${FEVR_PORT:-5090}
+      MQTT_CLIENT: "false"          # Set to "true" if you wish to run fevr_mqtt on this container as well
+    command: /fevr/run_fevr.sh
+
+  fevr_mqtt:    # You can run this in the fEVR container by setting MQTT_CLIENT to "true" AND REMOVE THIS SECTION
+    image: ghcr.io/beardedtek-com/fevr-flask:main
+    container_name: fevr_mqtt
+    restart: unless-stopped
+    privileged: true
+    networks:
+      fevrnet:
+        ipv4_address: ${MQTT_CLIENT_IP:-192.168.101.2}
+    volumes:
+      - ./:/fevr
+    command: bash /fevr/run_mqtt_client.sh
+
 networks:
-  beardnet:
+  fevrnet:
     driver: bridge
     ipam:
       config:
-        - subnet: ${NETWORK_SUBNET:-192.168.200.0/24}
-          gateway: ${NETWORK_GATEWAY:-192.168.200.1}
-
-#volumes:                                                          # Uncomment this section if you wish to use NFS
-#  nfsevents:
-#    driver_opts:
-#      type: "nfs"
-#      o: "addr=${NAS_IP},nfsvers=4"
-#      device: ":${NAS_EVENTS}"
-#  nfsdata:
-#    driver_opts:
-#      type: "nfs"
-#      o: "addr=${NAS_IP},nfsvers=4"
-#      device: ":${NAS_DATA}"
+        - subnet: ${BRIDGE_SUBNET:-192.168.101.0/24}
+          gateway: ${BRIDGE_GATEWAY:-192.168.101.254}

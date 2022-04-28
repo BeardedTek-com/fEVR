@@ -1,0 +1,71 @@
+<html lang="en">
+    <head>
+        <meta name="viewport" content="width=device-width, initial-scale=1"/>
+        <meta http-equiv="ScreenOrientation" content="autoRotate:disabled">
+        <meta name="description" content="frigate Event Video Recorder Uses frigate object detection as a backend for an Event driven network Video Recorder."/>
+        <meta http-equiv="X-UA-Compatible" content="ie=edge" />
+	    <meta name="mobile-web-app-capable" content="yes"/>
+        <meta name="theme-color" content="#3B4248"/>
+        <link rel="apple-touch-icon" href="/static/img/fEVR-192.png"/>
+        <link rel="icon" type="image/png" href="/static/img/favicon.png">
+        <link rel="stylesheet" href="/static/css/main.css"/>
+        <link rel="stylesheet" type="text/css" href="/static/css/landscape.css" media="screen and (orientation: landscape)">
+        <link rel="stylesheet" type="text/css" href="/static/css/portrait.css" media="screen and (orientation: portrait)">
+        <link rel="stylesheet" href="/static/css/events.css"/>
+        <link rel="stylesheet" href="/static/css/colors.css"/>
+        <link rel="stylesheet" href="/static/css/setup.css"/>
+        <title>fEVR by BeardedTek</title>
+        <script src='/static/js/main.js'></script>
+    </head>
+    <body class="bg-dark">
+        <div class="navbar bg-dark">
+            <div class="logo">
+                <a href="/"><img alt="fEVR Logo" src="/static/img/fevr.svg"></a>
+            </div>
+            <div class="links noSelect">
+                {% import "menu.html" as menu %}
+                {{ menu.navbar(current_user,page) }}
+            </div>
+        </div>
+        {% if current_user.is_authenticated %}
+        <div class="menu {{'menuHide' if Menu=="closed"}}" id="mainMenu">
+            <div class="menu-left">
+                <div class="menu-events">
+                    <a href="/all">All Events</a><br/>
+                    <a href="/latest">Latest Events</a><br/>
+                </div>
+            </div>
+            <div class="menu-right">
+                <div class="menu-system">
+                    <a href="/routes">Sitemap</a><br>
+                    <a href="/setup">Settings</a>
+                </div>
+                <div class="menu-user">
+                    <a href="/profile">Edit Profile</a><br/>
+                    <a href="/logout?page={{page}}">Logout</a>
+                </div>
+            </div>
+            {{ menu.cameras(cameras) }}
+        </div>
+        {% endif %}
+        <div class="content">
+            <div class="description">
+                <div class="tagline">
+                    {{ title|safe }}
+                </div>
+                <div id="container" class="contentContainer">
+                    {% block content %}
+                    {% endblock %}
+                </div>
+                </div>
+                <div class="footerContents">
+                    <div class="footerContent footercopyleft"><a target='_blank' href='https://beardedtek.com'><span class='copyleft'>&copy;</span>2022 BeardedTek.com</a></div>
+                    <div class="footerContent"><a href='https://github.com/beardedtek-com/fEVR/discussions' target='_blank'>Get Support</a></div>
+                    <div class="footerContent"><a href='https://github.com/beardedtek-com/fevr'>GitHub</a></div>
+                    <div class="footerContent"><a href='https://fevr.video' target='_blank'>fEVR.video</a></div>
+                    <div class="footerContent"><a href="https://docs.fevr.video" target='_blank'>docs.fEVR.video</a></div>
+                </div>
+            </div>
+            
+    </body>
+</html>

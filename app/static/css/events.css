@@ -1,0 +1,462 @@
+body{
+    min-width: 375px;
+    margin: 0;
+}
+body::-webkit-scrollbar {
+    width:0;
+}
+a{
+    color: rgb(230, 230, 230);
+    font-size: 0.85em
+}
+a:hover{
+    filter: drop-shadow(0 0 0.03em rgb(49, 55, 66));
+    color: rgb(200, 200, 200);
+}
+.danger a{
+    color: rgb(255, 125, 125);
+}
+.danger a:hover{
+    color: rgb(150, 75, 75);
+}
+.codeBlock{
+    font-size: 1em;
+    font-family: courier;
+    font-weight: normal;
+    width: 25%;
+    overflow-x:auto;
+}
+.view20{
+   width: 30%;
+   text-align: right;
+}
+.objcam{
+    width: 60%;
+    text-align: center;
+}
+.back{
+    width: 10%;
+}
+.contentContainer{
+    display: flex;
+    flex-flow:row wrap;
+    justify-content: center;
+    align-content: flex-start;
+    overflow:hidden;
+    overflow-wrap: break-word;
+    width: 100%;
+    min-height: 83vh;
+    padding-top: 0.25em;
+}
+.event{
+    padding: 20px;
+}
+.eventControls{
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    margin-top: 1em;
+}
+.events{
+    padding: 0 0.75em 0.75em 0;
+}
+.eventTitle{
+    font-family:-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+    font-size: 1.5em;
+    font-weight: bold;
+}
+.eventText{
+    font-family:-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+    font-size: 1.15em;
+}
+.newevent{
+    color:rgb(199, 47, 47)
+}
+
+.eventHeader{
+    display: flex;
+    flex-flow:row wrap;
+    justify-content:flex-start space-evenly;
+    align-items:flex-start;
+    overflow:hidden;
+    overflow-wrap: break-word;
+    width: 100%;
+    padding-right: 20px;
+}
+
+.view{
+    margin: auto;
+    padding-top: 20px;
+}
+.clip{
+
+    width: 90%;
+    max-width: 720px;
+    margin: auto;
+}
+.live{
+    width: 640px;
+    height: 360px;
+    border: 0;
+}
+.popout{
+    height: 1em;
+    width: auto;
+}
+.eventDetails{
+    display: flex;
+    justify-content: space-around;
+    margin-bottom: 0.5em;
+}
+.eventsDetails{
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    display: flex;
+    justify-content: space-around;
+    width: 320px;
+    background: rgba(160, 168, 170, 0.5);
+}
+.subdetail{
+    font-size: 1em;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+    font-weight: bold;
+}
+.eventDetailsItem{
+    padding-right: 1.5em;
+}
+.eventDetailsItem img {
+    height: 1em;
+    width: auto;
+    padding-right: 0.5em;
+}
+.popout{
+    padding-left: 0.5em;
+}
+.modal{
+    position: absolute;
+    top: 2.5em;
+    justify-content: space-around;
+    margin: auto;
+    width: 50%;
+    min-height: 10%;
+    min-width: 20em;
+    word-wrap: break-word;
+    background-color: rgba(244, 244, 250, 0.8);
+    border-color: rgb(22, 38, 126);
+    font-size: 1.15em;
+    font-family:-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+    color:rgb(22, 38, 126);
+    border-radius: 1em;
+    vertical-align: middle;
+    padding: 2em;
+}
+.dialog{
+    border-color: rgb(137, 143, 145);
+    border-radius: 1em;
+    margin: auto;
+    width: 95vw;
+    vertical-align: middle;
+    background-color: rgba(244, 244, 250, 0.8)
+}
+.dialog::backdrop{
+    background: none;
+}
+@supports ((-webkit-backdrop-filter: none) or (backdrop-filter: none)) {
+    .dialog {
+      background-color: rgba(244, 244, 250, 0.5);
+      -webkit-backdrop-filter: blur(3px) contrast(0.5);
+      backdrop-filter: blur(3px) contrast(0.5);
+    }
+  }
+#titlebar{
+    border: 0 solid darkblue;
+    height: 2em;
+}
+.title{
+    font-size: 1.25em;
+    font-weight: bold;
+    font-family:-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+    padding-left: 0.25em;
+}
+#content{
+    margin: 0.5em;
+    font-size: 1.15em;
+    font-family:-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+}
+#footer{
+    display: flex;
+    flex-flow:row;
+    justify-content: space-evenly;
+    align-items:flex-start;
+}
+button{
+    background: rgb(160,168,170);
+    border-radius: 0.25em;
+    font-size: 1.25em;
+    font-weight: bold;
+    padding: 0.1em;
+    padding-top: 0.5em;
+    padding-bottom: 0.5em;
+    margin: 1%;
+    width: 48%;
+}
+button.buttonAction{
+    background: rgb(160,168,170);
+    border-radius: 0.25em;
+    font-size: 0.7em;
+    width: 40vw;
+    height: 2.5em;
+}
+button.buttonAction:hover{
+    cursor: pointer;
+    background: rgb(203, 213, 216);
+}
+button.enabled:hover{
+    cursor: pointer;
+    background: rgb(203, 213, 216);
+}
+button:hover{
+    cursor: pointer;
+}
+.disabled{
+    opacity: 0.33;
+}
+.enabled{
+    opacity: 1;
+}
+.hide{
+    opacity: 0;
+}
+.left{
+    display: flex;
+    width: 45%;
+    justify-content: left;
+}
+.right{
+    display: flex;
+    width: 45%;
+    justify-content: right;
+}
+.DANGER{
+    color: rgb(199, 47, 47);
+}
+.eventThumb{
+    position: relative;
+    display: flex;
+    background-color: black;
+}
+.eventThumb img{
+    height: 180px;
+    width: 320px;
+    opacity: 1;
+}
+.eventThumb img:hover{
+    opacity: 0.8;
+}
+.eventView{
+    position: relative;
+    display: flex;
+    margin-top: 1em;
+}
+.eventView img{
+    width: 100%;
+}
+.eventView video{
+    width: 100%;
+}
+.eventView .new{
+    font-size: 2em;
+    padding: 0.125em;
+}
+.new{
+    position: absolute;
+    top: 0;
+    left: 0;
+    background: rgba(160, 168, 170, 0.9);
+    font-size: 1em;
+    font-weight: bolder;
+    font-family:-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+    color:rgb(199, 47, 47)
+}
+.details{
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 320px;
+    padding: 0.2em;
+    margin: 0 10px 10px 10px;
+    background: rgba(51, 51, 56, 0.9);
+    font-size: 1em;
+    font-weight: bold;
+    font-family:-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+}
+.camera{
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    padding: 0.2em;
+    margin: 0em 0em 0.5em 0.5em;
+    background: rgba(51, 51, 56, 0.9);
+    font-size: 1em;
+    font-weight: bold;
+    font-family:-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+}
+.cameraNew{
+    color: red;
+}
+.hidden{
+    display: none;
+}
+#filterContainer{
+    position: -webkit-sticky;
+    position: sticky;
+    top: 0;
+    width: 100%;
+    background-color: rgb(51, 51, 56);
+    z-index:100000;
+}
+.delConfirm{
+    color:rgb(199, 47, 47);
+    width: 100%;
+    font-size: 1.25em;
+    padding-top: 0.5em;
+    padding-bottom: 0.5em;
+}
+.eventsFilter{
+    position: -webkit-sticky;
+    position: sticky;
+    top: 0;
+    display: flex;
+    justify-content: space-around;
+    flex-wrap: wrap;
+    align-items: center;
+    padding-top: 0.25em;
+    padding-bottom: 0.25em;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+    font-size: 1em;
+    font-weight: bold;
+    overflow: hidden;
+    width: 100%;
+    max-width: 1000px;
+    margin: auto;
+    color: rgb(51, 51, 56);
+}
+#filterContainer button{
+    padding: 0.1em 0.5em 0.1em 0.5em;
+    background: rgb(51, 51, 56);
+    color: rgb(160, 168, 170);
+    border: solid 1px rgb(160, 168, 170);
+    border-radius: 0.25em;
+    font-size: 1.25em;
+    font-weight: bold;
+}
+#filterContainer button:hover{
+    background-color: rgb(160, 168, 170);
+    color: rgb(51, 51, 56);
+    cursor: pointer;
+}
+.filterSelect{
+    border: solid 1px rgb(49, 55, 66);
+    background-color: rgb(94, 93, 104);
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+    padding: 0;
+    outline: 0;
+    font-size: 1.25em;
+    text-align: center;
+}
+.filterSpan{
+    margin-right: 0.25em;
+    width: 35%;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+    font-size: 1.25em;
+}
+select:active{
+    background-color: rgb(74, 74, 78);
+}
+select:hover{
+    background-color: rgb(74, 74, 78);
+
+}
+.countFilter{
+    width: 2.5em;
+}
+.countFilterTitle{
+    width: 4em;
+}
+.eventsFilter a{
+    text-decoration: none;
+}
+@supports ((-webkit-backdrop-filter: none) or (backdrop-filter: none)) {
+    .new {
+      background-color: rgba(244, 244, 250, 0.2);
+      -webkit-backdrop-filter: blur(3px) contrast(0.5);
+      backdrop-filter: blur(3px) contrast(0.5);
+    }
+    .details {
+        background-color: rgba(244, 244, 250, 0.2);
+        -webkit-backdrop-filter: blur(3px) contrast(0.5);
+        backdrop-filter: blur(3px) contrast(0.5);
+      }
+}
+@media screen and (max-width: 750px) {
+    button.buttonAction{
+        background: rgb(160,168,170);
+        border-radius: 0.25em;
+        font-size: 0.7em;
+        min-width: 320px;
+        width: 80vw;
+        height: 2.5em;
+    }
+    .contentContainer{
+        justify-content: center;
+    }
+}
+@media screen and (max-width: 600px) {
+    .eventInfo{
+        font-size: 1.25rem;
+        padding-top: 20px;
+	    padding-left: 0px;
+        line-height: 2.25;
+    }
+    .eventTitle{
+        font-size: 1.25em
+    }
+    .eventText{
+        padding-top: 0.5em;
+        font-size: 1.35em;
+        line-height: 1.8;
+    }
+    a{
+        color: rgb(230, 230, 230);
+        font-size: 0.9em
+    }
+    a:hover{
+        filter: drop-shadow(0 0 0.03em rgb(49, 55, 66));
+        color: rgb(200, 200, 200);
+    }
+    .danger a{
+        color: rgb(255, 125, 125);
+    }
+    .danger a:hover{
+        color: rgb(150, 75, 75);
+    }
+}
+.filters {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    align-content: center;
+    justify-content: flex-start;
+    align-items: baseline;
+    padding-left: 2em;
+    padding-bottom: 1em;
+    width: 100%;
+}
+.filter {
+    padding-right: 1em;
+    font-size: 1.5em;
+}
+.filter a {
+    font-size: 1em;
+}

@@ -1,0 +1,56 @@
+@media screen and (max-width: 750px) {
+    .navbar{
+        height:3em;
+    }
+}
+@media screen and (max-width: 575px) {
+    body{
+        font-size: 0.9em;
+    }
+}
+@media screen and (max-width: 520px) {
+    body{
+        font-size: 0.8em;
+    }
+}
+@media screen and (max-width: 465px) {
+    body{
+        font-size: 0.75em;
+    }
+}
+@media screen and (max-width: 435px) {
+    body{
+        font-size: 0.7em;
+    }
+}
+@media screen and (max-width: 405px) {
+    body{
+        font-size: 0.65em;
+    }
+}
+@media screen and (max-width: 380px) {
+    body{
+        font-size: 0.6em;
+    }
+}
+@media screen and (max-width: 350px) {
+    body{
+        font-size: 0.55em;
+    }
+}
+@media screen and (max-width: 320px) {
+    body{
+        font-size: 0.5em;
+    }
+}
+
+@media screen and (max-width: 300px) {
+    body{
+        font-size: 0.45em;
+    }
+}
+@media screen and (max-width: 270px) {
+    body{
+        font-size: 0.4em;
+    }
+}

@@ -1,0 +1,30 @@
+{% extends "setup.html" %}
+    {% block setupContent %}
+    <div class="contraint">
+    <div class="login">
+        View/Edit/Add Cameras<br/>
+        <div>
+            <form method="POST" action="/setup/cameras/add">
+                <input type="text" name="camera" placeholder="Camera Name">
+                <input type="text" name="hls" placeholder="http(s)://url:port/camera">
+                <input type="text" name="rtsp" placeholder="rtsp://user:pass@url:port">
+                <button>Add Camera</button>
+            </form>
+        </div>
+    {% if user.group == "admin" %}
+    <div class="title">Active Cameras</div>
+    {% for camera in Cameras %}
+
+    <div>
+        <form method="POST" action="/setup/cameras/edit">
+            <input type="hidden" name="camera" value="{{ camera.camera }}"> <a href="/api/cameras/delete/{{camera.camera}}">{{camera.camera}} Delete</a><br/>
+            <input type="text" name="hls" value="{{ camera.hls }}">
+            <input type="text" name="rtsp" value="{{ camera.rtsp }}">
+            <button>Edit Camera</button>
+        </form>
+    </div>
+    {% endfor %}
+</div>
+</div>
+    {% endif %}
+    {% endblock %}

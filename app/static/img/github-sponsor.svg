@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- Created with Inkscape (http://www.inkscape.org/) -->
+
+<svg
+   width="103.1217mm"
+   height="32.502724mm"
+   viewBox="0 0 103.1217 32.502724"
+   version="1.1"
+   id="svg37305"
+   inkscape:version="1.1.2 (0a00cf5339, 2022-02-04)"
+   sodipodi:docname="github-sponsor.svg"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:svg="http://www.w3.org/2000/svg">
+  <sodipodi:namedview
+     id="namedview37307"
+     pagecolor="#ffffff"
+     bordercolor="#666666"
+     borderopacity="1.0"
+     inkscape:pageshadow="2"
+     inkscape:pageopacity="0.0"
+     inkscape:pagecheckerboard="0"
+     inkscape:document-units="mm"
+     showgrid="false"
+     inkscape:zoom="0.56123737"
+     inkscape:cx="238.75816"
+     inkscape:cy="160.35996"
+     inkscape:window-width="1920"
+     inkscape:window-height="1051"
+     inkscape:window-x="0"
+     inkscape:window-y="0"
+     inkscape:window-maximized="1"
+     inkscape:current-layer="layer2" />
+  <defs
+     id="defs37302" />
+  <g
+     inkscape:groupmode="layer"
+     id="layer2"
+     inkscape:label="background"
+     transform="translate(-0.41858479,0.00876135)">
+    <rect
+       style="fill:#f0ffff;fill-opacity:1;stroke:#ccc7c7;stroke-width:0.375606;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+       id="rect35599"
+       width="102.74609"
+       height="32.127117"
+       x="0.60638779"
+       y="0.17904165"
+       rx="8.1980114"
+       ry="6.8837037" />
+  </g>
+  <g
+     inkscape:label="Layer 1"
+     inkscape:groupmode="layer"
+     id="layer1"
+     transform="translate(-41.729168,-105.83989)">
+    <path
+       d="m 64.445819,132.99483 c 0.04072,0.021 0.08611,0.0302 0.130333,0.0302 0.04423,0 0.08962,-0.0105 0.130338,-0.0302 3.851991,-1.92599 11.216227,-9.03622 11.216227,-14.41167 0,-4.75616 -3.876379,-6.48166 -6.48166,-6.48166 -2.291274,0 -4.22196,1.82704 -4.864488,2.50912 -0.641135,-0.68208 -2.571817,-2.50912 -4.864488,-2.50912 -2.605532,0 -6.48166,1.72575 -6.48166,6.48166 0,5.37545 7.365431,12.48553 11.216223,14.41167 z m -4.734169,-20.3118 c 2.482243,0 4.618807,2.52294 4.641053,2.54868 0.110462,0.1315 0.336261,0.1315 0.446916,0 0.02201,-0.0255 2.157663,-2.54868 4.641053,-2.54868 2.371771,0 5.900127,1.57104 5.900127,5.90013 0,5.18692 -7.373415,12.04913 -10.764364,13.82415 -3.391253,-1.77463 -10.764866,-8.63723 -10.764866,-13.82415 0,-4.32914 3.528406,-5.90013 5.900127,-5.90013 z"
+       id="path26543"
+       style="fill:#c24690;fill-opacity:1;stroke:none;stroke-width:0.0498743;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1" />
+    <text
+       xml:space="preserve"
+       style="font-size:13.1617px;line-height:1.25;font-family:Roboto;-inkscape-font-specification:Roboto;stroke-width:0.329042"
+       x="82.065338"
+       y="126.62947"
+       id="text34113"><tspan
+         sodipodi:role="line"
+         id="tspan34111"
+         style="stroke-width:0.329042"
+         x="82.065338"
+         y="126.62947">Sponsor</tspan></text>
+  </g>
+</svg>

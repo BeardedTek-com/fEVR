@@ -1,8 +1,0 @@
-body::-webkit-scrollbar{
-    width:0;
-}
-.logfile{
-    font-family: courier;
-    font-size: 0.85em;
-    color: rgb(160, 168, 170);
-}

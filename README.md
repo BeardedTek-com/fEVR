@@ -2,202 +2,178 @@
 
 # fEVR - frigate Event Video Recorder
 fEVR works along side of [frigate](https://frigate.video) and [home assistant](https://www.home-assistant.io/) to collect video and snapshots of objects detected using your existing camera systems.
-
-# Refactoring to Flask - v0.6
-Thanks to an amazing dev named @Mikhail5555 I was show the light.
-The v0.6 branch planned improvements are
-- Rewritten in flask
-- API backend:
-  - Easily add cameras
-  - Change config
-  - Database management
-  - Event management
-- Frontend changes
-  - Shiny new UI ([fevr.video](https://fevr.video) frontend with a few modifications
-  - Support multiple frigate instances
-  - Frigate configuration wizard
-    - Including multiple instances
-    - Enable/disable sound for each camera
-    - Set sane object detection parameters
-    - Fine tuning wizard
-  - Clip sharing
-    - Auto expiring event links
-    - MP4 exporting
-    - Social sharing
-- rtsp-simple-server
-  - RTSP relay camera rtsp streams
-  - auto converts hls for high quality in browser viewing
-
-Feature requests are very valuable at this time
-All development on the v0.5 branch is halted to concentrate on these changes.  A feature parity release of the v0.5.1 release will be released first.
-
-## Notable Mentions
-<a href="https://selfhosted.show/67"><img src="https://assets.fireside.fm/file/fireside-images/podcasts/images/7/7296e34a-2697-479a-adfb-ad32329dd0b0/cover_small.jpg?v=2" style="height:3em;"></a> <a href="https://linuxunplugged.com/451"><img src="https://assets.fireside.fm/file/fireside-images/podcasts/images/f/f31a453c-fa15-491f-8618-3f71f1d565e5/cover_small.jpg?v=3" style="height:3em;"></a>
-
-## [Value 4 Value](https://www.entrepreneurability.nl/value-for-value-model/?lang=en)
-If you find value in this, please give back.  Filing a [bug report, suggestion or feature request](https://github.com/BeardedTek-com/fEVR/issues/new/choose), a high five, share us on social media, a kind note, or even a donation goes a long way to making the upkeep of open source software more enjoyable for the community as a whole.
-
-## Screenshot
-![fEVR v0.5.1 Screenshot](https://fevr.video/img/screenshot.png)
-
-
-## Features
-- Stores video independently of frigate
-- Home Assistant generates notifications and makes a RESTful command to fEVR to grab data from frigate
-- fEVR stores, sorts, and makes browsing frigate events a snap.
-
-## Support
-- [The Official fEVR.video website](https://fevr.video)
-- [Our Discussion on Github](https://github.com/BeardedTek-com/fEVR/discussions)
-- [File an Issue on Github](https://github.com/BeardedTek-com/fEVR/issues)
-
-
-### Cloud Instances of fEVR
-- I will be offering cloud instances of fEVR soon.
-- [Click here](https://fevr.video) for more details.
-### Cloud BETA Testing
-- If you would like to beta test this feature, please let me know by submitting an issue.
-
-## Known Bugs
-- [See Issues for known bugs.](https://github.com/BeardedTek-com/fEVR/issues)
+![fEVR v0.6 Screenshot](https://user-images.githubusercontent.com/93575915/165704583-fec8e202-88b8-4ca2-9ff2-345c04da3722.png)
 
 ## Requirements:
-- [docker](https://docker.com)
-- [docker-compose](https://docs.docker.com/compose/)
-- [Home Assistant](https://home-assistant.io)
-- [frigate](https://frigate.video)
+- Frigate fully setup and working
+- MQTT server (if you have frigate running, you have this)
 
-## Install
-The easiest and recommended method of install is docker-compose.
-- Included is a container running tailscale to securely access fEVR.  This is not 100% necessary, but far more secure.
+## Optional but nice:
+- Tailscale Account (for secure remote access)
+  - A docker-compose file will be included below for users not wanting tailscale
+- Home Assistant (for notifications)
+- Proxy Server
+  - Python's built in flask server can be flaky.  Sometimes images won't load properly, but I've found with ngnix in front of it these problems do not exist.  If someone could explain why, that would be nice...
+    - NOTE: I do plan on transitioning to possibly gunicorn or another wsgi server, but for now, I'm sticking with this.
 
-- Create .env file
+
+## .env Setup
+Copy template.env to .env and adjust as necessary:
+NOTE: The IP addresses in the .env file are for internal bridge networking and SHOULD NOT be on the same subnet as your home network.
+The default values should serve you well.
 ```
-cp template.env .env
-nano .env
+#fEVR Setup
+#####################################################################
+# Changes the port fEVR runs on DEFAULT: 5090
+FEVR_PORT=5090
+# Uncomment FLASK_ENV=development to put fEVR into Debug Mode
+#FLASK_ENV=development
+#####################################################################
+
+#Tailscale
+#####################################################################
+# Obtain Auth Key from https://login.tailscale.com/admin/authkeys
+AUTH_KEY=
+TAILSCALE_IP=192.168.101.253
+#####################################################################
+
+# Bridge Network Variables
+BRIDGE_SUBNET=192.168.101.0/24
+BRIDGE_GATEWAY=192.168.101.254
+
+# fEVR container Network Address
+FEVR_IP=192.168.101.1
+
+# mqtt_client container Network Address
+MQTT_CLIENT_IP=192.168.101.2
 ```
-- Edit .env file
+
+## Docker Compose (Tailscale):
+Example docker-compose.yml:
 ```
-# Bridge Network Details
-NETWORK_NAME=beardnet
-NETWORK_SUBNET=192.168.200.0/24
-NETWORK_GATEWAY=192.168.200.1
+version: '2.4'
+services:
+  tailscale:
+    image: tailscale/tailscale
+    container_name: fevr_tailscale
+    restart: unless-stopped
+    privileged: true
+    volumes:
+      - ./tailscale/varlib:/var/lib
+      - /dev/net/tun:/dev/net/tun
+      - ./run_tailscale.sh:/run.sh
+    cap_add:
+      - net_admin
+      - sys_module
+    environment:
+      AUTH_KEY: ${AUTH_KEY}
+      BRIDGE_SUBNET: ${BRIDGE_SUBNET:-192.168.101.0/24}
+    command: /run.sh
+    networks:
+      fevrnet:
+        ipv4_address: ${TAILSCALE_IP:-192.168.101.253}
+    
+  fevr_flask:
+    image: ghcr.io/beardedtek-com/fevr-flask:main
+    container_name: fevr_flask
+    restart: unless-stopped
+    privileged: true
+    networks:
+      fevrnet:
+        ipv4_address: ${FEVR_IP:-192.168.101.1}
+    volumes:
+      - ./:/fevr
+    environment:
+      FLASK_ENV: ${FLASK_ENV:-}
+      FEVR_PORT: ${FEVR_PORT:-5090}
+    command: /fevr/run_fevr.sh
 
-# Tailscale Container Variables
-TAILSCALE_IP=192.168.200.3
-TAILSCALE_IMAGE=ghcr.io/beardedtek-com/tailscale:main
-TAILSCALE_CONTAINER_NAME=tailscale-devel
-TAILSCALE_CONTEXT=./docker/tailscale/
-TAILSCALE_DATA=./vol/tailscale/data
-TAILSCALE_VAR_LIB=./vol/tailscale/var_lib
-TAILSCALE_COMMAND=/opt/tailscale/tailscale
-
-# fEVR Container Variables
-FEVR_IP=192.168.200.2
-FEVR_IMAGE=ghcr.io/beardedtek-com/fevr:main
-FEVR_CONTAINER_NAME=fevr-devel
-FEVR_CONTEXT=./docker/fEVR/
-FEVR_DEBUG=true
-FEVR_TITLE=Home
-FRGIGATE_URL=http://192.168.2.240:5000
-
-# OPTIONAL NAS
-NAS_IP=192.168.18.10
-NAS_EVENTS=/export/fevr
-NAS_DATA=/export/fevr_data
-
-# MQTT
-MQTT_BROKER_URL=192.168.18.10
-MQTT_BROKER_PORT=1883
-MQTT_USER=
-MQTT_PASS=
-
-# comma seperated list of topics
-# Default: 'frigate/available,frigate/events,frigate/stats'
-# Debugging: 'frigate/+
-# limited to 5 topics, all extras will be dropped.
-MQTT_TOPICS='frigate/available,frigate/events,frigate/stats'
-
+  fevr_mqtt:
+    image: ghcr.io/beardedtek-com/fevr-flask:main
+    container_name: fevr_mqtt
+    restart: unless-stopped
+    privileged: true
+    networks:
+      fevrnet:
+        ipv4_address: ${MQTT_CLIENT_IP:-192.168.101.2}
+    volumes:
+      - ./:/fevr
+    command: bash /fevr/run_mqtt_client.sh
+networks:
+  fevrnet:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: ${BRIDGE_SUBNET:-192.168.101.0/24}
+          gateway: ${BRIDGE_GATEWAY:-192.168.101.254}
 ```
-- Bring the stack up:
-```
-sudo docker-compose up -d
-```
-- After stack is up, issue the following command to bring up tailscale:
-```
-sudo docker-compose exec tailscale tailscale up --advertise-routes=192.168.200.0/24 --accept-routes
-```
-- Follow the Auth URL and either add to your existing account or create a new one.  Its free and easy to use.
 
-- Configure Home Assistant Automation provide notifications:
-
-### Home Assistant Automation
-Home Assistant Automation adds a "break" using an input boolean helper.
-```yaml
-alias: fEVR Backyard Person Alert
-description: fEVR Object Detection Alerts
-trigger:
-  - platform: mqtt
-    topic: frigate/events
-condition:
-  - condition: template
-    value_template: '{{ trigger.payload_json["type"] == "end" }}'
-  - condition: template
-    value_template: |-
-      {{
-      trigger.payload_json["after"]["label"] == "person"
-      }}
-  - condition: template
-    value_template: |-
-      {{
-      trigger.payload_json["after"]["top_score"] > 0.76
-      }}
-  - condition: template
-    value_template: |-
-      {{
-      trigger.payload_json["after"]["camera"] == "backyard"
-      }}
-action:
-  - choose:
-      - conditions:
-          - condition: state
-            state: 'off'
-            entity_id: input_boolean.fevrbackyardanimal
-        sequence:
-          - service: notify.mobile_app_sg20plus
-            data:
-              message: '{{ trigger.payload_json["after"]["label"] | title }} Detected'
-              data:
-                notification_icon: mdi:cctv
-                ttl: 0
-                priority: high
-                sticky: true
-                actions:
-                  - action: URI
-                    title: fEVR
-                    uri: https://fevr.local:5080/?action=event&id={{trigger.payload_json['after']['id']}}
-                image: >-
-                  /api/frigate/notifications/{{trigger.payload_json['after']['id']}}/snapshot.jpg?bbox=1
-                tag: '{{trigger.payload_json["after"]["id"]}}'
-                alert_once: true
-          - service: input_boolean.turn_on
-            data: {}
-            target:
-              entity_id: input_boolean.fevrbackyardanimal
-          - delay:
-              hours: 0
-              minutes: 0
-              seconds: 30
-              milliseconds: 0
-          - service: input_boolean.turn_off
-            data: {}
-            target:
-              entity_id: input_boolean.fevrbackyardperson
-    default: []
-mode: single
-
+## Docker Compose (No Tailscale):
+Example docker-compose.yml:
 ```
-## Help!
-If you have any issues, please reach out and [file an issue](https://github.com/BeardedTek-com/fEVR/issues) or [start a discussion](https://github.com/BeardedTek-com/fEVR/discussions).
+version: '2.4'
+services:
+  fevr_flask:
+    image: ghcr.io/beardedtek-com/fevr-flask:main
+    container_name: fevr_flask
+    restart: unless-stopped
+    privileged: true
+    ports:
+      - 5090:${FEVR_PORT:-5090}
+    volumes:
+      - ./:/fevr
+    environment:
+      FLASK_ENV: ${FLASK_ENV:-}
+      FEVR_PORT: ${FEVR_PORT:-5090}
+    command: /fevr/run_fevr.sh
+  fevr_mqtt:
+    image: ghcr.io/beardedtek-com/fevr-flask:main
+    container_name: fevr_mqtt
+    restart: unless-stopped
+    privileged: true
+    volumes:
+      - ./:/fevr
+    command: bash /fevr/run_mqtt_client.sh
+```
 
-I hope you find this useful!
+Bring the system up:
+```
+docker-compose up -d
+```
+
+View the logs:
+```
+docker-compose logs -f fevr_flask fevr_mqtt
+```
+You will notice right away that fevr_mqtt will be saying:
+```
+bash: /fevr/run_mqtt_client.sh: No such file or directory
+```
+This is 100% NORMAL BEHAVIOR.  You must go through the Web UI setup to enable the mqtt_client.  Until then, It's just a pretty interface that does nothing.
+
+# Setup
+Procedure:
+
+- Visit http(s)://<fevr_url>/setup
+- Create admin account
+- Login to new admin account
+- Visit http(s)://fevr_url>/setup AGAIN.
+- Add all of your cameras.
+  - It asks for both HLS and RTSP feeds.  Technically you don't need to enter anything but the camera name, but in a future release live view and frigate config will be enabled and will require these values
+  - Click Next
+- Configure Frigate
+  - make one entry called 'frigate' (without the quotes) with your internally accessible frigate URL
+  - make another entry called 'external' (without the quotes) with your externally accessible frigate URL
+    - This is 100% Optional.  It does, however, enable live view outside your network.
+    - If you don't have an externally accessible frigate URL, you can skip this step.
+  - Click Next
+- Configure MQTT Client
+  - You need to generate an API Auth Key to configure this step.
+    - This can be done on your profile page.  Click the Bearded Tek logo to drop down the menu and click on profile.
+    - Scroll down and fill in the fields:
+      - Name: Enter a name to remember this is for the mqtt client (mqtt_client)
+      - ipv4 Address: OPTIONAL
+      - Limit: Enter 0
+        - If anything above 0 is entered, it is a limited use key.  It can only be used that many times to authenticate with the system.  Once it has been used x amount of times, it will be disabled.
+  - Click Add and then Next
+- Other is not populated yet, There are future plans for this page, just click Next again and you'll be brought to the main interface.

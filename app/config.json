@@ -1,0 +1,10 @@
+{
+    "SECRET_KEY"                        : "SECRET_KEY",
+    "SESSION_COOKIE_NAME"               : "fEVR_Session",
+    "STATIC_FOLDER"                     : "static",
+    "TEMPLATES_FOLDER"                  : "TEMPLATES_FOLDER",
+    "DEBUG"                             : true,
+    "TESTING"                           : true,
+    "SQLALCHEMY_DATABASE_URI"           : "sqlite:///fEVR.sqlite",
+    "SQLALCHEMY_TRACK_MODIFICATIONS"    : false
+}
