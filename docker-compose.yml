@@ -1,6 +1,6 @@
 version: '2.4'
 services:
-  tailscale:
+  tailscale:      # OPTIONAL - THIS SECTION CAN BE REMOVED IF YOU DON'T WANT TO RUN TAILSCALE
     image: tailscale/tailscale
     container_name: fevr_tailscale
     restart: unless-stopped
@@ -20,12 +20,9 @@ services:
       fevrnet:
         ipv4_address: ${TAILSCALE_IP:-192.168.101.253}
     
-  fevr_flask:
-#    build:
-#      context: ./
-#      dockerfile: Dockerfile
+  fevr:
     image: ghcr.io/beardedtek-com/fevr-flask:main
-    container_name: fevr_flask
+    container_name: fevr
     restart: unless-stopped
     privileged: true
     networks:
@@ -36,12 +33,10 @@ services:
     environment:
       FLASK_ENV: ${FLASK_ENV:-}
       FEVR_PORT: ${FEVR_PORT:-5090}
+      MQTT_CLIENT: "false"          # Set to "true" if you wish to run fevr_mqtt on this container as well
     command: /fevr/run_fevr.sh
 
-  fevr_mqtt:
-#    build:
-#      context: ./
-#      dockerfile: Dockerfile
+  fevr_mqtt:    # You can run this in the fEVR container by setting MQTT_CLIENT to "true" AND REMOVE THIS SECTION
     image: ghcr.io/beardedtek-com/fevr-flask:main
     container_name: fevr_mqtt
     restart: unless-stopped
@@ -52,22 +47,6 @@ services:
     volumes:
       - ./:/fevr
     command: bash /fevr/run_mqtt_client.sh
-     #usage: mqtt_client [-h] [-p PORT] [-t TOPICS] [-u USER] [-P PASSWORD] [-f FEVR] [-s] mqtt
-     #
-     #positional arguments:
-     #  mqtt                  MQTT Broker IP/FQDN **Required** (default: None)
-     #  key                   fEVR API Key        **Required** (default: None)
-     #
-     #optional arguments:
-     #  -h, --help            show this help message and exit
-     #  -p PORT, --port PORT  MQTT Port (default: 1883)
-     #  -t TOPICS, --topics TOPICS
-     #                        MQTT Topics (default: 'frigate/+')
-     #  -u USER, --user USER  MQTT Username (default: '')
-     #  -P PASSWORD, --password PASSWORD
-     #                        MQTT Password (default: '')
-     #  -f FEVR, --fevr FEVR  fEVR IP Address/FQDN (default: '192.168.101.1:5090)
-     #  -s, --https           If set uses https:// (default: http://)
 
 networks:
   fevrnet:

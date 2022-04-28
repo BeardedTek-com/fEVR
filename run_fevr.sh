@@ -24,5 +24,5 @@ echo "Starting fEVR"
 
 TS=0
 while [ $TS == 0 ]; do
-    sleep 10000
+if $MQTT_CLIENT == "true"; then /fevr/run_mqtt_client.sh; sleep 30; else sleep 10000; fi
 done
