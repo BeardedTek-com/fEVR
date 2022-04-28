@@ -1,0 +1,49 @@
+{% extends "home.html" %}
+
+{% block content %}
+<div class="login">
+    
+    <div class="box">
+    <div class='login-header'>
+        <h2>Sign In</h2>
+        Please sign in to continue.
+    </div>
+    <div class="notification">
+    </div>
+        {% with messages = get_flashed_messages() %}
+        {% if messages %}
+            <div class="notification danger">
+                {{ messages[0]|replace('access this page',fwdName) }}
+            </div>
+        {% else %}
+            <div class="notification">
+            </div>
+        {% endif %}
+        
+        {% endwith %}
+        <form method="POST" action="/login">
+            <div class="field">
+                <div class="control">
+                    <input class="input is-large" type="email" name="email" placeholder="Your Email" autofocus="">
+                </div>
+            </div>
+            <div class="field">
+                <div class="control">
+                    <input class="input is-large" type="hidden" name="fwd" value="{{ fwd }}">
+                </div>
+            </div>
+            <div class="field">
+                <div class="control">
+                    <input class="input is-large" type="password" name="password" placeholder="Your Password">
+                </div>
+            </div>
+            <div class="field">
+                <input class="checkbox" type="checkbox" name="remember">
+                <label>Remember me</label>
+                
+            </div>
+            <button>Sign In</button>
+        </form>
+    </div>
+</div>
+{% endblock %}

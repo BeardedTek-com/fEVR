@@ -1,0 +1,42 @@
+{% extends "home.html" %}
+
+{% block content %}
+<div class="filters">
+    {% if camera == "all" %}
+    <div class="filter"><a href="/">Latest</a></div>
+
+    <div class="filter"><a href="/all">All</a></div>
+    {% else %}
+    <div class="filter"><a href="/events/camera/{{camera}}">All</a></div>
+    {% endif %}
+    <div class="filter"><a href="/events/camera/{{camera}}/object/person">Person</a></div>
+    <div class="filter"><a href="/events/camera/{{camera}}/object/animal">Animal</a></div>
+    <div class="filter"><a href="/events/camera/{{camera}}/object/car">Vehicle</a></div>
+    
+</div>
+{% if events|length > 0 %}
+    {% for event in events %}
+        <div class='events'>
+        <div class="eventThumb">
+        <a href='/event/{{ event.eventid }}/snap'>
+        <img class='thumb' alt="{{event.eventid}} - {{event.object}} in {{event.camera}}" src='/static/events/{{ event.eventid}}/thumb.jpg'>
+        </a>
+        <div class='eventsDetails'>
+        <div class='subdetail'>{{ event.time|timezone }}</div>
+        
+        <div class='subdetail'>{{ event.object }}</div>
+        <div class='subdetail'>{{ event.score }}%</div>
+        </div>
+        <div class="{% if event.ack == 'true' %}hidden{% else %}new{% endif %}">NEW</div>
+        </div>
+        </div>
+    {% endfor %}
+{% else %}
+    <div class="events" style="font-size: 2em; text-align:center;">
+        <br/>
+        <br/>
+        Sorry, No events found matching your criteria.<br/><br/>
+        <a onclick='history.back();' style="font-size:1em;cursor:pointer;">Please go back.
+    </div>
+{% endif %}
+{% endblock %}

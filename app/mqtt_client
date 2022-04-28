@@ -1,0 +1,140 @@
+#!/usr/bin/python3
+#    fEVR (frigate Event Video Recorder)
+#
+#    Copyright (C) 2021-2022  The Bearded Tek (http://www.beardedtek.com) William Kenny
+#
+#    This program is free software: you can redistribute it and/or modify
+#    it under the terms of the GNU General Public License as published by
+#    the Free Software Foundation, either version 3 of the License, or
+#    (at your option) any later version.
+#
+#    This program is distributed in the hope that it will be useful,
+#    but WITHOUT ANY WARRANTY; without even the implied warranty of
+#    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#    GNU General Public License for more details.
+#
+#    You should have received a copy of the GNU General Public License
+#    along with this program.  If not, see <https://www.gnu.org/licenses/>.
+
+from paho.mqtt import client as mqtt_client
+import argparse
+from os import getenv
+from time import time
+from os import environ
+from json import loads, dumps
+from math import floor
+from random import randint
+import socket
+import requests
+from math import floor
+from logit import logit
+import socket
+
+class getLocalIP:
+    s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+    s.connect(("8.8.8.8", 80))
+    addr = s.getsockname()[0]
+
+class auth:
+    def api(transport,apikey,fevr,rSession):
+        # Construct the json for the post request
+        JsonPost = {'key':apikey,'ip':getLocalIP.addr}
+        # Sen the post using our session
+        authResponse = rSession.post(f"{transport}{fevr}/apiAuth", json=JsonPost)
+        logit.execute(authResponse.content,src=__name__)
+    
+class fevrMQTT:
+    def __init__(self):
+        self.script = 'mqtt_client'
+        hostname = socket.gethostname()
+        self.clientID = f"fevr-{hostname}-{randint(0,100)}"
+        self.getVars()
+        self.run()
+    def getVars(self):
+        parser = argparse.ArgumentParser()
+        parser.add_argument('mqtt',type=str, help="MQTT Broker IP/FQDN **Required** (default: None)")
+        parser.add_argument('key',type=str,help="fEVR API Key        **Required** (default: None)")
+        parser.add_argument('-p','--port',type=int,required=False,help="MQTT Port (default: 1883)")
+        parser.set_defaults(port=1883)
+        parser.add_argument('-t','--topics',type=str,required=False,help="MQTT Topics (default: 'frigate/+')")
+        parser.set_defaults(topics="frigate/+")
+        parser.add_argument('-u','--user',type=str,required=False,help="MQTT Username (default: '')")
+        parser.set_defaults(user="")
+        parser.add_argument('-P','--password',type=str,required=False,help="MQTT Password (default: '')")
+        parser.set_defaults(password="")
+        parser.add_argument('-f','--fevr',type=str,required=False,help="fEVR IP Address/FQDN (default: '192.168.101.1:5090)")
+        parser.set_defaults(fevr='192.168.101.1:5090')
+        parser.add_argument('-s','--https',action='store_true',help="If set uses https:// (default: http://)")
+        parser.set_defaults(https=False)
+        args = parser.parse_args()
+        self.fevr = args.fevr
+        self.broker = args.mqtt
+        self.port = args.port
+        self.username = args.user
+        self.password = args.password
+        self.apikey = args.key
+        topics = args.topics
+        if args.https:
+            self.transport = "https://"
+        else:
+            self.transport = "http://"
+        self.topics = []
+        topics = topics.split(',',5)
+        count=0
+        excluded = None
+        for topic in topics:
+            if 4 >= count:
+                self.topics.append(topic)
+            else:
+                if 5 == count:
+                    excluded = f"Topic Limit Exceeded. Excluded Topics: "
+                excluded += f"'{topic}' "
+        if excluded:
+            logit.execute(excluded,src=self.script)
+        #logit.execute(f"fevr:{self.fevr} | broker: {self.broker} | port: {self.port} | user: {self.username} | password: {self.password} | https: {args.https} | apiKey: {self.apikey} | topics: {self.topics}", src=__name__)
+    def connect_mqtt(self) -> mqtt_client:
+        def on_connect(client, userdata, flags, rc):
+            if rc == 0:
+                logit.execute(f"Connected to {self.broker}:{self.port} as {self.clientID}",src=self.script)
+                logit.execute(f"Subscribed to:{self.topics}".replace('[','\t').replace(']','').replace(', ','\t').replace("'",""),src=self.script)
+            else:
+                logit.execute("Failed to connect, return code %d", rc,src=self.script)
+        client = mqtt_client.Client(self.clientID)
+        if self.username and self.password:
+            client.username_pw_set(self.username, self.password)
+        client.on_connect = on_connect
+        client.connect(self.broker, self.port)
+        return client
+    def processMsg(self,msg,topic):
+        if 'available' in topic:
+            logit.execute('frigate is online',src=self.script)
+        elif 'event' in topic:
+            # Authenticate first
+            # Open a session so we can use the session cookie
+            rSession = requests.Session()
+            auth.api(self.transport,self.apikey,self.fevr,rSession)
+            event = loads(msg)
+            type = event['type']
+            after = event['after']
+            if type == 'end':
+                type = after['label']
+                score = floor(float(after['score'])*100)
+                camera = after['camera']
+                eventid = after['id']
+                fEVRurl = f"{self.transport}{self.fevr}/api/events/add/{eventid}/{camera}/{type}/{score}"
+                addEventResponse = rSession.get(fEVRurl)
+                logit.execute(fEVRurl,src=__name__)
+                logit.execute(addEventResponse.content,src=self.script)
+    def subscribe(self, client: mqtt_client):
+        def on_message(client, userdata, msg):
+            ## This is where our code goes to do what we want when a message is received
+            self.processMsg(msg.payload.decode(),msg.topic)
+        for topic in self.topics:
+            client.subscribe(topic)
+        client.on_message = on_message
+    def run(self):
+        self.client = self.connect_mqtt()
+        self.subscribe(self.client)
+        self.client.loop_forever()
+if __name__ == '__main__':
+    fevrMQTT()

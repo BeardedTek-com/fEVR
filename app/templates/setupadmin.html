@@ -1,0 +1,58 @@
+{% extends "setup.html" %}
+<div class="signup">
+    {% block setupContent %}
+            
+    <div class="login adminExists">
+        <h3 class="title">Admin Setup</h3>
+        {% if admin %}
+        Admin user already exists:<br/>
+        <br/>
+        Please contact {{admin[0]}} to be added as an admin.<br/>
+        <br/>
+        <a href="mailto:{{admin[1]}}">{{admin[1]}}</a>
+        {% else %}
+        Create the initial admin user.<br/>
+        <br/>
+        <div class="box">
+            {% with messages = get_flashed_messages() %}
+            {% if messages %}
+                <div class="notification danger">
+                    {{ messages[0] }}
+                </div>
+            {% endif %}
+            {% endwith %}
+            <div class="notification">
+                
+            </div>
+            <form method="POST" action="/setup/admin">
+                <div class="field">
+                    <div class="control">
+                        <input class="input is-large" type="email" name="email" placeholder="Email" autofocus="">
+                    </div>
+                </div>
+
+                <div class="field">
+                    <div class="control">
+                        <input class="input is-large" type="text" name="name" placeholder="Name" autofocus="">
+                    </div>
+                </div>
+
+                <div class="field">
+                    <div class="control">
+                        <input type="password" name="password" placeholder="Password">
+                    </div>
+                </div>
+
+                <div class="field">
+                    <div class="control">
+                        <input type="password" name="retypePassword" placeholder="Password">
+                    </div>
+                </div>
+
+                <button>Sign Up</button>
+            </form>
+        </div>
+        {% endif%}
+    </div>
+</div>
+{% endblock %}

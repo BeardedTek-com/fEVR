@@ -1,0 +1,28 @@
+{% extends "setup.html" %}
+    {% block setupContent %}
+    <div class="constraint">
+    <div class="login">
+        View/Edit/Add Frigate Instances<br/>
+        <div>
+            <form method="POST" action="/setup/frigate/add">
+                <input type="text" name="name" placeholder="Frigate MQTT name (or external)">
+                <input type="text" name="url" placeholder="http(s)://url:port/camera">
+                <button>Add</button>
+            </form>
+        </div>
+    {% if user.group == "admin" %}
+    <div class="title">Active Frigate Instances</div>
+    {% for server in frigate %}
+
+    <div>
+        <form method="POST" action="/setup/frigate/edit">
+            <input type="hidden" name="name" value="{{ server.name }}"> <a href="/api/frigate/delete/{{server.name}}">{{server.name}} Delete</a>
+            <input type="text" name="url" value="{{ server.url }}">
+            <button>Edit</button>
+        </form>
+    </div>
+    {% endfor %}
+</div>
+</div>
+    {% endif %}
+    {% endblock %}

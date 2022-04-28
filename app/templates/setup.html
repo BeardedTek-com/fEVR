@@ -1,0 +1,30 @@
+{% extends "home.html" %}
+
+{% block content %}
+<div class="setupContainer">
+    {% with messages = get_flashed_messages() %}
+        {% if messages %}
+            <div class="notification danger" style="font-size:1.5em;width:100%;">
+                {{ messages[0] }}
+            </div>
+        {% else %}
+            <div class="notification">
+            </div>
+        {% endif %}
+        {% endwith %}
+    <div class="setupProgress noSelect">
+        
+        <div onclick="window.location.href='/setup'" class="setup-label div-link">Admin</div>
+        {% for item in items['db'] %}
+        <div onclick="window.location.href='/setup/{{item}}'" class="setup-label setup-{{'current' if Item==item else items['db'][item]}}">
+            {{item}}
+        </div>
+        {% endfor %}
+        <div onclick="window.location.href='{{next}}'" class="setup-label div-link">Next</div>
+    </div>
+    <div class="setup-content">
+        {% block setupContent %}
+        {% endblock %}
+    </div>
+</div>
+{% endblock %}

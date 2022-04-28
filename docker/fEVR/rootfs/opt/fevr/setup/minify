@@ -1,5 +1,0 @@
-#!/bin/bash
-CSS="/var/www/html/css"
-JS="/var/www/html/js"
-css-html-js-minify --overwrite "$CSS"
-css-html-js-minify --overwrite "$JS"

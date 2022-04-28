@@ -1,0 +1,27 @@
+{% macro navbar(current_user,page) -%}
+        {% if current_user.is_authenticated %}
+                <div class="profile div-link" onclick="menu('mainMenu');">
+                        <!-- <img src="/static/img/beardmenu.png"> -->
+                </div>
+            
+        {% else %}
+                <button class="div-link" onclick="window.location.href='/login'">Login</button>
+                <button class="div-link" onclick="window.location.href='/signup'">Register</button>
+        {% endif %}
+{%- endmacro %}
+
+{% macro cameras(cameras) -%}
+        <div id="cameraMenu" class="cameraMenu noSelect">
+        {% for camera in cameras %}
+                <div class="cameraitem" onclick="window.location.href='/events/camera/{{camera}}';"><a>{{camera|title}}</a></div>
+        {% endfor %}
+        </div>
+<!--        
+        <div id="filterMenu" class="filterMenu noSelect">
+                <div class="filterItem" onclick="window.location.href='./object/person';">Person</div>
+                <div class="filterItem" onclick="window.location.href='./object/car';">Vehicle</div>
+                <div class="filterItem" onclick="window.location.href='./object/animal';">Animal</div>
+                <div class="filterItem" onclick="window.location.href='./ack/false';">Unseen</div>
+        </div>
+-->
+{%- endmacro %}

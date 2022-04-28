@@ -1,0 +1,99 @@
+{% extends "home.html" %}
+<div class="signup">
+    {% block content %}
+            
+    <div class="login">
+        <h3 class="title">{{ user.name }}</h3>
+        View/Edit your profile information<br/>
+        <br/>
+        <div class="box">
+            {% with messages = get_flashed_messages() %}
+            {% if messages %}
+                <div class="notification danger">
+                    {{ messages[0] }}
+                </div>
+            {% endif %}
+            {% endwith %}
+            <div class="notification">
+                
+            </div>
+            <form method="POST" action="/profile">
+                <div class="field">
+                    <div class="noInput">
+                        {{ user.email }}
+                        <input type="hidden" name="email" value="{{ user.email }}">
+                    </div>
+                </div>
+
+                <div class="field">
+                    <div class="control">
+                        <input class="input is-large" type="text" name="name" value="{{user.name}}" autofocus="">
+                    </div>
+                </div>
+
+                {% if user.group == "admin" %}
+                <div class="field">
+                    <div class="control">
+                        <input class="input is-large" type="text" name="group" value="{{user.group}}" autofocus="">
+                    </div>
+                </div>
+                {% else %}
+                        <input type="hidden" name="group" value="{{user.group}}"/>
+                {% endif %}
+
+                <div class="field">
+                    <div class="control">
+                        <input type="password" name="password" placeholder="Password">
+                    </div>
+                </div>
+
+                <div class="field">
+                    <div class="control">
+                        <input type="password" name="retypePassword" placeholder="Re-Type Password">
+                    </div>
+                </div>
+                <button>Update Profile</button>
+            </form>  
+        </div>
+    </div>
+    {% if user.group == "admin" %}
+    <div class="login">
+        <h3 class="title">New API Auth Key</h3>
+        <br/>
+        <div class="box">
+            <form method="POST" action="/auth/add/key">
+                <input type="text" name="name" placeholder="Name"><br/>
+                <input type="text" name="ip" placeholder="IPv4 Address"><br/>
+                <input type="text" name="limit" placeholder="Login Count 0=forever"><br/>
+                <button>Add Key</button>
+            </form>
+        </div>
+    </div>
+    <div class="keylist">
+        <div class="keystitle">Active Keys</div>
+            <div class="keyitem keylabels">
+                <div class="keyname emspaceTitle">Name</div>
+                <div class="keyIP emspaceTitle">IPv4 Addr</div>
+                <div class="keylimit emspaceTitle">Limit</div>
+                <div class="keyexpired emspaceTitle">Expire</div>
+                <div class="keydel emspaceTitle">Del</div>
+            </div>
+        {% for key in keys %}
+            <div class="keyitem">
+                <div class="keyname emspace">{{ key.name }}</div>
+                <div class="keyIP emspace">{{ key.authIP }}</div>
+                <div class="keylimit emspace">{{ key.limit }}</div>
+                {% if key.expired == None %}
+                    {% set expired = False %}
+                {% else %}
+                    {% set expired = key.expired%}
+                {% endif %}
+                <div class="keyexpired emspace">{{ expired }}</div>
+                <div class="keydel emspace"><a href="/api/del/key/{{ key.id }}">Delete</a></div>
+                <div class="key emspace">{{ key.key }}</div>
+            </div>
+        {% endfor %}
+    </div>
+    {% endif %}
+    {% endblock %}
+</div>
