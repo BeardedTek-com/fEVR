@@ -196,9 +196,13 @@ def setupAddMqttPost():
                 elif field == "user":
                     if "none" in fields[field]:
                         user=""
+                    else:
+                        user = brokerU
                 elif field == "password":
                     if "none" in fields[field]:
                         password=""
+                    else:
+                        password = brokerP
         if Valid:
             MQTT = mqtt(port=port,topics=topics,user=user,password=password,https=https,fevr=fevr,broker=broker,key=key)
             db.session.add(MQTT)
