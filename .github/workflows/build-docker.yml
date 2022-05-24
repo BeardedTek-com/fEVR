@@ -3,11 +3,11 @@
 # separate terms of service, privacy policy, and support
 # documentation.
 
-name: Create and publish beardedtek/fevr-flask Docker image
+name: Create and publish beardedtek/fevr Docker image
 
 on:
   push:
-    branches: ['main','v0.6']
+    branches: ['main']
 
 env:
   REGISTRY: ghcr.io
