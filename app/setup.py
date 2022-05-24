@@ -172,10 +172,11 @@ def setupAddMqttPost():
         topics = request.form.get('topics')
         https = request.form.get('https')
         fevr = request.form.get('fevr')
+        fevrport = request.form.get('fevrport')
         key = request.form.get('key')
         user = ""
         password = ""
-        fields = {"broker":broker,"port":port,"user":brokerU,"password":brokerP,"topics":topics,"https":https,"fevr":fevr,"key":key}
+        fields = {"broker":broker,"port":port,"user":brokerU,"password":brokerP,"topics":topics,"https":https,"fevr":fevr,"fevrport":fevrport,"key":key}
         Valid = True
         for field in fields:
             if not fields[field] and field != "password" and field != "user":
@@ -206,6 +207,16 @@ def setupAddMqttPost():
                         password=""
                     else:
                         password = brokerP
+                elif field == "fevrport":
+                    if https == "https":
+                        if fevrport != "443":
+                            fevr = f"{fevr}:{fevrport}"
+                    elif https == "http":
+                        if fevrport != "80":
+                            fevr = f"{fevr}:{fevrport}"
+                    else:
+                        fevr = f"{fevr}:{fevrport}"
+                        
         if Valid:
             if not user:
                 user = ""
