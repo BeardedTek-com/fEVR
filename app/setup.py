@@ -179,7 +179,7 @@ def setupAddMqttPost():
         fields = {"broker":broker,"port":port,"user":brokerU,"password":brokerP,"topics":topics,"https":https,"fevr":fevr,"fevrport":fevrport,"key":key}
         Valid = True
         for field in fields:
-            if not fields[field] and field != "password" and field != "user":
+            if not fields[field] and field != "password" and field != "user" and field != "fevrport":
                 flash(f"{field.title()} is a required field.")
                 Valid = False
             else:
