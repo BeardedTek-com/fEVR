@@ -443,6 +443,12 @@ a:hover{
     font-size: 1em;
     width: 98%;
 }
+.login select{
+    height: 1.25em;
+    padding: 1em;
+    margin: 0.25em;
+    font-size: 1em;
+}
 .login .checkbox{
     height: 1em;
     width: 1em;
