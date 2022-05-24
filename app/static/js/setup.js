@@ -5,7 +5,10 @@ function fevrURLdetect(id){
       https = true;
     }
     fqdn = URL[1].split("/")[0]
-    port = URL[1].split(":")
+    if (Boolean(fqdn[1]) == true){
+        fqdn = URL[1].split("/")[0].split(":")[0]
+    }
+    port = URL[1].split("/")[0].split(":")
     if (Boolean(port[1])){
       port = port[1]
     }

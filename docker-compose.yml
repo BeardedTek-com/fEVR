@@ -19,9 +19,8 @@ services:
     networks:
       fevrnet:
         ipv4_address: ${TAILSCALE_IP:-192.168.101.253}
-    
   fevr:
-    image: ghcr.io/beardedtek-com/fevr-flask:main
+    image: ghcr.io/beardedtek-com/fevr:main
     container_name: fevr
     restart: unless-stopped
     privileged: true
@@ -37,7 +36,7 @@ services:
     command: /fevr/run_fevr.sh
 
   fevr_mqtt:    # You can run this in the fEVR container by setting MQTT_CLIENT to "true" AND REMOVE THIS SECTION
-    image: ghcr.io/beardedtek-com/fevr-flask:main
+    image: ghcr.io/beardedtek-com/fevr:main
     container_name: fevr_mqtt
     restart: unless-stopped
     privileged: true

@@ -20,12 +20,12 @@
                 <input type="text" name="brokerP" placeholder="Broker Password (enter none for no password)">
                 <input type="text" name="topics" placeholder="MQTT Topics (frigate/event,frigate/available)">
                 <input type="text" name="key" placeholder="API Key">
-                <select name="https" id="mqttHttps">
-                    <option value="https">https://</option>
-                    <option selected value="http">http://</option>
+                <select name="https">
+                    <option id="fevrhttps" value="https">https://</option>
+                    <option id="fevrhttp" selected value="http">http://</option>
                 </select>
-                <input type="text" name="fevr" placeholder="fEVR url">
-                <input type="text" name="fevrport" placeholder="Port Number"> 
+                <input type="text" id="fevrfqdn" name="fevr" placeholder="fEVR url">
+                <input type="text" id="fevrport" name="fevrport" placeholder="Port Number"> 
                 <button>Add</button>
             </form>
             <script>
