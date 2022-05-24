@@ -173,11 +173,14 @@ def setupAddMqttPost():
         https = request.form.get('https')
         fevr = request.form.get('fevr')
         key = request.form.get('key')
+        user = ""
+        password = ""
         fields = {"broker":broker,"port":port,"user":brokerU,"password":brokerP,"topics":topics,"https":https,"fevr":fevr,"key":key}
         Valid = True
         for field in fields:
-            if not fields[field]:
+            if not fields[field] and field != "password" and field != "user":
                 flash(f"{field.title()} is a required field.")
+                Valid = False
             else:
                 if field == "https":
                     if fields[field] != "http" and fields[field] != "https":
@@ -194,16 +197,20 @@ def setupAddMqttPost():
                         flash("Port must be an integer.  If unsure, just enter 1883.")
                         Valid = False
                 elif field == "user":
-                    if "none" in fields[field]:
+                    if not fields[field]:
                         user=""
                     else:
                         user = brokerU
                 elif field == "password":
-                    if "none" in fields[field]:
+                    if not fields[field]:
                         password=""
                     else:
                         password = brokerP
         if Valid:
+            if not user:
+                user = ""
+            if not password:
+                password = ""
             MQTT = mqtt(port=port,topics=topics,user=user,password=password,https=https,fevr=fevr,broker=broker,key=key)
             db.session.add(MQTT)
             db.session.commit()

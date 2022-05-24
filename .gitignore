@@ -10,3 +10,4 @@ __pycache__
 .python_history
 .cookies
 tailscale
+run_mqtt_client.sh
