@@ -671,6 +671,7 @@ a:hover{
 }
 .mqtt_client{
     max-width:100%;
+    word-break: break-all;
     font-family:monospace;
     font-size:0.75em;
     padding: 1em;
