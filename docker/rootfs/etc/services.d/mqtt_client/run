@@ -1,4 +1,4 @@
 #!/bin/bash
 
-#Check if Virtual Environment is initialized
+chmod +x /fevr/run_mqtt_client.sh
 /fevr/run_mqtt_client.sh
