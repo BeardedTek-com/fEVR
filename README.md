@@ -174,7 +174,7 @@ The automation uses this helper entity for 2 purposes.
 
 Here is the automation I'm currently using:
 As displayed when:
-- editing the automation
+- editing the automation via the UI
 - click on overflow menu (3 dots)
 - click Edit in YAML
 
