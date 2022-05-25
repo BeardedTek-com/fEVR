@@ -1,9 +1,9 @@
-FROM python:3.10.4-slim-bullseye
+FROM ghcr.io/home-assistant/amd64-base-python:3.10-alpine3.15
 COPY . /fevr
-RUN groupadd -g 1000 fevr && useradd -u 1000 -g fevr -d /fevr fevr && \
-    chown -R 1000:1000 /fevr && \
-    apt-get update && \
-    apt-get install --no-install-recommends -y \
-    python3-paho-mqtt python3-requests python3-dotenv
+RUN addgroup -S fevr -g 1000 && adduser -S fevr -G fevr -u 1000 && \
+    apk --no-cache add py3-pip py3-pillow py3-paho-mqtt py3-requests py3-dotenv git && \
+    ln -s /usr/bin/python3 /usr/bin/python && \
+    git clone https://github.com/beardedtek-com/fevr
+COPY rootfs /
+RUN chown -R 1000:1000 /fevr
 WORKDIR /fevr
-USER fevr
