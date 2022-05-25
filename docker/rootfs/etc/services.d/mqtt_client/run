@@ -1,0 +1,4 @@
+#!/bin/bash
+
+#Check if Virtual Environment is initialized
+/fevr/run_mqtt_client.sh

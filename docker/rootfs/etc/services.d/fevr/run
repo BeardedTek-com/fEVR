@@ -1,0 +1,12 @@
+#!/bin/bash
+
+# Get Environment Variables
+FEVR_IP="${FEVR_IP:-192.168.100.1}"
+echo ""
+echo ""
+echo "        Starting fEVR on http://$IP_ADDR:5080"
+echo ""
+echo ""
+chown -R 100:101 /var/www/data
+chmod -R 0770 /var/www/data
+httpd -DFOREGROUND
