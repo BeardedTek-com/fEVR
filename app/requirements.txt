@@ -1,5 +1,5 @@
 requests~=2.27.1
-Pillow~=9.1.0
+Pillow~=9.1.1
 paho-mqtt~=1.6.1
 Flask~=2.1.1
 flasK_sqlalchemy~=2.5.1
