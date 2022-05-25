@@ -4,7 +4,7 @@ paho-mqtt~=1.6.1
 Flask~=2.1.1
 flasK_sqlalchemy~=2.5.1
 python-dotenv~=0.20.0
-flask-login~=0.6.0
+flask-login~=0.6.1
 IPy
 svgwrite
 python-dateutil
