@@ -36,12 +36,23 @@ class getLocalIP:
     addr = s.getsockname()[0]
 
 class auth:
-    def api(transport,apikey,fevr,rSession):
+    def __init__(self,transport="http://",fevr="192.168.101.1:5090",rSession=requests.Session(),apikey=""):
+        self.transport = transport
+        self.fevr = fevr
+        self.rSession = rSession
+        self.apikey = apikey
+        self.api()
+
+    def api(self):
+        logit.execute(f"transport: {self.transport}",src=__name__)
+        logit.execute(f"apikey: {self.apikey}",src=__name__)
+        logit.execute(f"fevr: {self.fevr}",src=__name__)
+        logit.execute(f"rSession: {rSession}",src=__name__)
         # Construct the json for the post request
-        JsonPost = {'key':apikey,'ip':getLocalIP.addr}
-        # Sen the post using our session
-        authResponse = rSession.post(f"{transport}{fevr}/apiAuth", json=JsonPost)
-        logit.execute(authResponse.content,src=__name__)
+        JsonPost = {'key':self.apikey,'ip':getLocalIP.addr}
+        # Send the post using our session
+        logit.execute(f"{self.transport}{self.fevr}/apiAuth, json={JsonPost}")
+        logit.execute(self.rSession.post(f"{self.transport}{self.fevr}/apiAuth", json=JsonPost),src=__name__)
     
 class fevrMQTT:
     def __init__(self):
@@ -110,9 +121,9 @@ class fevrMQTT:
             logit.execute('frigate is online',src=self.script)
         elif 'event' in topic:
             # Authenticate first
-            # Open a session so we can use the session cookie
+            # Create Session to share cookies
             rSession = requests.Session()
-            auth.api(self.transport,self.apikey,self.fevr,rSession)
+            auth(transport=self.transport,apikey=self.apikey,fevr=self.fevr,rSession=rSession)
             event = loads(msg)
             type = event['type']
             after = event['after']
