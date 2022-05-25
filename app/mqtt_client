@@ -44,15 +44,13 @@ class auth:
         self.api()
 
     def api(self):
-        logit.execute(f"transport: {self.transport}",src=__name__)
-        logit.execute(f"apikey: {self.apikey}",src=__name__)
-        logit.execute(f"fevr: {self.fevr}",src=__name__)
-        logit.execute(f"rSession: {rSession}",src=__name__)
         # Construct the json for the post request
         JsonPost = {'key':self.apikey,'ip':getLocalIP.addr}
         # Send the post using our session
-        logit.execute(f"{self.transport}{self.fevr}/apiAuth, json={JsonPost}")
-        logit.execute(self.rSession.post(f"{self.transport}{self.fevr}/apiAuth", json=JsonPost),src=__name__)
+        fevrUrl = f"{self.transport}{self.fevr}/apiAuth"
+        logit.execute(f"self.rSession.post('{fevrUrl}', json='{JsonPost})'")
+        apiAuth = self.rSession.post(f"{fevrUrl}", json=JsonPost)
+        logit.execute(apiAuth,src=__name__)
     
 class fevrMQTT:
     def __init__(self):
