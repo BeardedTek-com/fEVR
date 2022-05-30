@@ -8,29 +8,23 @@
             Provide the following parameters to setup fEVR's MQTT Client.  This is required to listen for Frigate's generated events.<br/>
             <br/>
             You need to generate an API Key in order for the mqtt client to function.<br/>
-            <a href="/profile" target="_blank">Click here</a> to generate or view your API Keys.<br/>
+            <a href="/profile" target="_blank">Click here to generate or view your API Keys.</a><br/>
             <br/>
             MQTT Topics is comma separated ex: frigate/+,frigate2/+,frigate3/+<br/>
         </div>
         <div>
             <form method="POST" action="/setup/mqtt/add" class="">
-                <input type="text" name="broker" placeholder="MQTT Broker IP/URL">
-                <input type="text" name="port" placeholder="MQTT Broker Port">
-                <input type="text" name="brokerU" placeholder="Broker Username (enter none for no username)">
-                <input type="text" name="brokerP" placeholder="Broker Password (enter none for no password)">
-                <input type="text" name="topics" placeholder="MQTT Topics (frigate/event,frigate/available)">
-                <input type="text" name="key" placeholder="API Key">
-                <select name="https">
-                    <option id="fevrhttps" value="https">https://</option>
-                    <option id="fevrhttp" selected value="http">http://</option>
-                </select>
+                <input type="text" name="broker" placeholder="MQTT Broker IP/URL **REQUIRED**">
+                <input type="text" name="port" placeholder="MQTT Broker Port (defaults to 1883)">
+                <input type="text" name="brokerU" placeholder="Broker Username (defaults to '')">
+                <input type="text" name="brokerP" placeholder="Broker Password (defaults to '')">
+                <input type="text" name="topics" placeholder="MQTT Topics (defaults to 'frigate/+') comma separated values">
+                <input type="text" name="key" placeholder="API Key **REQUIRED** SEE NOTES ABOVE">
+                <input type="text" name="https" placeholder="http:// or https://">
                 <input type="text" id="fevrfqdn" name="fevr" placeholder="fEVR url">
-                <input type="text" id="fevrport" name="fevrport" placeholder="Port Number"> 
+                <input type="text" id="fevrport" name="fevrport" placeholder="Port Number">
                 <button>Add</button>
             </form>
-            <script>
-                fevrURLdetect('fevr')
-            </script>
         </div>
     {% if user.group == "admin" %}
     <br/>

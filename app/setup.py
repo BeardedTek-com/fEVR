@@ -179,14 +179,15 @@ def setupAddMqttPost():
         fields = {"broker":broker,"port":port,"user":brokerU,"password":brokerP,"topics":topics,"https":https,"fevr":fevr,"fevrport":fevrport,"key":key}
         Valid = True
         for field in fields:
-            if not fields[field] and field != "password" and field != "user" and field != "fevrport":
+            if not fields[field] and field == "broker" and field == "key":
                 flash(f"{field.title()} is a required field.")
                 Valid = False
             else:
                 if field == "https":
                     if fields[field] != "http" and fields[field] != "https":
                         flash(f"https field must be either http or https")
-                        Valid = False
+                        flash(f"defaulting to 'http://'")
+                        https="http://"
                 elif field == "key":
                     if 128 > len(fields[field]) > 128:
                         flash(f"key must be exactly 128 characters long.")
@@ -208,7 +209,7 @@ def setupAddMqttPost():
                     else:
                         password = brokerP
                 elif field == "fevrport":
-                    if https == "https":
+                    if https == "https://":
                         if fevrport != "443":
                             fevr = f"{fevr}:{fevrport}"
                     elif https == "http":
