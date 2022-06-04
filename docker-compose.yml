@@ -1,44 +1,22 @@
 version: '2.4'
 services:
-
-  tailscale:      # OPTIONAL - THIS SECTION CAN BE REMOVED IF YOU DON'T WANT TO RUN TAILSCALE
-    image: tailscale/tailscale
-    container_name: fevr_tailscale
-    restart: unless-stopped
-    privileged: true
-    volumes:
-      - ./tailscale/varlib:/var/lib
-      - /dev/net/tun:/dev/net/tun
-      - ./run_tailscale.sh:/run.sh
-    cap_add:
-      - net_admin
-      - sys_module
-    environment:
-      AUTH_KEY: ${AUTH_KEY}
-      BRIDGE_SUBNET: ${BRIDGE_SUBNET:-192.168.101.0/24}
-    command: /run.sh
-    networks:
-      fevrnet:
-        ipv4_address: ${TAILSCALE_IP:-192.168.101.253}
-
   fevr:
     image: ghcr.io/beardedtek-com/fevr:main
     container_name: fevr
     restart: unless-stopped
     privileged: true
-    networks:
-      fevrnet:
-        ipv4_address: ${FEVR_IP:-192.168.101.1}
     volumes:
       - ./:/fevr
     environment:
-      FLASK_ENV: ${FLASK_ENV:-}
+      FLASK_ENV: ${FLASK_ENV:-development}
       FEVR_PORT: ${FEVR_PORT:-5090}
 
-networks:
-  fevrnet:
-    driver: bridge
-    ipam:
-      config:
-        - subnet: ${BRIDGE_SUBNET:-192.168.101.0/24}
-          gateway: ${BRIDGE_GATEWAY:-192.168.101.254}
+      TAILSCALE_ENABLE: ${TAILSCALE_ENABLE:-true}
+      TAILSCALE_AUTHKEY: ${TAILSCALE_AUTHKEY}
+      TAILSCALE_HOSTNAME: ${TAILSCALE_HOSTNAME:-fevr}
+      TAILSCALE_TAGS: ${TAILSCALE_TAGS}
+      MQTT_BROKER_IP: ${MQTT_BROKER_IP}
+      MQTT_BROKER_PORT: ${MQTT_BROKER_PORT}
+      MQTT_BROKER_USER: ${MQTT_BROKER_USER}
+      MQTT_BROKER_PASS: ${MQTT_BROKER_PASS}
+      MQTT_TOPICS: ${MQTT_TOPICS}
