@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 echo "$USE_TAILSCALE"
 if [ "$USE_TAILSCALE" != "false" ]; then
     echo "##### TAILSCALE ENABLED #####"
