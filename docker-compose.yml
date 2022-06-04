@@ -10,7 +10,6 @@ services:
     environment:
       FLASK_ENV: ${FLASK_ENV:-development}
       FEVR_PORT: ${FEVR_PORT:-5090}
-
       TAILSCALE_ENABLE: ${TAILSCALE_ENABLE:-true}
       TAILSCALE_AUTHKEY: ${TAILSCALE_AUTHKEY}
       TAILSCALE_HOSTNAME: ${TAILSCALE_HOSTNAME:-fevr}
