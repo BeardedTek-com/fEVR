@@ -9,5 +9,5 @@ app/*.sqlite
 __pycache__
 .python_history
 .cookies
-tailscale
+vol
 run_mqtt_client.sh
