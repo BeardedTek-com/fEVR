@@ -1,4 +1,9 @@
-#!/bin/ash
+#!/bin/bash
+whoami
+env
+echo ""
+echo ""
+echo ""
 echo "$TAILSCALE_ENABLE"
 if [ "$TAILSCALE_ENABLE" != "false" ]; then
     echo "##### TAILSCALE ENABLED #####"
