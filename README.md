@@ -6,113 +6,88 @@ fEVR works along side of [frigate](https://frigate.video) and [home assistant](h
 
 ## Requirements:
 - Frigate fully setup and working
-- MQTT server (if you have frigate running, you have this)
+- MQTT Broker (if you have frigate running, you have this) listening to 0.0.0.0
+  - This caused me many headaches, hopefully it saves you some hair pulling.
+    It allows mqtt clients on different subnets to access the broker.
+    If setup within your local lan this does not alone open up external access, only to other subnets which already have access.
+  - Example mosquitto.conf listener section if using port 1883
+```
+listener 1883 0.0.0.0
+```
 
 ## Optional but nice:
 - Tailscale Account (for secure remote access)
   - A docker-compose file will be included below for users not wanting tailscale
 - Home Assistant (for notifications)
-- Proxy Server
-  - Python's built in flask server can be flaky.  Sometimes images won't load properly, but I've found with ngnix in front of it these problems do not exist.  If someone could explain why, that would be nice...
-    - NOTE: I do plan on transitioning to possibly gunicorn or another wsgi server, but for now, I'm sticking with this.
+- Proxy server (nginx, traefik, caddy, etc)
 
+
+# Install
 
 ## .env Setup
 Copy template.env to .env and adjust as necessary:
 NOTE: The IP addresses in the .env file are for internal bridge networking and SHOULD NOT be on the same subnet as your home network.
 The default values should serve you well.
 ```
-#fEVR Setup
-#####################################################################
+### fEVR Setup ######################################################
+
 # Changes the port fEVR runs on DEFAULT: 5090
 FEVR_PORT=5090
-# Uncomment FLASK_ENV=development to put fEVR into Debug Mode
-#FLASK_ENV=development
-#####################################################################
 
-#Tailscale
-#####################################################################
+# FLASK_ENV=development to put fEVR into Debug Mode
+FLASK_ENV=development
+
+
+### MQTT Client Setup ###############################################
+
+MQTT_BROKER_IP=127.0.0.1
+MQTT_BROKER_PORT=1883
+
+# If there is no user/password, leave unset
+MQTT_BROKER_USER=
+MQTT_BROKER_PASS=
+
+# Comma seperated string of MQTT topics to subscribe to.  LIMIT 5!!!
+MQTT_TOPICS="frigate/+"
+
+
+### Tailscale #######################################################
+
+# Set to false to disable tailscale
+TAILSCALE_ENABLE=true
+
+TAILSCALE_TAGS=tag:fevr
+TAILSCALE_HOSTNAME=fevr
+
 # Obtain Auth Key from https://login.tailscale.com/admin/authkeys
-AUTH_KEY=
-TAILSCALE_IP=192.168.101.253
-#####################################################################
-
-# Bridge Network Variables
-BRIDGE_SUBNET=192.168.101.0/24
-BRIDGE_GATEWAY=192.168.101.254
-
-# fEVR container Network Address
-FEVR_IP=192.168.101.1
-
-# mqtt_client container Network Address
-MQTT_CLIENT_IP=192.168.101.2
+TAILSCALE_AUTHKEY=tskey-XXXXXXXXXXXX-XXXXXXXXXXXXXXXXXXXXXX
 ```
 
-## Docker Compose (Tailscale):
-Example docker-compose.yml:
+## Docker Compose:
 ```
 version: '2.4'
 services:
-  tailscale:
-    image: tailscale/tailscale
-    container_name: fevr_tailscale
+  fevr:
+    image: ghcr.io/beardedtek-com/fevr:main
+    container_name: fevr
     restart: unless-stopped
     privileged: true
-    volumes:
-      - ./tailscale/varlib:/var/lib
-      - /dev/net/tun:/dev/net/tun
-      - ./run_tailscale.sh:/run.sh
-    cap_add:
-      - net_admin
-      - sys_module
-    environment:
-      AUTH_KEY: ${AUTH_KEY}
-      BRIDGE_SUBNET: ${BRIDGE_SUBNET:-192.168.101.0/24}
-    command: /run.sh
-    networks:
-      fevrnet:
-        ipv4_address: ${TAILSCALE_IP:-192.168.101.253}
-    
-  fevr_flask:
-    image: ghcr.io/beardedtek-com/fevr-flask:main
-    container_name: fevr_flask
-    restart: unless-stopped
-    privileged: true
-    networks:
-      fevrnet:
-        ipv4_address: ${FEVR_IP:-192.168.101.1}
+#    ports:               #Uncomment to export port 5090 if you don't wish to use tailscale
+#      - 5090:5090
     volumes:
       - ./:/fevr
     environment:
-      FLASK_ENV: ${FLASK_ENV:-}
+      FLASK_ENV: ${FLASK_ENV:-development}
       FEVR_PORT: ${FEVR_PORT:-5090}
-
-networks:
-  fevrnet:
-    driver: bridge
-    ipam:
-      config:
-        - subnet: ${BRIDGE_SUBNET:-192.168.101.0/24}
-          gateway: ${BRIDGE_GATEWAY:-192.168.101.254}
-```
-
-## Docker Compose (No Tailscale):
-Example docker-compose.yml:
-```
-version: '2.4'
-services:
-  fevr_flask:
-    image: ghcr.io/beardedtek-com/fevr-flask:main
-    container_name: fevr_flask
-    restart: unless-stopped
-    privileged: true
-    ports:
-      - 5090:${FEVR_PORT:-5090}
-    volumes:
-      - ./:/fevr
-    environment:
-      FLASK_ENV: ${FLASK_ENV:-}
-      FEVR_PORT: ${FEVR_PORT:-5090}
+      TAILSCALE_ENABLE: ${TAILSCALE_ENABLE:-true}
+      TAILSCALE_AUTHKEY: ${TAILSCALE_AUTHKEY}
+      TAILSCALE_HOSTNAME: ${TAILSCALE_HOSTNAME:-fevr}
+      TAILSCALE_TAGS: ${TAILSCALE_TAGS}
+      MQTT_BROKER_IP: ${MQTT_BROKER_IP}
+      MQTT_BROKER_PORT: ${MQTT_BROKER_PORT}
+      MQTT_BROKER_USER: ${MQTT_BROKER_USER}
+      MQTT_BROKER_PASS: ${MQTT_BROKER_PASS}
+      MQTT_TOPICS: ${MQTT_TOPICS}
 ```
 
 Bring the system up:
@@ -120,23 +95,12 @@ Bring the system up:
 docker-compose up -d
 ```
 
-View the logs:
-```
-docker-compose logs -f fevr_flask fevr_mqtt
-```
-You will notice right away that fevr_mqtt will be saying:
-```
-bash: /fevr/run_mqtt_client.sh: No such file or directory
-```
-This is 100% NORMAL BEHAVIOR.  You must go through the Web UI setup to enable the mqtt_client.  Until then, It's just a pretty interface that does nothing.
-
 # Setup
 Procedure:
 
 - Visit http(s)://<fevr_url>/setup
 - Create admin account
 - Login to new admin account
-- Visit http(s)://fevr_url>/setup AGAIN.
 - Add all of your cameras.
   - It asks for both HLS and RTSP feeds.  Technically you don't need to enter anything but the camera name, but in a future release live view and frigate config will be enabled and will require these values
   - Click Next

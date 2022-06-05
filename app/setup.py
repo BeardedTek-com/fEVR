@@ -60,8 +60,6 @@ def setupfEVR(Item):
         if Item == 'start' or Item == 'fevr' or Item == 'admin':
             next='frigate'
             label = 'fEVR Setup'
-            
-
         elif Item == 'cameras':
             next="/setup/frigate"
             template = "setupcameras.html"
@@ -121,7 +119,7 @@ def setupAdminProcessForm():
         db.session.add(new_user)
         db.session.commit()
 
-        return redirect(url_for('auth.login'))
+        return redirect("/login?next=%2Fsetup%2Fcameras")
 
 @setup.route('/setup/cameras/add',methods=['POST'])
 @login_required

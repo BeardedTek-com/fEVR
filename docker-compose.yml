@@ -5,6 +5,8 @@ services:
     container_name: fevr
     restart: unless-stopped
     privileged: true
+#    ports:               #Uncomment to export port 5090 if you don't wish to use tailscale
+#      - 5090:5090
     volumes:
       - ./:/fevr
     environment:
