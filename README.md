@@ -75,7 +75,7 @@ services:
 #    ports:               #Uncomment to export port 5090 if you don't wish to use tailscale
 #      - 5090:5090
     volumes:
-      - ./:/fevr
+      - ./events:/fevr/static/events
     environment:
       FLASK_ENV: ${FLASK_ENV:-development}
       FEVR_PORT: ${FEVR_PORT:-5090}
