@@ -5,7 +5,12 @@ echo ""
 echo ""
 echo ""
 echo "$TAILSCALE_ENABLE"
-if [ "$TAILSCALE_ENABLE" != "false" ]; then
+if [ "$TAILSCALE_ENABLE" == "false" ]; then
+    FOREVER=1
+    while [ $FOREVER == 1 ]; do
+        sleep 9999999
+    done
+else
     echo "##### TAILSCALE ENABLED #####"
     # Enable IP forwarding
     rm -f /etc/sysctl.conf
