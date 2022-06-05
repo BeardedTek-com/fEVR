@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/with-contenv bash
 # This will check if run_mqtt_client.sh has been generated.
 # If it has not, we will check every 5 seconds
 # After 120 seconds of checking (24 cycles) we will output an error msg
