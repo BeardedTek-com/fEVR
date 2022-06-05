@@ -3,10 +3,8 @@ COPY . /fevr
 COPY rootfs /
 RUN apk --no-cache add py3-pip py3-pillow py3-paho-mqtt py3-requests py3-dotenv git nano tailscale
 RUN ln -s /usr/bin/python3 /usr/bin/python
-RUN chown -R 1000:1000 /fevr
 RUN adduser -u 1000 -h /fevr -D fevr
 WORKDIR /fevr
-USER fevr
 
 # FEVR ENV Variables
 ENV FEVR_PORT=5090
