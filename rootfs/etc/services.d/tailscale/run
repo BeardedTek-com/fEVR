@@ -43,6 +43,4 @@ else
     while [ $TS == 0 ]; do
         sleep 5000
     done
-else
-    echo "##### TAILSCALE DISABLED #####"
 fi
