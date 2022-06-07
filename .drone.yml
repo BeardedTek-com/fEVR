@@ -1,0 +1,28 @@
+kind: pipeline
+name: default
+type: docker
+
+trigger:
+  branch:
+    - main
+  event:
+    - push
+
+steps:
+- name: build-fevr
+  image: ubuntu-latest
+  commands:
+    - git clone https://gitea.beardedtek.com/beardedtek/fevr
+    - cd fevr
+    - docker build . -t beardedtek-com/fevr:drone
+
+- name: publish
+  image: plugins/docker
+  settings:
+    username:
+      from_secret: docker_username
+    password:
+      from_secret: docker_password
+    repo: beardedtek-com/fevr
+    auto_tag: true
+    auto_tag_suffix: drone
