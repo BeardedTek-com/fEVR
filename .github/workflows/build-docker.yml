@@ -42,5 +42,5 @@ jobs:
         with:
           context: .
           push: true
-          tags: latest, ${{ steps.meta.outputs.tags }}, v0.6-RC4
+          tags: latest, ${{ steps.meta.outputs.tags }}, v0.6-rc4
           labels: ${{ steps.meta.outputs.labels }}
