@@ -6,20 +6,23 @@ cd /fevr
 # Check if Virtual Environment is initialized
 [ ! -d "/fevr/venv" ] && \
     echo "Initializing Virtual Environment" && \
-    python -m venv venv
-
-# Activate Virtual Environment
-echo "Starting Virtual Environment" && \
-source /fevr/venv/bin/activate \
+    python -m venv venv && \
+    echo "Starting Virtual Environment" && \
+    source /fevr/venv/bin/activate \
+|| \
+    echo "Python Virtual Environment already installed."
+    echo "Activating Python Virtual Environment"
+    source /fevr/venv/bin/activate
 
 # Install Dependencies
-echo "pip install wheel" && \
-pip install wheel && \
-echo "pip install requirements" && \
-pip install -r /fevr/requirements.txt && \
+echo "pip install requirements"
+python -m pip install -r /fevr/requirements.txt
 echo "Done Installing python requirements"
 
-echo "Starting fEVR"
+FEVR_HOST=${FEVR_HOST:-0.0.0.0}
+FEVR_PORT=${FEVR_PORT:-5090}
+echo "Starting fEVR on $FEVR_HOST:$FEVR_PORT"
 # Uncomment to put fEVR into development Mode
 #export FLASK_ENV='development'
-/fevr/venv/bin/flask run -h "0.0.0.0" -p ${FEVR_PORT:-5090}
+#/fevr/venv/bin/flask run -h "0.0.0.0" -p ${FEVR_PORT:-5090}
+uwsgi --http $FEVR_HOST:$FEVR_PORT --wsgi-file fevr.py --callable app --processes ${UWSGI_PROCESSES:-8} --threads ${UWSGI_THREADS:-4} &
