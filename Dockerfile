@@ -1,12 +1,12 @@
 FROM ghcr.io/home-assistant/amd64-base-python:3.10-alpine3.15
 COPY . /fevr
 COPY rootfs /
-RUN apk --no-cache add py3-pip py3-pillow py3-paho-mqtt py3-requests py3-dotenv git nano \
-                       tailscale python3-dev build-base linux-headers pcre-dev
-RUN ln -s /usr/bin/python3 /usr/bin/python
-RUN mkdir /data
-RUN ln -s /fevr/app/static/events /data/events
-RUN adduser -u 1000 -h /fevr -D fevr
-RUN chown -R fevr /fevr
-RUN chown -R fevr /data
+RUN apk --no-cache add py3-pip git nano tailscale python3-dev build-base linux-headers pcre-dev &&\
+    ln -s /usr/bin/python3 /usr/bin/python && \
+    mkdir /data && \
+    ln -s /fevr/app/static/events /data/events && \
+    adduser -u 1000 -h /fevr -D fevr && \
+    chown -R fevr /fevr && \
+    chown -R fevr /data && \
+    apk --no-cache del python3-dev build-base linux-headers pcre-dev
 WORKDIR /fevr
