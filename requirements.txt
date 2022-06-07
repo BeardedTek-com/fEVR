@@ -5,7 +5,6 @@ Flask~=2.1.2
 flasK_sqlalchemy~=2.5.1
 python-dotenv~=0.20.0
 flask-login~=0.6.1
-uwsgi~=2.0.19
 IPy
 svgwrite
 python-dateutil
