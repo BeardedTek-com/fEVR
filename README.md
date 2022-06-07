@@ -22,9 +22,13 @@ listener 1883 0.0.0.0
 - Proxy server (nginx, traefik, caddy, etc)
 
 
-# Install
+# Installation
 
-## .env Setup
+## Docker Compose:
+
+docker-compose is the preferred installation method
+
+### Edit .env file
 Copy template.env to .env and adjust as necessary:
 NOTE: The IP addresses in the .env file are for internal bridge networking and SHOULD NOT be on the same subnet as your home network.
 The default values should serve you well.
@@ -63,7 +67,6 @@ TAILSCALE_HOSTNAME=fevr
 TAILSCALE_AUTHKEY=tskey-XXXXXXXXXXXX-XXXXXXXXXXXXXXXXXXXXXX
 ```
 
-## Docker Compose:
 ```
 version: '2.4'
 services:
