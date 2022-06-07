@@ -9,4 +9,3 @@ RUN adduser -u 1000 -h /fevr -D fevr
 RUN chown -R fevr /fevr
 RUN chown -R fevr /data
 WORKDIR /fevr
-USER fevr
