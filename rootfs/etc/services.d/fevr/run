@@ -16,7 +16,7 @@ source /fevr/venv/bin/activate \
 echo "pip install wheel" && \
 pip install wheel && \
 echo "pip install requirements" && \
-pip install -r /fevr/app/requirements.txt && \
+pip install -r /fevr/requirements.txt && \
 echo "Done Installing python requirements"
 
 echo "Starting fEVR"
