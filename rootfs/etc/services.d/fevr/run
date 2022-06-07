@@ -9,15 +9,16 @@ cd /fevr
     python -m venv venv && \
     echo "Starting Virtual Environment" && \
     source /fevr/venv/bin/activate \
+    # Install Dependencies
+    echo "pip install requirements"
+    python -m pip install -r /fevr/requirements.txt
+    echo "Done Installing python requirements"
 || \
     echo "Python Virtual Environment already installed."
     echo "Activating Python Virtual Environment"
     source /fevr/venv/bin/activate
 
-# Install Dependencies
-echo "pip install requirements"
-python -m pip install -r /fevr/requirements.txt
-echo "Done Installing python requirements"
+
 
 FEVR_HOST=${FEVR_HOST:-0.0.0.0}
 FEVR_PORT=${FEVR_PORT:-5090}
