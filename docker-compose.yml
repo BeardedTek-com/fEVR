@@ -1,12 +1,12 @@
 version: '2.4'
 services:
   fevr:
-    image: ghcr.io/beardedtek-com/fevr:main
+    image: beardedtek-com/fevr:main
     container_name: fevr
     restart: unless-stopped
     privileged: true
-#    ports:               #Uncomment to export port 5090 if you don't wish to use tailscale
-#      - 5090:5090
+    ports:               #Uncomment to export port 5090 if you don't wish to use tailscale
+      - 5090:5090
     volumes:
       - ./events:/data/events
     environment:
