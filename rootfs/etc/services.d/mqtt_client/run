@@ -1,28 +1,35 @@
 #!/usr/bin/with-contenv bash
 # This will check if run_mqtt_client.sh has been generated.
 # If it has not, we will check every 5 seconds
-# After 120 seconds of checking (24 cycles) we will output an error msg
+# After 300 seconds of checking (60 cycles) we will output an error msg
 # telling the user to run the configuration
 if [ -f "/fevr/run_mqtt_client.sh" ]; then
-    echo "EXISTS, SKIPPING LOOP"
     EXISTS=1
 else
-    echo "DOES NOT EXIST, LOOPING"
     EXISTS=0
-    echo "EXISTS = $EXISTS"
 fi
+# Wait until UWSGI is started
+sleep 60
 while [ "$EXITS" != "1" ] # Loop until EXISTS = 1
 do
-    echo "LOOP"
     # Print URL to visit to configure fEVR
-    echo "Visit $(hostname -i):5180/setup to complete setup."
+    echo ""
+    echo ""
+    echo "########################  SETUP NOT COMPLETE  ##################################"
+    echo "#                                                                              #"
+    echo "# fEVR will not function as intended until you complete this process           #"
+    echo "# Please finish setup by visiting:                                             #"
+    echo "# http://$(hostname -i):${FEVR_PORT:-5090}/setup.                                                #"
+    echo "#                                                                              #"
+    echo "################################################################################"
+    echo ""
+    echo ""
     for i in {1..60}
     # Loop 24 times
     do
     # Check if /fevr/run_mqtt_client.sh exists
     # If it exists, set EXISTS to 1
     if [ -f "/fevr/run_mqtt_client.sh" ]; then
-        echo "File Exists"
         EXISTS=1
         break
     fi
@@ -33,9 +40,6 @@ do
         break
     fi
 done
-
-
-
 
 chmod +x /fevr/run_mqtt_client.sh
 /fevr/run_mqtt_client.sh

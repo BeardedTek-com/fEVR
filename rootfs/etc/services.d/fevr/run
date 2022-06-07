@@ -23,8 +23,10 @@ fi
 
 FEVR_HOST=${FEVR_HOST:-0.0.0.0}
 FEVR_PORT=${FEVR_PORT:-5090}
-echo "Starting fEVR on $FEVR_HOST:$FEVR_PORT"
+UWSGI_WORKERS=${UWSGI_WORKERS:-4}
+echo "Starting fEVR on $FEVR_HOST:$FEVR_PORT with $UWSGI_WORKERS workers."
 # Uncomment to put fEVR into development Mode
 #export FLASK_ENV='development'
 #/fevr/venv/bin/flask run -h "0.0.0.0" -p ${FEVR_PORT:-5090}
-uwsgi --http $FEVR_HOST:$FEVR_PORT --wsgi-file fevr.py --callable app --processes ${UWSGI_PROCESSES:-8} --threads ${UWSGI_THREADS:-4}
+export UWSGI_STARTING=1
+uwsgi --http $FEVR_HOST:$FEVR_PORT --wsgi-file fevr.py --callable app --workers $UWSGI_WORKERS --uid 1000 --gid 1000
