@@ -11,7 +11,7 @@ trigger:
 
 steps:
 - name: build-fevr
-  image: beardedtek/dronebuilder:latest
+  image: busybox
   commands:
     - git clone https://gitea.beardedtek.com/beardedtek/fevr
     - cd fevr
