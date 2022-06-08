@@ -3,11 +3,11 @@
 # separate terms of service, privacy policy, and support
 # documentation.
 
-name: Create and publish beardedtek/fevr Docker image
+name: Create and publish ghcr.io/beardedtek/fevr Docker image
 
 on:
-  push:
-    branches: ['main']
+  release:
+    types: [published]
 
 env:
   REGISTRY: ghcr.io
@@ -42,5 +42,5 @@ jobs:
         with:
           context: .
           push: true
-          tags: latest, ${{ steps.meta.outputs.tags }}, v0.6-rc4
+          tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
