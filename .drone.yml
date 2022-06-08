@@ -11,7 +11,7 @@ trigger:
 
 steps:
 - name: build-fevr
-  image: ubuntu-latest
+  image: beardedtek/dronebuilder:latest
   commands:
     - git clone https://gitea.beardedtek.com/beardedtek/fevr
     - cd fevr
