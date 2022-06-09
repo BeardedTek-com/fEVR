@@ -14,7 +14,8 @@ steps:
     event:
       - pull_request
   settings:
-    username: beardedtek
+    username:
+      from_secret: docker_username
     password:
       from_secret: github_user_token
     repo: ghcr.io/beardedtek-com/fevr
@@ -32,7 +33,7 @@ steps:
     username:
       from_secret: docker_username
     password:
-      from_secret: docker_password
+      from_secret: github_user_token
     repo: ghcr.io/beardedtek-com/fevr
     registry: ghcr.io
     tags: latest,${DRONE_TAG}
@@ -45,9 +46,10 @@ steps:
     event:
       - pull_request
   settings:
-    username: beardedtek
+    username:
+      from_secret: docker_username
     password:
-      from_secret: github_user_token
+      from_secret: docker_password
     repo: beardedtek/fevr
     tags: latest,${DRONE_PULL_REQUEST}
     experimental: true
