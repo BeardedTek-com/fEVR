@@ -3,7 +3,7 @@
 # fEVR - frigate Event Video Recorder
 fEVR works along side of [frigate](https://frigate.video) and [home assistant](https://www.home-assistant.io/) to collect video and snapshots of objects detected using your existing camera systems.
 ![fEVR v0.6 Screenshot](https://user-images.githubusercontent.com/93575915/165704583-fec8e202-88b8-4ca2-9ff2-345c04da3722.png)
-
+[![Build Status](https://drone2.beardedtek.com/api/badges/BeardedTek-com/fEVR/status.svg?ref=refs/heads/main)](https://drone2.beardedtek.com/BeardedTek-com/fEVR)
 ## Requirements:
 - Frigate fully setup and working
 - MQTT Broker (if you have frigate running, you have this) listening to 0.0.0.0
