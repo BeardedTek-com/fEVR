@@ -3,6 +3,7 @@ name: default
 trigger:
   branch:
     - main
+    - dev
   event:
     - push
     - tag
