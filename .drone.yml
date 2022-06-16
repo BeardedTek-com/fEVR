@@ -94,11 +94,10 @@ steps:
     event:
       - tag
   settings:
-    username:
-      from_secret: docker_username
+    username: beardedtek
     password:
       from_secret: docker_password
-    repo: docker.beardedtek.com/beardedtek/fevr
+    repo: docker.beardedtek.com/beardedtek-com/fevr
     registry: docker.beardedtek.com
     tags: latest,${DRONE_TAG}
     experimental: true
@@ -110,11 +109,10 @@ steps:
     event:
       - pull_request
   settings:
-    username:
-      from_secret: docker_username
+    username: beardedtek
     password:
       from_secret: docker_password
-    repo: docker.beardedtek.com/beardedtek/fevr
+    repo: docker.beardedtek.com/beardedtek-com/fevr
     registry: docker.beardedtek.com
     tags: latest,${DRONE_PULL_REQUEST}
     experimental: true
