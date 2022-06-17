@@ -63,17 +63,17 @@ def convertTZ(time,clockFmt=12,Timezone="America/Anchorage"):
 # Setup mqtt_client
 MQTT= mqtt.query.first()
 command = f"/fevr/venv/bin/python /fevr/app/mqtt_client"
-if mqtt.port != 1883:
-    command += f" -p {mqtt.port}"
-if mqtt.topics != "frigate/+":
-    command += f" -t {mqtt.topics}"
-if mqtt.user != "" and mqtt.password != "":
-    command += f" -u {mqtt.user} -P {mqtt.password}"
-if mqtt.https == "https":
+if MQTT.port != 1883:
+    command += f" -p {MQTT.port}"
+if MQTT.topics != "frigate/+":
+    command += f" -t {MQTT.topics}"
+if MQTT.user != "" and MQTT.password != "":
+    command += f" -u {MQTT.user} -P {MQTT.password}"
+if MQTT.https == "https":
     command += " -s "
-if mqtt.fevr != "localhost:5090":
-    command += f" -f {mqtt.fevr}"
-command += f" {mqtt.broker} {mqtt.key}"
+if MQTT.fevr != "localhost:5090":
+    command += f" -f {MQTT.fevr}"
+command += f" {MQTT.broker} {MQTT.key}"
 # Write new run_mqtt_client.sh:
 with open('run_mqtt_client.sh', "w") as myfile:
     myfile.write(f"#!/bin/sh\n{command}")
