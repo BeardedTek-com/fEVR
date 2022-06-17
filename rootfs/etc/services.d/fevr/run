@@ -4,22 +4,9 @@
 cd /fevr
 
 # Check if Virtual Environment is initialized
-if [ ! -d "/fevr/venv" ]; then
-    echo "Initializing Virtual Environment"
-    python -m venv venv
-    echo "Starting Virtual Environment"
-    source /fevr/venv/bin/activate
-    # Install Dependencies
-    echo "pip install requirements"
-    python -m pip install -r /fevr/requirements.txt
-    echo "Done Installing python requirements"
-else
-    echo "Python Virtual Environment already installed."
-    echo "Activating Python Virtual Environment"
-    source /fevr/venv/bin/activate
-fi
-
-
+echo "Python Virtual Environment already installed."
+echo "Activating Python Virtual Environment"
+source /fevr/venv/bin/activate
 
 FEVR_HOST=${FEVR_HOST:-0.0.0.0}
 FEVR_PORT=${FEVR_PORT:-5090}

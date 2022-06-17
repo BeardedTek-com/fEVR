@@ -31,7 +31,7 @@ login_manager = LoginManager()
 login_manager.login_view = 'auth.login'
 login_manager.init_app(app)
 
-from .models.models import User
+from .models.models import User, mqtt
 
 @login_manager.user_loader
 def load_user(user_id):
@@ -59,3 +59,21 @@ def convertTZ(time,clockFmt=12,Timezone="America/Anchorage"):
             outformat = "%-m/%-d/%y %H:%M:%S"
         outTime = dt.strftime(outformat).lower()
         return outTime
+
+# Setup mqtt_client
+MQTT= mqtt.query.first()
+command = f"/fevr/venv/bin/python /fevr/app/mqtt_client"
+if mqtt.port != 1883:
+    command += f" -p {mqtt.port}"
+if mqtt.topics != "frigate/+":
+    command += f" -t {mqtt.httpstopics}"
+if mqtt.user != "" and mqtt.password != "":
+    command += f" -u {mqtt.user} -P {mqtt.password}"
+if mqtt.https == "https":
+    command += " -s "
+if mqtt.fevr != "localhost:5090":
+    command += f" -f {mqtt.fevr}"
+command += f" {mqtt.broker} {mqtt.key}"
+# Write new run_mqtt_client.sh:
+with open('run_mqtt_client.sh', "w") as myfile:
+    myfile.write(f"#!/bin/sh\n{command}")
