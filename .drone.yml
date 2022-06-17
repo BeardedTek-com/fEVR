@@ -1,5 +1,7 @@
 kind: pipeline
 name: default
+image_pull_secrets:
+  - docker-auth-beardedtek.com
 trigger:
   branch:
     - main
@@ -112,5 +114,3 @@ steps:
     experimental: true
     compress: true
     squash: true
-image_pull_secrets:
-- dockerconfig
