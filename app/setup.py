@@ -72,11 +72,16 @@ def setupfEVR(Item):
         elif Item == 'mqtt':
             label = 'MQTT Client Setup'
             next = '/setup/config'
-            template = "setupmqtt.html"
-            command = "Not Yet Setup."
-            if exists('../run_mqtt_client.sh'):
-                with open('../run_mqtt_client.sh', 'r') as f:
-                    command = f.read()
+            template = "setupmqtt.html"            
+            MQTT = mqtt.query.first()
+            command = f"BROKER   : {mqtt.broker}\n \
+                        PORT     : {mqtt.port}\n \
+                        MQTT USER: {mqtt.user}\n \
+                        MQTT PASS: {mqtt.password}\n \
+                        TOPIC    : {mqtt.topics}\n \
+                        FEVR     : {mqtt.fevr}\n \
+                        PROTOCOL : {mqtt.https}\n \
+                        API KEY  : {mqtt.key}"
             resp = render_template(template,mqtt=mqtt.query.order_by(desc(mqtt.id)).first(),cameras=Cameras,menu=menu,next=next,label=label,page=page,items=status,Item=Item,user=user,command=command)
         elif Item == 'config' or Item == 'other':
             label = "Other"
@@ -269,6 +274,8 @@ def setupAddMqttPost():
                 user = ""
             if not password:
                 password = ""
+            MQTT = mqtt.query.all()
+            db.session.delete(MQTT)
             MQTT = mqtt(port=port,topics=topics,user=user,password=password,https=https,fevr=fevr,broker=broker,key=key)
             db.session.add(MQTT)
             db.session.commit()
