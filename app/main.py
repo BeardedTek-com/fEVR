@@ -22,7 +22,7 @@ def index():
     page = '/'
     title = 'Latest Events'
     db.create_all()
-    Events = events.filter(events.show==True).query.order_by(desc(events.time)).order_by(desc(events.time)).limit(12).all()
+    Events = events.query.filter(events.show==True).order_by(desc(events.time)).order_by(desc(events.time)).limit(12).all()
     return cookies.setCookies(cookiejar,make_response(render_template('events.html',Menu=menu,page=page,title=title,events=Events,cameras=Cameras,camera="all")))
 
 @main.route('/latest')
