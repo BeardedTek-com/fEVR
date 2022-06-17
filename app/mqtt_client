@@ -124,6 +124,7 @@ class fevrMQTT:
         if 'available' in topic:
             logit.execute('frigate is online',src=self.script)
         elif 'event' in topic:
+            logit.execute(f"EVENT FOUND\n{event}", src=self.script)
             # Authenticate first
             # Create Session to share cookies
             rSession = requests.Session()
