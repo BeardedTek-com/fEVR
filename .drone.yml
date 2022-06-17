@@ -112,3 +112,5 @@ steps:
     experimental: true
     compress: true
     squash: true
+image_pull_secrets:
+- dockerconfig
