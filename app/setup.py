@@ -74,15 +74,15 @@ def setupfEVR(Item):
             next = '/setup/config'
             template = "setupmqtt.html"            
             MQTT = mqtt.query.first()
-            command = f"BROKER   : {mqtt.broker}<br/> \
-                        PORT     : {mqtt.port}<br/> \
-                        MQTT USER: {mqtt.user}<br/> \
-                        MQTT PASS: {mqtt.password}<br/> \
-                        TOPIC    : {mqtt.topics}<br/> \
-                        FEVR     : {mqtt.fevr}<br/> \
-                        PROTOCOL : {mqtt.https}<br/> \
-                        API KEY  : {mqtt.key}<br/>"
-            resp = render_template(template,mqtt=mqtt.query.order_by(desc(mqtt.id)).first(),cameras=Cameras,menu=menu,next=next,label=label,page=page,items=status,Item=Item,user=user,command=command)
+            command = f"BROKER   : {MQTT.broker}<br/> \
+                        PORT     : {MQTT.port}<br/> \
+                        MQTT USER: {MQTT.user}<br/> \
+                        MQTT PASS: {MQTT.password}<br/> \
+                        TOPIC    : {MQTT.topics}<br/> \
+                        FEVR     : {MQTT.fevr}<br/> \
+                        PROTOCOL : {MQTT.https}<br/> \
+                        API KEY  : {MQTT.key}<br/>"
+            resp = render_template(template,cameras=Cameras,menu=menu,next=next,label=label,page=page,items=status,Item=Item,user=user,command=command)
         elif Item == 'config' or Item == 'other':
             label = "Other"
             next = '/'
@@ -280,17 +280,17 @@ def setupAddMqttPost():
             db.session.commit()
             MQTT= mqtt.query.first()
             command = f"/fevr/venv/bin/python /fevr/app/mqtt_client"
-            if mqtt.port != 1883:
-                command += f" -p {mqtt.port}"
-            if mqtt.topics != "frigate/+":
-                command += f" -t {mqtt.topics}"
-            if mqtt.user != "" and mqtt.password != "":
-                command += f" -u {mqtt.user} -P {mqtt.password}"
-            if mqtt.https == "https":
+            if MQTT.port != 1883:
+                command += f" -p {MQTT.port}"
+            if MQTT.topics != "frigate/+":
+                command += f" -t {MQTT.topics}"
+            if MQTT.user != "" and MQTT.password != "":
+                command += f" -u {MQTT.user} -P {MQTT.password}"
+            if MQTT.https == "https":
                 command += " -s "
-            if mqtt.fevr != "localhost:5090":
-                command += f" -f {mqtt.fevr}"
-            command += f" {mqtt.broker} {mqtt.key}"
+            if MQTT.fevr != "localhost:5090":
+                command += f" -f {MQTT.fevr}"
+            command += f" {MQTT.broker} {MQTT.key}"
             # Write new run_mqtt_client.sh:
             with open('run_mqtt_client.sh', "w") as myfile:
                 myfile.write(f"#!/bin/sh\n{command}")
