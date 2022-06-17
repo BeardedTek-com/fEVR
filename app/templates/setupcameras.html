@@ -17,11 +17,11 @@
     {% for camera in Cameras %}
 
     <div>
-        <form method="POST" action="/setup/cameras/edit">
-            <input type="hidden" name="camera" value="{{ camera.camera }}"> <a href="/api/cameras/delete/{{camera.camera}}">{{camera.camera}} Delete</a><br/>
-            <input type="text" name="hls" value="{{ camera.hls }}">
-            <input type="text" name="rtsp" value="{{ camera.rtsp }}">
-            <input type="text" name="show" value="{{ camera.show }}"
+        <form method="POST" action="/setup/cameras/edit/{{ camera.camera }}">
+            <span class="label">Name:</span><input type="hidden" name="camera" value="{{ camera.camera }}"> <a href="/api/cameras/delete/{{camera.camera}}">{{camera.camera}} Delete</a><br/>
+            <span class="label">HLS:</span><input type="text" name="hls" value="{{ camera.hls }}">
+            <span class="label">RTSP:</span><input type="text" name="rtsp" value="{{ camera.rtsp }}">
+            <span class="label">Hidden:</span><input type="text" name="show" value="{{ camera.show }}">
             <button>Edit Camera</button>
         </form>
     </div>

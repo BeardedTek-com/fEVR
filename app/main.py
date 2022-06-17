@@ -22,7 +22,7 @@ def index():
     page = '/'
     title = 'Latest Events'
     db.create_all()
-    Events = events.query.order_by(desc(events.time)).order_by(desc(events.time)).limit(12).all()
+    Events = events.filter(events.show==True).query.order_by(desc(events.time)).order_by(desc(events.time)).limit(12).all()
     return cookies.setCookies(cookiejar,make_response(render_template('events.html',Menu=menu,page=page,title=title,events=Events,cameras=Cameras,camera="all")))
 
 @main.route('/latest')
@@ -156,7 +156,7 @@ def viewSingle(eventid,view):
         if event['ack'] == "" and view != 'unack':
             api.apiAckEvent(eventid)
             event['ack'] = "true"
-        title = f"<div class='back'><a href='/'><img src='/static/img/back.svg'></a></div><div class='objcam'>{event['object'].title()} in {event['camera'].title()}</div>"
+        title = f"<div class='back'><a href='' onclick='history.back()'><img src='/static/img/back.svg'></a></div><div class='objcam'>{event['object'].title()} in {event['camera'].title()}</div>"
         xx = 0
         for X in ['live','clip','snap']:
             if view == X:

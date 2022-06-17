@@ -16,10 +16,9 @@
 </div>
 {% if events|length > 0 %}
     {% for event in events %}
-        {% for camera in cameras %}
-            {% if event.camera == camera.camera %}
-                {% if camera.show %}
-                    SHOW
+        {% for Camera in cameras %}
+            {% if event.camera == Camera.camera %}
+                {% if Camera.show or camera != "all" %}
                     <div class='events'>
                     <div class="eventThumb">
                     <a href='/event/{{ event.eventid }}/snap'>
@@ -34,8 +33,6 @@
                     <div class="{% if event.ack == 'true' %}hidden{% else %}new{% endif %}">NEW</div>
                     </div>
                     </div>
-                {% else %}
-                    NOSHOW
                 {% endif %}
             {% endif %}
         {% endfor %}

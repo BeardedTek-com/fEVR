@@ -165,7 +165,7 @@ def apiEditCameraPost(camera):
             db.session.commit()
     resp = redirect('/setup/cameras')
     return resp
-
+        
 @setup.route('/setup/frigate/add',methods=['POST'])
 @login_required
 def setupAddFrigatePost():
@@ -181,6 +181,20 @@ def setupAddFrigatePost():
         resp = redirect('/setup/frigate')
     else:
         resp = redirect('/')
+    return resp
+
+@setup.route('/setup/frigate/edit/<Frigate>',methods=['POST'])
+@login_required
+def setupAddFrigatePost(Frigate):
+    if current_user.group == "admin":
+        edit = False
+        frigateEdit = frigate.query.filter_by(Frigate=Frigate).first()
+        if frigateEdit.name != request.form.get('url'):
+            frigateEdit.name = request.form.get('url')
+            edit = True
+        if edit:
+            db.session.commit()
+    resp = redirect('/setup/frigate')
     return resp
 
 @setup.route('/setup/mqtt/add',methods=['POST'])
