@@ -185,7 +185,7 @@ def setupAddFrigatePost():
 
 @setup.route('/setup/frigate/edit/<Frigate>',methods=['POST'])
 @login_required
-def setupAddFrigatePost(Frigate):
+def setupEditFrigatePost(Frigate):
     if current_user.group == "admin":
         edit = False
         frigateEdit = frigate.query.filter_by(Frigate=Frigate).first()
