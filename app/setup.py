@@ -143,7 +143,7 @@ def apiAddCameraPost():
 
 @setup.route('/setup/cameras/edit/<camera>',methods=['POST'])
 @login_required
-def apiAddCameraPost(camera):
+def apiEditCameraPost(camera):
     if current_user.group == "admin":
         edit = False
         camEdit = cameras.query.filter_by(camera=camera).first()
@@ -164,26 +164,6 @@ def apiAddCameraPost(camera):
         if edit:
             db.session.commit()
     resp = redirect('/setup/cameras')
-    return resp
-
-@setup.route('/setup/cameras/edit',methods=['POST'])
-@login_required
-def apiAddCameraPost():
-    if current_user.group == "admin":
-        db.create_all()
-        camera = request.form.get('camera')
-        hls = request.form.get('hls')
-        rtsp = request.form.get('rtsp')
-        if request.form.get('show') == "true":
-            show = True
-        else:
-            show = False
-        camera = cameras(camera=camera,hls=hls,rtsp=rtsp,show=show)
-        db.session.add(camera)
-        db.session.commit()
-        resp = redirect('/setup/cameras')
-    else:
-        resp = redirect('/')
     return resp
 
 @setup.route('/setup/frigate/add',methods=['POST'])
