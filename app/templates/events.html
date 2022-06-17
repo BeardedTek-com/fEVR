@@ -16,22 +16,29 @@
 </div>
 {% if events|length > 0 %}
     {% for event in events %}
-      {% if cameras[event.camera][show]%}
-        <div class='events'>
-        <div class="eventThumb">
-        <a href='/event/{{ event.eventid }}/snap'>
-        <img class='thumb' alt="{{event.eventid}} - {{event.object}} in {{event.camera}}" src='/static/events/{{ event.eventid}}/thumb.jpg'>
-        </a>
-        <div class='eventsDetails'>
-        <div class='subdetail'>{{ event.time|timezone }}</div>
+        {% for camera in cameras %}
+            {% if event.camera == camera.camera %}
+                {% if camera.show %}
+                    SHOW
+                    <div class='events'>
+                    <div class="eventThumb">
+                    <a href='/event/{{ event.eventid }}/snap'>
+                    <img class='thumb' alt="{{event.eventid}} - {{event.object}} in {{event.camera}}" src='/static/events/{{ event.eventid}}/thumb.jpg'>
+                    </a>
+                    <div class='eventsDetails'>
+                    <div class='subdetail'>{{ event.time|timezone }}</div>
         
-        <div class='subdetail'>{{ event.object }}</div>
-        <div class='subdetail'>{{ event.score }}%</div>
-        </div>
-        <div class="{% if event.ack == 'true' %}hidden{% else %}new{% endif %}">NEW</div>
-        </div>
-        </div>
-      {% endif %}
+                    <div class='subdetail'>{{ event.object }}</div>
+                    <div class='subdetail'>{{ event.score }}%</div>
+                    </div>
+                    <div class="{% if event.ack == 'true' %}hidden{% else %}new{% endif %}">NEW</div>
+                    </div>
+                    </div>
+                {% else %}
+                    NOSHOW
+                {% endif %}
+            {% endif %}
+        {% endfor %}
     {% endfor %}
 {% else %}
     <div class="events" style="font-size: 2em; text-align:center;">

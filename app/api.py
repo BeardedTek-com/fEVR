@@ -70,16 +70,17 @@ def apiAddEvent(eventid,camera,score,object):
     def addEvent(eventid,camera,score,object):
         db.create_all()
         time = datetime.fromtimestamp(int(eventid.split('.')[0]))
-        event = events(eventid=eventid,camera=camera,object=object,score=int(score),ack='',time=time)
+        cameras = cameras.query.filter_by(camera=camera).first()
+        if cameras.show:
+            show = True
+        else:
+            show = False
+        event = events(eventid=eventid,camera=camera,object=object,score=int(score),ack='',time=time,show=show)
         db.session.add(event)
         db.session.commit()
         fetchPath = f"{os.getcwd()}/app/static/events/{eventid}/"
         frigateConfig = apiFrigate()
         frigateURL = frigateConfig['frigate']
-        
-        print(f"######################################################################################### \n \
-                # Fetching {eventid} for {object} in {camera} from {frigateConfig['frigate']} \n \
-                ######################################################################################### ")
         Fetch(fetchPath,eventid,frigateURL)
         
     # Check if eventid already exists
@@ -98,16 +99,17 @@ def apiAdminAddEvent(eventid,camera,score,object):
     def addEvent(eventid,camera,score,object):
         db.create_all()
         time = datetime.fromtimestamp(int(eventid.split('.')[0]))
-        event = events(eventid=eventid,camera=camera,object=object,score=int(score),ack='',time=time)
+        cameras = cameras.query.filter_by(camera=camera).first()
+        if cameras.show:
+            show = True
+        else:
+            show = False
+        event = events(eventid=eventid,camera=camera,object=object,score=int(score),ack='',time=time,show=show)
         db.session.add(event)
         db.session.commit()
         fetchPath = f"{os.getcwd()}/app/static/events/{eventid}/"
         frigateConfig = apiFrigate()
         frigateURL = frigateConfig['frigate']
-        
-        print(f"######################################################################################### \n \
-                # Fetching {eventid} for {object} in {camera} from {frigateConfig['frigate']} \n \
-                ######################################################################################### ")
         Fetch(fetchPath,eventid,frigateURL)
     if current_user.group == 'admin':
         addEvent(eventid,camera,score,object)
@@ -144,7 +146,7 @@ def apiShowLatest():
     if not events.exists():
         db.create_all()
     query = events.query.order_by(desc(events.time)).limit(12).all()
-    return events.dict(query)
+    return query
 
 @api.route('/api/events/all')
 @login_required
@@ -152,19 +154,19 @@ def apiShowAllEvents():
     if not events.exists():
         db.create_all()
     query = events.query.order_by(desc(events.time)).all()
-    return events.dict(query)
+    return query
 
 @api.route('/api/event/<eventid>/<view>')
 @login_required
 def apiSingleEvent(eventid):
     query = events.query.filter_by(eventid=eventid)
-    return events.dict(query)
+    return query
 
 @api.route('/api/events/camera/<camera>')
 @login_required
 def apiEventsByCamera(camera):
     query = events.query.filter_by(camera=camera)
-    return events.dict(query)
+    return query
 
 @api.route('/api/cameras/add/<camera>/<server>')
 @login_required

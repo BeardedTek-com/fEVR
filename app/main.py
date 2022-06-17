@@ -13,7 +13,7 @@ main = Blueprint('main',__name__)
 @main.route('/')
 @login_required
 def index():
-    Cameras = cameras.lst(cameras.query.all())
+    Cameras = cameras.query.all()
     if request.cookies.get('menu'):
         menu = request.cookies.get('menu')
     else:
@@ -33,7 +33,7 @@ def latest():
 @main.route('/all')
 @login_required
 def viewAll():
-    Cameras = Cameras = cameras.lst(cameras.query.all())
+    Cameras = cameras.query.all()
     if request.cookies.get('menu'):
         menu = request.cookies.get('menu')
     else:
@@ -52,7 +52,7 @@ def viewAll():
 @main.route('/events/camera/<Camera>')        
 @login_required
 def viewEventsbyCamera(Camera):
-    Cameras = Cameras = cameras.lst(cameras.query.all())
+    Cameras = cameras.query.all()
     if request.cookies.get('menu'):
         menu = request.cookies.get('menu')
     else:
@@ -75,7 +75,7 @@ def viewEventsbyCamera(Camera):
 @login_required
 def viewEventsbyCameraFiltered(Camera,filter,value):
     cookiejar = {}
-    Cameras = Cameras = cameras.lst(cameras.query.all())
+    Cameras = cameras.query.all()
     if request.cookies.get('menu'):
         menu = request.cookies.get('menu')
     else:
@@ -131,7 +131,7 @@ def viewEventsbyCameraFiltered(Camera,filter,value):
 @login_required
 def viewSingle(eventid,view):
     cookiejar = {}
-    Cameras = Cameras = cameras.lst(cameras.query.all())
+    Cameras = cameras.query.all()
     if request.cookies.get('menu'):
         menu = request.cookies.get('menu')
     else:

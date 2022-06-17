@@ -83,6 +83,7 @@ class events(db.Model):
     object = db.Column(db.String(25))
     score = db.Column(db.Integer)
     ack = db.Column(db.String(10))
+    show = db.Column(db.Boolean)
 
 
     def exists():
