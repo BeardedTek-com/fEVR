@@ -66,7 +66,7 @@ command = f"/fevr/venv/bin/python /fevr/app/mqtt_client"
 if mqtt.port != 1883:
     command += f" -p {mqtt.port}"
 if mqtt.topics != "frigate/+":
-    command += f" -t {mqtt.httpstopics}"
+    command += f" -t {mqtt.topics}"
 if mqtt.user != "" and mqtt.password != "":
     command += f" -u {mqtt.user} -P {mqtt.password}"
 if mqtt.https == "https":
