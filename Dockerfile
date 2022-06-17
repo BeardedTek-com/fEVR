@@ -1,4 +1,4 @@
-FROM ghcr.io/beardedtek-com/fevr-base:0.6.0
+FROM docker.beardedtek.com/beardedtek-com/fevr-base:latest
 COPY . /fevr
 COPY rootfs /
 WORKDIR /fevr
