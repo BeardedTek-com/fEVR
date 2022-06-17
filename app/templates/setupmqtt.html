@@ -38,7 +38,7 @@
     <div>
         Current mqtt_client command:<br/>
         <br/>
-        <div class="mqtt_client">mqtt_client -p {{mqtt.port}} -t {{mqtt.topics}} -u "{{mqtt.user}}" -P "{{mqtt.password}}" -f {{mqtt.fevr}} {{"-s" if mqtt.https == "https"}} {{mqtt.broker}} {{mqtt.key if mqtt.key else '<NO KEY>'}}</div>
+        <div class="mqtt_client">{{ command }}</div>
     </div>
     {% endif %}
     <br/>

@@ -7,6 +7,7 @@ from .helpers.drawSVG import drawSVG
 from . import db
 from .rndpwd import randpwd
 from .helpers.cookies import cookies
+from os.path import exists
 setup = Blueprint('setup', __name__)
 
 
@@ -72,7 +73,11 @@ def setupfEVR(Item):
             label = 'MQTT Client Setup'
             next = '/setup/config'
             template = "setupmqtt.html"
-            resp = render_template(template,mqtt=mqtt.query.order_by(desc(mqtt.id)).first(),cameras=Cameras,menu=menu,next=next,label=label,page=page,items=status,Item=Item,user=user)
+            command = "Not Yet Setup."
+            if exists('../run_mqtt_client.sh'):
+                with open('../run_mqtt_client.sh', 'r') as f:
+                    command = f.read()
+            resp = render_template(template,mqtt=mqtt.query.order_by(desc(mqtt.id)).first(),cameras=Cameras,menu=menu,next=next,label=label,page=page,items=status,Item=Item,user=user,command=command)
         elif Item == 'config' or Item == 'other':
             label = "Other"
             next = '/'
@@ -267,10 +272,18 @@ def setupAddMqttPost():
             MQTT = mqtt(port=port,topics=topics,user=user,password=password,https=https,fevr=fevr,broker=broker,key=key)
             db.session.add(MQTT)
             db.session.commit()
-            command = f"/fevr/venv/bin/python /fevr/app/mqtt_client -p {port} -t {topics} -u \"{user}\" -P \"{password}\" -f {fevr} "
+            command = f"/fevr/venv/bin/python /fevr/app/mqtt_client"
+            if port != 1883:
+                command += f" -p {port}"
+            if topics != "frigate/+":
+                command += f" -t {topics}"
+            if user != "" and password != "":
+                command += f" -u {user} -P {password}"
             if https == "https":
-                command += "-s "
-            command += f"\"{broker}\" {key}"
+                command += " -s "
+            if fevr != "localhost:5090":
+                command += f" -f {fevr}"
+            command += f" {broker} {key}"
             # Write new run_mqtt_client.sh:
             with open('run_mqtt_client.sh', "w") as myfile:
                 myfile.write(f"#!/bin/sh\n{command}")
