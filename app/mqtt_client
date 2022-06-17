@@ -1,4 +1,4 @@
-#!/usr/bin/python3
+#!/fevr/venv/bin/python
 #    fEVR (frigate Event Video Recorder)
 #
 #    Copyright (C) 2021-2022  The Bearded Tek (http://www.beardedtek.com) William Kenny
@@ -29,6 +29,7 @@ import requests
 from math import floor
 from logit import logit
 import socket
+import json
 
 class getLocalIP:
     s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
@@ -41,6 +42,7 @@ class auth:
         self.fevr = fevr
         self.rSession = rSession
         self.apikey = apikey
+        self.script = "mqtt_AUTH"
         self.api()
 
     def api(self):
@@ -48,13 +50,17 @@ class auth:
         JsonPost = {'key':self.apikey,'ip':getLocalIP.addr}
         # Send the post using our session
         fevrUrl = f"{self.transport}{self.fevr}/apiAuth"
-        logit.execute(f"self.rSession.post('{fevrUrl}', json='{JsonPost})'")
+        logit.execute(f"Authenticating with {fevrUrl}",src=self.script)
         apiAuth = self.rSession.post(f"{fevrUrl}", json=JsonPost)
-        logit.execute(apiAuth,src=__name__)
+        apiAuthJSON = json.loads(apiAuth.content)
+        if apiAuthJSON['auth']:
+            logit.execute(f"AUTH SUCCESS: source: {apiAuthJSON['authIP']} name: {apiAuthJSON['name']}",src=self.script)
+        else:
+            logit.execute(f"AUTH FAILURE: source:{apiAuthJSON['authIP']} name: {apiAuthJSON['name']}",src=self.script)
     
 class fevrMQTT:
     def __init__(self):
-        self.script = 'mqtt_client'
+        self.script = 'mqtt_CLIENT'
         hostname = socket.gethostname()
         self.clientID = f"fevr-{hostname}-{randint(0,100)}"
         self.getVars()
@@ -121,19 +127,23 @@ class fevrMQTT:
             # Authenticate first
             # Create Session to share cookies
             rSession = requests.Session()
-            auth(transport=self.transport,apikey=self.apikey,fevr=self.fevr,rSession=rSession)
             event = loads(msg)
             type = event['type']
             after = event['after']
             if type == 'end':
+                auth(transport=self.transport,apikey=self.apikey,fevr=self.fevr,rSession=rSession)
                 type = after['label']
                 score = floor(float(after['score'])*100)
                 camera = after['camera']
                 eventid = after['id']
                 fEVRurl = f"{self.transport}{self.fevr}/api/events/add/{eventid}/{camera}/{type}/{score}"
                 addEventResponse = rSession.get(fEVRurl)
-                logit.execute(fEVRurl,src=__name__)
-                logit.execute(addEventResponse.content,src=self.script)
+                addEventResponseJSON = json.loads(addEventResponse.content)
+                logit.execute(fEVRurl,src=self.script)
+                if addEventResponseJSON["msg"] == "Success":
+                    logit.execute(f"SUCCESS: {eventid} ({type} in {camera}) added",src=self.script)
+                else:
+                    logit.execute(f"FAILURE: {eventid} ({type} in {camera}) not added",src=self.script)
     def subscribe(self, client: mqtt_client):
         def on_message(client, userdata, msg):
             ## This is where our code goes to do what we want when a message is received

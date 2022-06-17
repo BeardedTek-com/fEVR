@@ -41,6 +41,7 @@ class cameras(db.Model):
     camera = db.Column(db.String(20), unique = True)
     hls = db.Column(db.String(200))
     rtsp = db.Column(db.String(200))
+    show = db.Column(db.Boolean)
 
     def __repr__(self):
     # Returns string representation of dict
@@ -137,3 +138,15 @@ class mqtt(db.Model):
     fevr = db.Column(db.String(200))
     broker = db.Column(db.String(200))
     key = db.Column(db.String(150))
+    
+class liveview(db.Model):
+# Table     : liveview
+#           Defines Live Camera View Layouts
+# Columns   : - id      (auto incrementing primary key)
+#           : - name    Name of layout
+#           : - layout  Layout style (2x2, 4x4, etc)
+#           : - members Comma separated list of camera id (from cameras table)
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(10))
+    layout = db.Column(db.String(10))
+    members = db.Column(db.String(200))

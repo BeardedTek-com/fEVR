@@ -8,6 +8,7 @@
                 <input type="text" name="camera" placeholder="Camera Name">
                 <input type="text" name="hls" placeholder="http(s)://url:port/camera">
                 <input type="text" name="rtsp" placeholder="rtsp://user:pass@url:port">
+                <input type="text" name="show" placeholder="true/false show in latest/all views">
                 <button>Add Camera</button>
             </form>
         </div>
@@ -20,6 +21,7 @@
             <input type="hidden" name="camera" value="{{ camera.camera }}"> <a href="/api/cameras/delete/{{camera.camera}}">{{camera.camera}} Delete</a><br/>
             <input type="text" name="hls" value="{{ camera.hls }}">
             <input type="text" name="rtsp" value="{{ camera.rtsp }}">
+            <input type="text" name="show" value="{{ camera.show }}"
             <button>Edit Camera</button>
         </form>
     </div>

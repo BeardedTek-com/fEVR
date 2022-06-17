@@ -129,7 +129,56 @@ def apiAddCameraPost():
         camera = request.form.get('camera')
         hls = request.form.get('hls')
         rtsp = request.form.get('rtsp')
-        camera = cameras(camera=camera,hls=hls,rtsp=rtsp)
+        if request.form.get('show') == "true":
+            show = True
+        else:
+            show = False
+        camera = cameras(camera=camera,hls=hls,rtsp=rtsp,show=show)
+        db.session.add(camera)
+        db.session.commit()
+        resp = redirect('/setup/cameras')
+    else:
+        resp = redirect('/')
+    return resp
+
+@setup.route('/setup/cameras/edit/<camera>',methods=['POST'])
+@login_required
+def apiAddCameraPost(camera):
+    if current_user.group == "admin":
+        edit = False
+        camEdit = cameras.query.filter_by(camera=camera).first()
+        if camEdit.hls != request.form.get('hls'):
+            camEdit.hls = request.form.get('hls')
+            edit = True
+        if camEdit.rtsp != request.form.get('rtsp'):
+            camEdit.rtsp = request.form.get('rtsp')
+            edit = True
+        if camEdit.show:
+            if request.form.get('show') != "true":
+                camEdit.show = False
+                edit = True
+        else:
+            if request.form.get('show') == "true":
+                camEdit.show = True
+                edit = True
+        if edit:
+            db.session.commit()
+    resp = redirect('/setup/cameras')
+    return resp
+
+@setup.route('/setup/cameras/edit',methods=['POST'])
+@login_required
+def apiAddCameraPost():
+    if current_user.group == "admin":
+        db.create_all()
+        camera = request.form.get('camera')
+        hls = request.form.get('hls')
+        rtsp = request.form.get('rtsp')
+        if request.form.get('show') == "true":
+            show = True
+        else:
+            show = False
+        camera = cameras(camera=camera,hls=hls,rtsp=rtsp,show=show)
         db.session.add(camera)
         db.session.commit()
         resp = redirect('/setup/cameras')
@@ -224,7 +273,7 @@ def setupAddMqttPost():
             MQTT = mqtt(port=port,topics=topics,user=user,password=password,https=https,fevr=fevr,broker=broker,key=key)
             db.session.add(MQTT)
             db.session.commit()
-            command = f"/fevr/app/mqtt_client -p {port} -t {topics} -u \"{user}\" -P \"{password}\" -f {fevr} "
+            command = f"/fevr/venv/bin/python /fevr/app/mqtt_client -p {port} -t {topics} -u \"{user}\" -P \"{password}\" -f {fevr} "
             if https == "https":
                 command += "-s "
             command += f"\"{broker}\" {key}"
