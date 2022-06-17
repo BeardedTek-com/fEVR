@@ -9,6 +9,21 @@ trigger:
     - push
     - tag
 steps:
+- name: dockerhub-TAG
+  image: plugins/docker
+  when:
+    event:
+      - tag
+  settings:
+    username: beardedtek
+    password:
+      from_secret: docker_password
+    repo: beardedtek/fevr
+    tags: latest,${DRONE_TAG}
+    experimental: true
+    compress: true
+    squash: true
+
 - name: ghcr-io-TAG
   image: plugins/docker
   when:
@@ -24,21 +39,7 @@ steps:
     experimental: true
     compress: true
     squash: true
-- name: dockerhub-TAG
-  image: plugins/docker
-  when:
-    event:
-      - tag
-  settings:
-    username: beardedtek
-    password:
-      from_secret: docker_password
-    repo: beardedtek/fevr
-    tags: latest,${DRONE_TAG}
-    experimental: true
-    compress: true
-    squash: true
-    
+
 - name: beardedtek-PUSH
   image: plugins/docker
   when:
