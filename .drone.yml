@@ -8,23 +8,7 @@ trigger:
   event:
     - push
     - tag
-    - pull_request
 steps:
-- name: ghcr-io-PR
-  image: plugins/docker
-  when:
-    event:
-      - pull_request
-  settings:
-    username: beardedtek
-    password:
-      from_secret: github_user_token
-    repo: ghcr.io/beardedtek-com/fevr
-    registry: ghcr.io
-    tags: latest,${DRONE_PULL_REQUEST}
-    experimental: true
-    compress: true
-    squash: true
 - name: ghcr-io-TAG
   image: plugins/docker
   when:
@@ -37,20 +21,6 @@ steps:
     repo: ghcr.io/beardedtek-com/fevr
     registry: ghcr.io
     tags: latest,${DRONE_TAG}
-    experimental: true
-    compress: true
-    squash: true
-- name: dockerhub-PR
-  image: plugins/docker
-  when:
-    event:
-      - pull_request
-  settings:
-    username: beardedtek
-    password:
-      from_secret: docker_password
-    repo: beardedtek/fevr
-    tags: latest,${DRONE_PULL_REQUEST}
     experimental: true
     compress: true
     squash: true
@@ -81,36 +51,6 @@ steps:
     repo: docker.beardedtek.com/beardedtek/fevr
     registry: docker.beardedtek.com
     tags: latest,${DRONE_REPO_BRANCH}
-    experimental: true
-    compress: true
-    squash: true
-- name: beardedtek-TAG
-  image: plugins/docker
-  when:
-    event:
-      - tag
-  settings:
-    username: beardedtek
-    password:
-      from_secret: docker_password
-    repo: docker.beardedtek.com/beardedtek/fevr
-    registry: docker.beardedtek.com
-    tags: latest,${DRONE_TAG}
-    experimental: true
-    compress: true
-    squash: true
-- name: beardedtek-PR
-  image: plugins/docker
-  when:
-    event:
-      - pull_request
-  settings:
-    username: beardedtek
-    password:
-      from_secret: docker_password
-    repo: docker.beardedtek.com/beardedtek/fevr
-    registry: docker.beardedtek.com
-    tags: latest,${DRONE_PULL_REQUEST}
     experimental: true
     compress: true
     squash: true
