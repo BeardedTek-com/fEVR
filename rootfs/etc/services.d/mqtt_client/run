@@ -9,9 +9,31 @@ else
     EXISTS=0
 fi
 # Wait until UWSGI is started
-sleep 60
+sleep 10
 while [ "$EXITS" != "1" ] # Loop until EXISTS = 1
 do
+
+    for i in {1..60}
+    # Loop 24 times
+    do
+    # Check if /fevr/run_mqtt_client.sh exists
+    # If it exists, set EXISTS to 1
+    if [ -f "/fevr/run_mqtt_client.sh" ]; then
+        EXISTS=1
+        break
+    else
+    
+    fi
+    # Wait 5 seconds (60*5 = 300 seconds or every 5 minutes)
+    sleep 5
+    done
+    if [ "$EXISTS" == "1" ]; then
+        break
+    fi
+done
+if [ -f "/fevr/run_mqtt_client.sh" ]; then
+    echo "Let's Go!"
+else
     # Print URL to visit to configure fEVR
     echo ""
     echo ""
@@ -24,22 +46,6 @@ do
     echo "################################################################################"
     echo ""
     echo ""
-    for i in {1..60}
-    # Loop 24 times
-    do
-    # Check if /fevr/run_mqtt_client.sh exists
-    # If it exists, set EXISTS to 1
-    if [ -f "/fevr/run_mqtt_client.sh" ]; then
-        EXISTS=1
-        break
-    fi
-    # Wait 5 seconds (60*5 = 300 seconds or every 5 minutes)
-    sleep 5
-    done
-    if [ "$EXISTS" == "1" ]; then
-        break
-    fi
-done
-
+fi
 chmod +x /fevr/run_mqtt_client.sh
 /fevr/run_mqtt_client.sh
