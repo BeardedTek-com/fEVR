@@ -70,8 +70,8 @@ def apiAddEvent(eventid,camera,score,object):
     def addEvent(eventid,camera,score,object):
         db.create_all()
         time = datetime.fromtimestamp(int(eventid.split('.')[0]))
-        cameras = cameras.query.filter_by(camera=camera).first()
-        if cameras.show:
+        Cameras = cameras.query.filter_by(camera=camera).first()
+        if Cameras.show:
             show = True
         else:
             show = False
@@ -99,8 +99,8 @@ def apiAdminAddEvent(eventid,camera,score,object):
     def addEvent(eventid,camera,score,object):
         db.create_all()
         time = datetime.fromtimestamp(int(eventid.split('.')[0]))
-        Cameras = cameras.query.filter_by(camera=camera).first()
-        if Cameras.show:
+        camera = cameras.query.filter_by(camera=camera).first()
+        if camera.show:
             show = True
         else:
             show = False
