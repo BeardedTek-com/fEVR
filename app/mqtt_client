@@ -37,10 +37,10 @@ class getLocalIP:
     addr = s.getsockname()[0]
 
 class auth:
-    def __init__(self,transport="http://",fevr="192.168.101.1:5090",Session=requests.Session(),apikey=""):
+    def __init__(self,transport="http://",fevr="localhost:5090",rSession=requests.Session(),apikey=""):
         self.transport = transport
         self.fevr = fevr
-        self.Session = Session
+        self.rSession = rSession
         self.apikey = apikey
         self.script = "mqtt_AUTH"
         self.api()
@@ -51,7 +51,7 @@ class auth:
         # Send the post using our session
         fevrUrl = f"{self.transport}{self.fevr}/apiAuth"
         logit.execute(f"Authenticating with {fevrUrl}",src=self.script)
-        apiAuth = self.Session.post(f"{fevrUrl}", json=JsonPost)
+        apiAuth = self.rSession.post(f"{fevrUrl}", json=JsonPost)
         apiAuthJSON = json.loads(apiAuth.content)
         if apiAuthJSON['auth']:
             logit.execute(f"AUTH SUCCESS: source: {apiAuthJSON['authIP']} name: {apiAuthJSON['name']}",src=self.script)
@@ -63,7 +63,6 @@ class fevrMQTT:
         self.script = 'mqtt_CLIENT'
         hostname = socket.gethostname()
         self.clientID = f"fevr-{hostname}-{randint(0,100)}"
-        self.Session = requests.Session()
         self.getVars()
         self.run()
     def getVars(self):
@@ -126,20 +125,33 @@ class fevrMQTT:
             logit.execute('frigate is online',src=self.script)
         elif 'event' in topic:
             # Create Session to share cookies
+            rSession = requests.Session()
             event = loads(msg)
             logit.execute(f"EVENT FOUND\n{event}", src=self.script)
+            
             type = event['type']
             after = event['after']
             if type == 'end':
-                logit.execute("EVENT ENDED, LET THE FUN BEGIN!",src=self.script)
-                auth(transport=self.transport,apikey=self.apikey,fevr=self.fevr,Session=self.Session)
+                logit.execute(f"AUTH:\
+                             transport: {self.transport}\n \
+                             apikey: {self.apikey}\n \
+                             fevr: {self.fevr}\n \
+                             rSession: {rSession}\n",
+                             src=self.script)
+                # Authenticate with API Key first...
+                auth(transport=self.transport,apikey=self.apikey,fevr=self.fevr,rSession=rSession)
+                # Populate Event Data
                 type = after['label']
                 score = floor(float(after['score'])*100)
                 camera = after['camera']
                 eventid = after['id']
+                # Calculate GET URL to submit
                 fEVRurl = f"{self.transport}{self.fevr}/api/events/add/{eventid}/{camera}/{type}/{score}"
-                addEventResponse = self.Session.get(fEVRurl)
+                # Make it so
+                addEventResponse = rSession.get(fEVRurl)
+                # Read the response to a variable
                 addEventResponseJSON = json.loads(addEventResponse.content)
+                # It's log, it's log, it's better than bad it's good.
                 logit.execute(fEVRurl,src=self.script)
                 if addEventResponseJSON["msg"] == "Success":
                     logit.execute(f"SUCCESS: {eventid} ({type} in {camera}) added",src=self.script)
