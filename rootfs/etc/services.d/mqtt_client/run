@@ -21,8 +21,6 @@ do
     if [ -f "/fevr/run_mqtt_client.sh" ]; then
         EXISTS=1
         break
-    else
-    
     fi
     # Wait 5 seconds (60*5 = 300 seconds or every 5 minutes)
     sleep 5
