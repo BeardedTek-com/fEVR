@@ -1,5 +1,4 @@
 from  .. import db
-from flask_sqlalchemy import inspect
 from flask_login import UserMixin
 from datetime import datetime
 
@@ -11,23 +10,6 @@ class frigate(db.Model):
     id = db.Column(db.Integer,primary_key = True)
     url = db.Column(db.String(200))
     name = db.Column(db.String(100), unique = True)
-
-    def __repr__(self):
-    # Returns string representation of dict
-        return str({"id":self.id,"url":self.url,"name":self.name})
-
-    def exists():
-    # Returns True if table exists
-        inspector = inspect(db.engine)
-        return inspector.has_table("frigate")
-
-    def dict(query):
-    # Returns dict of query
-        result = {}
-        for frigate in query:
-            result[frigate.name] = frigate.url
-        print(result)
-        return result
 
 
 
@@ -42,30 +24,6 @@ class cameras(db.Model):
     hls = db.Column(db.String(200))
     rtsp = db.Column(db.String(200))
     show = db.Column(db.Boolean)
-
-    def __repr__(self):
-    # Returns string representation of dict
-        return str({"id":self.id,"camera":self.camera,"hls":self.hls,"rtsp":self.rtsp})
-
-    def exists():
-    # Returns True if table exists
-        inspector = inspect(db.engine)
-        return inspector.has_table("events")
-
-    def dict(query):
-    # Returns dict of query
-        result = {}
-        for camera in query:
-            result[camera.camera] = {
-                "hls"   : camera.hls,
-                "rtsp"  : camera.rtsp
-            }
-        return result
-    def lst(query):
-        result =[]
-        for row in query:
-            result.append(row.camera)
-        return result
     
 class events(db.Model):
 # Table     : events
@@ -84,27 +42,6 @@ class events(db.Model):
     score = db.Column(db.Integer)
     ack = db.Column(db.String(10))
     show = db.Column(db.Boolean)
-
-
-    def exists():
-    # Returns True if table exists
-        inspector = inspect(db.engine)
-        if inspector:
-            return inspector.has_table("events")
-        
-    def dict(query):
-    # Returns dict of query
-        result = {}
-        for event in query:
-            result[event.id] = {
-                "eventid"   : event.eventid,
-                "time"      : event.time,
-                "camera"    : event.camera,
-                "object"    : event.object,
-                "score"     : event.score,
-                "ack"       : event.ack
-            }
-        return result
     
 class User(UserMixin,db.Model):
     id = db.Column(db.Integer, primary_key=True)

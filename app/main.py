@@ -148,27 +148,11 @@ def viewSingle(eventid,view):
     elif view == 'delOK':
         api.apiDelEvent(eventid)
         resp = redirect(url_for('main.index'))
-    query = events.query.filter_by(eventid=eventid).order_by()
-    query = events.dict(query)
-    for item in query:
-        event = query[item]
-    if 'event' in locals():
-        if event['ack'] == "" and view != 'unack':
-            api.apiAckEvent(eventid)
-            event['ack'] = "true"
-        title = f"<div class='back'><a href='' onclick='history.back()'><img src='/static/img/back.svg'></a></div><div class='objcam'>{event['object'].title()} in {event['camera'].title()}</div>"
-        xx = 0
-        for X in ['live','clip','snap']:
-            if view == X:
-                xx += 1
-        if xx > 0:
-            if view == 'clip' or view == 'snap':
-                title += f"<div class='view20'>Event {view.title()}</div>"
-            else:
-                title += f"<div class='view20'>{view.title()}</div>"
-        else:
-            title += "<div class='view20'> </div>"
-        resp = make_response(render_template('event.html',Menu=menu,page=page,title=title,event=event,view=view,frigateURL=frigateURL,cameras=Cameras))
+    event = events.query.filter_by(eventid=eventid).first()
+    if event:
+        if event.ack == "" and view != 'unack':
+            event.ack = "true"
+        resp = make_response(render_template('event.html',Menu=menu,page=page,event=event,view=view,frigateURL=frigateURL,cameras=Cameras))
     else:
         resp = redirect(url_for('main.index'))
     return cookies.setCookies(cookiejar,resp)

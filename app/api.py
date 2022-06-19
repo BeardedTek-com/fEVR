@@ -1,5 +1,6 @@
 from flask import Blueprint, render_template, escape, redirect, url_for, jsonify, make_response
 from flask_login import login_required, current_user
+from flask_sqlalchemy import inspect
 from sqlalchemy import desc
 import subprocess
 from datetime import datetime
@@ -48,7 +49,7 @@ def apiAddFrigate(name,http,ip,port):
 
 @api.route('/api/frigate')
 def apiFrigate():
-    if frigate.exists():
+    if inspect(db.engine).has_table("frigate"):
         db.create_all()
     query = frigate.query.all()
     internal = ""
@@ -143,7 +144,7 @@ def apiDelEvent(eventid):
 @api.route('/api/events/latest')
 @login_required
 def apiShowLatest():
-    if not events.exists():
+    if not inspect(db.engine).has_table("events"):
         db.create_all()
     query = events.query.order_by(desc(events.time)).limit(12).all()
     return query
@@ -151,7 +152,7 @@ def apiShowLatest():
 @api.route('/api/events/all')
 @login_required
 def apiShowAllEvents():
-    if not events.exists():
+    if not inspect(db.engine).has_table("events"):
         db.create_all()
     query = events.query.order_by(desc(events.time)).all()
     return query
@@ -182,10 +183,10 @@ def apiAddCamera(camera,server):
 @api.route('/api/cameras/<camera>')
 @login_required
 def apiCameras(camera):
-    if not cameras.exists():
+    if not inspect(db.engine).has_table("cameras"):
         db.create_all()
     if camera == "all":
         query = cameras.query.all()
     else:
         query = cameras.query.filter_by(camera=camera)
-    return cameras.dict(query)
+    return query

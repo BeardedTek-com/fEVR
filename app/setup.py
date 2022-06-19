@@ -38,7 +38,9 @@ def setupAdmin():
 @login_required
 def setupfEVR(Item):
     user = current_user
-    Cameras = cameras.lst(cameras.query.all())
+    Cameras =[]
+    for row in cameras.query.all():
+        Cameras.append(row.camera)
     menu=cookies.getCookie('menu')
     status = {'db':{'cameras':False,'frigate':False,'mqtt':False,'other':False}}
     tables = {
