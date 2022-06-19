@@ -24,6 +24,13 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v3
 
+      - name: log into docker.beardedtek.com
+      - uses: docker/login-action@v2
+        with:
+          registry: docker.beardedtek.com
+          username: ${{ secrets.DOCKER_BEARDEDTEK_USER }}
+          password: ${{ secrets.DOCKER_BEARDEDTEK_PASSWORD }}
+
       - name: Log in to the Container registry
         uses: docker/login-action@49ed152c8eca782a232dede0303416e8f356c37b
         with:
