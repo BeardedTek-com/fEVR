@@ -1,7 +1,7 @@
 version: '2.4'
 services:
   fevr:
-    image: docker.beardedtek.com/beardedtek/fevr:latest
+    image: ghcr.io/beardedtek-com/fevr:0.6
     container_name: fevr
     restart: unless-stopped
     privileged: true
