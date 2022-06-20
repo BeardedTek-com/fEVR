@@ -91,7 +91,7 @@ if MQTT.fevr != "localhost:5090":
 if environ.get("FEVR_URL") and environ.get("FEVR_PORT"):
     command += f" -f {environ.get('FEVR_URL')}:{environ.get('FEVR_PORT')}"
     
-if environ.get("MQTT_VERBOSE_LOGGING"):
+if environ.get("MQTT_VERBOSE_LOGGING") and environ.get("MQTT_VERBOSE_LOGGING") == "true":
     command += " -v"
     
 if environ.get("MQTT_BROKER"):

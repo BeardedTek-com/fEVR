@@ -42,7 +42,7 @@ class auth:
         self.fevr = fevr
         self.rSession = rSession
         self.apikey = apikey
-        self.script = "mqtt_AUTH"
+        self.script = "MQTT | auth"
         self.api()
 
     def api(self):
@@ -60,7 +60,7 @@ class auth:
     
 class fevrMQTT:
     def __init__(self):
-        self.script = 'mqtt_CLIENT'
+        self.script = 'MQTT | client'
         hostname = socket.gethostname()
         self.clientID = f"fevr-{hostname}-{randint(0,100)}"
         self.getVars()
@@ -112,10 +112,9 @@ class fevrMQTT:
         if self.verbose:
             if self.apikey:
                 key=True
-            logit.execute(f"fevr:{self.fevr} | broker: {self.broker} | port: {self.port} | user: {self.username} | password: {self.password} | https: {args.https} | apiKey: {key} | topics: {self.topics}", src=__name__)
+            logit.execute(f"fevr:{self.fevr} | broker: {self.broker} | port: {self.port} | user: {self.username} | password: {self.password} | https: {args.https} | apiKey: {key} | topics: {self.topics}", src=self.script)
     def connect_mqtt(self) -> mqtt_client:
         def on_connect(client, userdata, flags, rc):
-            if self.verbose:
                 if rc == 0:
                     logit.execute(f"Connected to {self.broker}:{self.port} as {self.clientID}",src=self.script)
                     logit.execute(f"Subscribed to:{self.topics}".replace('[','\t').replace(']','').replace(', ','\t').replace("'",""),src=self.script)
@@ -137,10 +136,9 @@ class fevrMQTT:
             if self.verbose:
                 eventfound = f"\n{json.dumps(event, indent=2)}"
             else:
-                eventfound = event["id"]
+                eventfound = event["before"]["id"]
             logit.execute(f"EVENT FOUND: {eventfound}", src=self.script)
             
-            type = event['type']
             after = event['after']
             if event['type'] == 'end':
                 # Authenticate with API Key first...
