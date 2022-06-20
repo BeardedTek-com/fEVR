@@ -72,7 +72,7 @@ elif environ.get("MQTT_BROKER_PORT"):
 if MQTT.topics != "frigate/+":
     command += f" -t {MQTT.topics}"
 elif environ.get("MQTT_TOPICS"):
-    command += f" -p {environ.get('MQTT_TOPICS')}"
+    command += f" -t {environ.get('MQTT_TOPICS')}"
 
 if MQTT.user != "" and MQTT.password != "":
     command += f" -u {MQTT.user} -P {MQTT.password}"
