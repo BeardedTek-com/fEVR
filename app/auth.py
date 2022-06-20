@@ -121,7 +121,10 @@ def loginProcessForm():
     email = request.form.get('email')
     password = request.form.get('password')
     remember = True if request.form.get('remember') else False
-    fwd = request.form.get('fwd')
+    if request.form.get('fwd'):
+        fwd = request.form.get('fwd')
+    else:
+        fwd = "/"
 
     user = User.query.filter_by(email=email).first()
 
