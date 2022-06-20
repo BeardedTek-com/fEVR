@@ -3,6 +3,8 @@
 # Enter our working directory
 cd /fevr
 
+# Make sure /fevr has the right permissions
+chown -R 1000:1000 /fevr
 # Check if Virtual Environment is initialized
 echo "Python Virtual Environment already installed."
 echo "Activating Python Virtual Environment"
