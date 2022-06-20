@@ -105,7 +105,7 @@ if not MQTT:
     create_mqtt_entry(db,ev)
     
     
-MQTT= mqtt.query.order_by(desc(id)).first()
+MQTT= mqtt.query.order_by(desc(mqtt.id)).first()
 command = f"/fevr/venv/bin/python /fevr/app/mqtt_client"
 if MQTT.port != 1883:
     command += f" -p {MQTT.port}"
