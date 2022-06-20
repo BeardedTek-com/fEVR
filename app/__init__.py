@@ -101,8 +101,17 @@ if not inspect(db.engine).has_table("mqtt"):
     create_mqtt_entry(db,ev)
 # Query the mqtt table and if MQTT=None, create an entry
 MQTT= mqtt.query.first()
-if not MQTT:
-    create_mqtt_entry(db,ev)
+if MQTT:
+    mqttdel = mqtt.query.all()
+    n = 0
+    for entry in mqttdel:
+        db.session.delete(entry)
+        n = n+1
+    if n > 0:
+        db.session.commit()
+create_mqtt_entry(db,ev)
+
+    
     
     
 MQTT= mqtt.query.order_by(desc(mqtt.id)).first()

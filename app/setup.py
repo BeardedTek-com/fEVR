@@ -276,7 +276,14 @@ def setupAddMqttPost():
                 user = ""
             if not password:
                 password = ""
-            mqtt.query.all().delete()
+            
+            mqttdel = mqtt.query.all()
+            n = 0
+            for entry in mqttdel:
+                db.session.delete(entry)
+                n = n+1
+            if n > 0:
+                db.session.commit()
             MQTT = mqtt(port=port,topics=topics,user=user,password=password,https=https,fevr=fevr,broker=broker,key=key)
             db.session.add(MQTT)
             db.session.commit()
