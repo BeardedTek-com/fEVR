@@ -7,6 +7,7 @@ from datetime import timedelta
 from datetime import datetime
 from dateutil import tz
 import pytz
+from os import environ
 
 # Flask app Setup
 app = Flask(__name__)
@@ -65,15 +66,44 @@ MQTT= mqtt.query.first()
 command = f"/fevr/venv/bin/python /fevr/app/mqtt_client"
 if MQTT.port != 1883:
     command += f" -p {MQTT.port}"
+elif environ.get("MQTT_BROKER_PORT"):
+    command += f" -p {environ.get('MQTT_BROKER_PORT')}"
+    
 if MQTT.topics != "frigate/+":
     command += f" -t {MQTT.topics}"
+elif environ.get("MQTT_TOPICS"):
+    command += f" -p {environ.get('MQTT_TOPICS')}"
+
 if MQTT.user != "" and MQTT.password != "":
     command += f" -u {MQTT.user} -P {MQTT.password}"
+if environ.get("MQTT_BROKER_USER") and environ.get("MQTT_BROKER_PASSWORD"):
+    command += f" -u {environ.get('MQTT_BROKER_USER')}"
+    command += f" -P {environ.get('MQTT_BROKER_PASSWORD')}"
+    
+    
 if MQTT.https == "https":
     command += " -s "
+if environ.get("FEVR_TRANSPORT") and environ.get("FEVR_TRANSPORT") == "true":
+    command += f" -s"
+    
 if MQTT.fevr != "localhost:5090":
     command += f" -f {MQTT.fevr}"
-command += f" {MQTT.broker} {MQTT.key}"
+if environ.get("FEVR_URL") and environ.get("FEVR_PORT"):
+    command += f" -f {environ.get('FEVR_URL')}:{environ.get('FEVR_PORT')}"
+    
+if environ.get("MQTT_VERBOSE_LOGGING"):
+    command += " -v"
+    
+if environ.get("MQTT_BROKER"):
+    command += f" {environ.get('MQTT_BROKER')}"
+else:
+    command += f" {MQTT.broker}"
+
+if environ.get("MQTT_APIAUTH_KEY"):
+    command +=f" {environ.get('MQTT_APIAUTH_KEY')}"
+else:
+    command +=f" {MQTT.key}"
+    
 # Write new run_mqtt_client.sh:
 with open('run_mqtt_client.sh', "w") as myfile:
     myfile.write(f"#!/bin/sh\n{command}")

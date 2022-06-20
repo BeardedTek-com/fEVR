@@ -79,8 +79,10 @@ class fevrMQTT:
         parser.set_defaults(password="")
         parser.add_argument('-f','--fevr',type=str,required=False,help="fEVR IP Address/FQDN (default: '127.0.0.1:5090)")
         parser.set_defaults(fevr='127.0.0.1:5090')
-        parser.add_argument('-s','--https',action='store_true',help="If set uses https:// (default: http://)")
+        parser.add_argument('-s','--https',action='store_true',help="If set uses https:// for fEVR API Calls (default: http://)")
         parser.set_defaults(https=False)
+        parser.add_argument('-v','--verbose'action='store_true',help="If set, outputs verbosely to stdout")
+        parser.set_defaults(verbose=False)
         args = parser.parse_args()
         self.fevr = args.fevr
         self.broker = args.mqtt
@@ -88,6 +90,7 @@ class fevrMQTT:
         self.username = args.user
         self.password = args.password
         self.apikey = args.key
+        self.verbose = args.verbose
         topics = args.topics
         if args.https:
             self.transport = "https://"
@@ -106,14 +109,18 @@ class fevrMQTT:
                 excluded += f"'{topic}' "
         if excluded:
             logit.execute(excluded,src=self.script)
-        #logit.execute(f"fevr:{self.fevr} | broker: {self.broker} | port: {self.port} | user: {self.username} | password: {self.password} | https: {args.https} | apiKey: {self.apikey} | topics: {self.topics}", src=__name__)
+        if self.verbose:
+            if self.apikey:
+                key=True
+            logit.execute(f"fevr:{self.fevr} | broker: {self.broker} | port: {self.port} | user: {self.username} | password: {self.password} | https: {args.https} | apiKey: {key} | topics: {self.topics}", src=__name__)
     def connect_mqtt(self) -> mqtt_client:
         def on_connect(client, userdata, flags, rc):
-            if rc == 0:
-                logit.execute(f"Connected to {self.broker}:{self.port} as {self.clientID}",src=self.script)
-                logit.execute(f"Subscribed to:{self.topics}".replace('[','\t').replace(']','').replace(', ','\t').replace("'",""),src=self.script)
-            else:
-                logit.execute("Failed to connect, return code %d", rc,src=self.script)
+            if self.verbose:
+                if rc == 0:
+                    logit.execute(f"Connected to {self.broker}:{self.port} as {self.clientID}",src=self.script)
+                    logit.execute(f"Subscribed to:{self.topics}".replace('[','\t').replace(']','').replace(', ','\t').replace("'",""),src=self.script)
+                else:
+                    logit.execute("Failed to connect, return code %d", rc,src=self.script)
         client = mqtt_client.Client(self.clientID)
         if self.username and self.password:
             client.username_pw_set(self.username, self.password)
@@ -127,41 +134,44 @@ class fevrMQTT:
             # Create Session to share cookies
             rSession = requests.Session()
             event = loads(msg)
-            logit.execute(f"EVENT FOUND\n{event}", src=self.script)
+            if self.verbose:
+                eventfound = f"\n{json.dumps(event, indent=2)}"
+            else:
+                eventfound = event["id"]
+            logit.execute(f"EVENT FOUND: {eventfound}", src=self.script)
             
             type = event['type']
             after = event['after']
-            if type == 'end':
-                logit.execute(f"AUTH:\
-                             transport: {self.transport}\n \
-                             apikey: {self.apikey}\n \
-                             fevr: {self.fevr}\n \
-                             rSession: {rSession}\n",
-                             src=self.script)
+            if event['type'] == 'end':
                 # Authenticate with API Key first...
                 auth(transport=self.transport,apikey=self.apikey,fevr=self.fevr,rSession=rSession)
                 # Populate Event Data
-                type = after['label']
+                Object = after['label']
                 score = floor(float(after['score'])*100)
                 camera = after['camera']
                 eventid = after['id']
                 # Calculate GET URL to submit
-                fEVRurl = f"{self.transport}{self.fevr}/api/events/add/{eventid}/{camera}/{type}/{score}"
+                fEVRurl = f"{self.transport}{self.fevr}/api/events/add/{eventid}/{camera}/{Object}/{score}"
                 # Make it so
                 addEventResponse = rSession.get(fEVRurl)
                 # Read the response to a variable
                 addEventResponseJSON = json.loads(addEventResponse.content)
                 # It's log, it's log, it's better than bad it's good.
-                logit.execute(fEVRurl,src=self.script)
+                if self.verbose:
+                    logit.execute(fEVRurl,src=self.script,src=self.script)
                 if addEventResponseJSON["msg"] == "Success":
-                    logit.execute(f"SUCCESS: {eventid} ({type} in {camera}) added",src=self.script)
+                    logit.execute(f"SUCCESS: {eventid} ({Object} in {camera}) added",src=self.script)
                 else:
-                    logit.execute(f"FAILURE: {eventid} ({type} in {camera}) not added",src=self.script)
+                    logit.execute(f"FAILURE: {eventid} ({Object} in {camera}) not added",src=self.script)
     def subscribe(self, client: mqtt_client):
         def on_message(client, userdata, msg):
             ## This is where our code goes to do what we want when a message is received
+            if self.verbose:
+                logit.execute(f"{msg.topic}: Message Received",src=self.script)
             self.processMsg(msg.payload.decode(),msg.topic)
         for topic in self.topics:
+            if self.verbose:
+                logit.execute(f"Subscribed to: {topic}",src=self.script)
             client.subscribe(topic)
         client.on_message = on_message
     def run(self):
