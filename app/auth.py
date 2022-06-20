@@ -183,7 +183,7 @@ def logout():
 @auth.route('/profile')
 @login_required
 def profile():
-    Cameras = Cameras = cameras.lst(cameras.query.all())
+    Cameras = cameras.query.all()
     Cookies = cookies.getCookies(['menu','page'])
     cookiejar = {'page':'/profile'}
     user = current_user

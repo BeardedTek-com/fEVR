@@ -158,7 +158,7 @@ class fevrMQTT:
                 addEventResponseJSON = json.loads(addEventResponse.content)
                 # It's log, it's log, it's better than bad it's good.
                 if self.verbose:
-                    logit.execute(fEVRurl,src=self.script,src=self.script)
+                    logit.execute(fEVRurl,src=self.script)
                 if addEventResponseJSON["msg"] == "Success":
                     logit.execute(f"SUCCESS: {eventid} ({Object} in {camera}) added",src=self.script)
                 else:
