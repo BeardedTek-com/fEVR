@@ -1,6 +1,6 @@
 # External Imports
 from flask import Flask, session
-from flask_sqlalchemy import SQLAlchemy
+from flask_sqlalchemy import SQLAlchemy, inspect
 import json
 from flask_login import LoginManager
 from datetime import timedelta
@@ -62,6 +62,10 @@ def convertTZ(time,clockFmt=12,Timezone="America/Anchorage"):
         return outTime
 
 # Setup mqtt_client
+# Check to see if mqtt table exists.  If not, create the databse
+if not inspect(db.engine).has_table("events"):
+    db.create_all()
+# Query the database
 MQTT= mqtt.query.first()
 command = f"/fevr/venv/bin/python /fevr/app/mqtt_client"
 if MQTT.port != 1883:

@@ -8,12 +8,9 @@ services:
     ports:
       - 5090:${FEVR_PORT:-5090}
     volumes:
-      - /export/fevr:/fevr/app/static/events
-      - /export/fevr/data:/fevr/app/data
+      - ./events:/fevr/app/static/events
+      - ./data:/fevr/app/data
       - ./fevr/varlib:/var/lib
-    depends_on:
-      - mqtt
-      - frigate
     environment:
       FEVR_DEVELOPMENT: ${FEVR_DEVELOPMENT:-false}
       FEVR_URL: ${FEVR_URL}
