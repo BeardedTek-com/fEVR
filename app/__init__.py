@@ -1,6 +1,7 @@
 # External Imports
 from flask import Flask, session
 from flask_sqlalchemy import SQLAlchemy, inspect
+from sqlalchemy import desc
 import json
 from flask_login import LoginManager
 from datetime import timedelta
@@ -64,7 +65,7 @@ def convertTZ(time,clockFmt=12,Timezone="America/Anchorage"):
 # Setup mqtt_client
 # Gather environment variables in a dict
 ev = {}
-ev["port"] = environ.get("MQTT_BROKER_PORT")
+ev["MQTT_BROKER_PORT"] = environ.get("MQTT_BROKER_PORT")
 ev["MQTT_TOPICS"] = environ.get("MQTT_TOPICS")
 ev["MQTT_BROKER_USER"] = environ.get("MQTT_BROKER_USER")
 ev["MQTT_BROKER_PASSWORD"] = environ.get("MQTT_BROKER_PASSWORD")
@@ -73,7 +74,6 @@ ev["MQTT_BROKER"] = environ.get("MQTT_BROKER")
 ev["MQTT_APIAUTH_KEY"] = environ.get("MQTT_APIAUTH_KEY")
 ev["FEVR_URL"] = environ.get('FEVR_URL')
 ev["FEVR_PORT"] = environ.get('FEVR_PORT')
-ev["fevr"] = f"{ev['FEVR_URL']}:{ev['FEVR_PORT']}"
 ev["MQTT_VERBOSE_LOGGING"] = environ.get("MQTT_VERBOSE_LOGGING")
 
 def create_mqtt_entry(db,ev):
@@ -105,7 +105,7 @@ if not MQTT:
     create_mqtt_entry(db,ev)
     
     
-MQTT= mqtt.query.first()
+MQTT= mqtt.query.order_by(desc(id)).first()
 command = f"/fevr/venv/bin/python /fevr/app/mqtt_client"
 if MQTT.port != 1883:
     command += f" -p {MQTT.port}"
