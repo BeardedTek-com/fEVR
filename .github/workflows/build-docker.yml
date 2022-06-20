@@ -24,6 +24,13 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v3
 
+      - name: log into docker hub
+        uses: docker/login-action@v2
+        with:
+          registry: docker.io
+          username: ${{ secrets.DOCKER_BEARDEDTEK_USER }}
+          password: ${{ secrets.DOCKER_BEARDEDTEK_PASSWORD }}
+
       - name: log into docker.beardedtek.com
         uses: docker/login-action@v2
         with:
@@ -49,5 +56,5 @@ jobs:
         with:
           context: .
           push: true
-          tags: ${{ steps.meta.outputs.tags }},ghcr.io/beardedtek-com/fevr:0.6,ghcr.io/beardedtek-com/fevr:v0.6
+          tags: ${{ steps.meta.outputs.tags }},ghcr.io/beardedtek-com/fevr:0.6,ghcr.io/beardedtek-com/fevr:v0.6,beardedtek/fevr:0.6,beardedtek/fevr:v0.6,beardedtek/fevr:latest,beardedtek/fevr:main
           labels: ${{ steps.meta.outputs.labels }}
