@@ -27,8 +27,34 @@ listener 1883 0.0.0.0
 # Installation
 
 ## Docker Compose:
-
 docker-compose is the preferred installation method
+
+### Environment Variables
+The following environment variables can be used to configure fEVR:
+If not set, configuration can be done via the Web UI.
+- MQTT_BROKER
+  - fqdn or ip of MQTT Broker.
+- MQTT_BROKER_PORT
+  - port number of the MQTT Broker.  If unset, it defaults to 1883
+- MQTT_BROKER_USER
+  - Leave unset if there is no username
+- MQTT_BROKER_PASSWORD
+  - Leave unset if there is no password
+- MQTT_TOPICS
+  - Comma separated string of MQTT Topics mqtt_client will listen to.  If unset, it will default to "frigate/+"
+- MQTT_VERBOSE_LOGGING (BOOLEAN)
+  - If set to true, will output verbosely to stdout and docker logs
+- MQTT_APIAUTH_KEY
+  - Obtain APIAUTH Key from http(s)://<fevr_url:port>/profile
+- FEVR_TRANSPORT
+  - http or https
+- FEVR_URL
+  - defaults to 'fevr'
+- FEVR_PORT
+  - defaults to 5090
+- FEVR_DEVELOPMENT
+  - If set to true, it will use the builtin flask server in development/debug mode
+  - If set to false or unset, it will use uwsgi server.
 
 ### Edit .env file
 Copy template.env to .env and adjust as necessary:
@@ -37,24 +63,34 @@ The default values should serve you well.
 ```
 ### fEVR Setup ######################################################
 
+# Set fevr in development mode using built in flask server (true/false)
+FEVR_DEVELOPMENT=false
+
 # Changes the port fEVR runs on DEFAULT: 5090
 FEVR_PORT=5090
 
-# FLASK_ENV=development to put fEVR into Debug Mode
-FLASK_ENV=development
+# Should be set to image name to use local transport, or an accessible url to feed an external instance of fEVR 
+FEVR_URL=fevr
 
+# Set to http or https depending on use.  For internal docker network, use http.
+FEVR_TRANSPORT=http
 
 ### MQTT Client Setup ###############################################
 
-MQTT_BROKER_IP=127.0.0.1
+MQTT_BROKER=mqtt
 MQTT_BROKER_PORT=1883
 
 # If there is no user/password, leave unset
 MQTT_BROKER_USER=
-MQTT_BROKER_PASS=
+MQTT_BROKER_PASSWORD=
 
 # Comma seperated string of MQTT topics to subscribe to.  LIMIT 5!!!
 MQTT_TOPICS="frigate/+"
+
+MQTT_VERBOSE_LOGGING=false
+
+# Obtain this key from http(s)://<fevr_url:port>/profile or leave unset to use web ui setup values
+MQTT_APIAUTH_KEY=
 
 
 ### Tailscale #######################################################
@@ -65,6 +101,7 @@ TAILSCALE_ENABLE=true
 TAILSCALE_TAGS=tag:fevr
 TAILSCALE_HOSTNAME=fevr
 
+
 # Obtain Auth Key from https://login.tailscale.com/admin/authkeys
 TAILSCALE_AUTHKEY=tskey-XXXXXXXXXXXX-XXXXXXXXXXXXXXXXXXXXXX
 ```
@@ -73,26 +110,34 @@ TAILSCALE_AUTHKEY=tskey-XXXXXXXXXXXX-XXXXXXXXXXXXXXXXXXXXXX
 version: '2.4'
 services:
   fevr:
-    image: ghcr.io/beardedtek-com/fevr:main
+    image: ghcr.io/beardedtek-com/fevr:0.6
     container_name: fevr
     restart: unless-stopped
     privileged: true
-#    ports:               #Uncomment to export port 5090 if you don't wish to use tailscale
-#      - 5090:5090
+    ports:
+      - 5090:${FEVR_PORT:-5090}
     volumes:
-      - ./events:/fevr/static/events
+      - /export/fevr:/fevr/app/static/events
+      - /export/fevr/data:/fevr/app/data
+      - ./fevr/varlib:/var/lib
+    depends_on:
+      - mqtt
+      - frigate
     environment:
-      FLASK_ENV: ${FLASK_ENV:-development}
-      FEVR_PORT: ${FEVR_PORT:-5090}
+      FEVR_DEVELOPMENT: ${FEVR_DEVELOPMENT:-false}
+      FEVR_URL: ${FEVR_URL}
+      FEVR_PORT: ${FEVR_PORT}
       TAILSCALE_ENABLE: ${TAILSCALE_ENABLE:-true}
       TAILSCALE_AUTHKEY: ${TAILSCALE_AUTHKEY}
       TAILSCALE_HOSTNAME: ${TAILSCALE_HOSTNAME:-fevr}
       TAILSCALE_TAGS: ${TAILSCALE_TAGS}
-      MQTT_BROKER_IP: ${MQTT_BROKER_IP}
+      MQTT_BROKER: ${MQTT_BROKER:-mqtt}
       MQTT_BROKER_PORT: ${MQTT_BROKER_PORT}
       MQTT_BROKER_USER: ${MQTT_BROKER_USER}
-      MQTT_BROKER_PASS: ${MQTT_BROKER_PASS}
-      MQTT_TOPICS: ${MQTT_TOPICS}
+      MQTT_BROKER_PASSWORD: ${MQTT_BROKER_PASSWORD}
+      MQTT_TOPICS: ${MQTT_TOPICS:-frigate/+}
+      MQTT_VERBOSE_LOGGING: ${MQTT_VERBOSE_LOGGING:-true}
+      MQTT_APIAUTH_KEY: ${MQTT_APIAUTH_KEY}
 ```
 
 Bring the system up:
