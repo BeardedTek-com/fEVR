@@ -8,8 +8,6 @@ if [ -f "/fevr/run_mqtt_client.sh" ]; then
 else
     EXISTS=0
 fi
-# Wait until UWSGI is started
-sleep 10
 while [ "$EXITS" != "1" ] # Loop until EXISTS = 1
 do
 
