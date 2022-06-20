@@ -62,72 +62,70 @@ def convertTZ(time,clockFmt=12,Timezone="America/Anchorage"):
         return outTime
 
 # Setup mqtt_client
-# Gather environment variables
-ev_port = environ.get("MQTT_BROKER_PORT")
-ev_topics = environ.get("MQTT_TOPICS")
-ev_user = environ.get("MQTT_BROKER_USER")
-ev_password = environ.get("MQTT_BROKER_PASSWORD")
-ev_https = environ.get("MQTT_TRANSPORT")
-ev_broker = environ.get("MQTT_BROKER")
-ev_key = environ.get("MQTT_APIAUTH_KEY")
-ev_url = environ.get('FEVR_URL')
-ev_port = environ.get('FEVR_PORT')
-ev_fevr = f"{ev_url}:{ev_port}"
-ev_verbose = environ.get("MQTT_VERBOSE_LOGGING")
+# Gather environment variables in a dict
+ev = {}
+ev["port"] = environ.get("MQTT_BROKER_PORT")
+ev["MQTT_TOPICS"] = environ.get("MQTT_TOPICS")
+ev["MQTT_BROKER_USER"] = environ.get("MQTT_BROKER_USER")
+ev["MQTT_BROKER_PASSWORD"] = environ.get("MQTT_BROKER_PASSWORD")
+ev["MQTT_TRANSPORT"] = environ.get("MQTT_TRANSPORT")
+ev["MQTT_BROKER"] = environ.get("MQTT_BROKER")
+ev["MQTT_APIAUTH_KEY"] = environ.get("MQTT_APIAUTH_KEY")
+ev["FEVR_URL"] = environ.get('FEVR_URL')
+ev["FEVR_PORT"] = environ.get('FEVR_PORT')
+ev["fevr"] = f"{ev['url']}:{ev['port']}"
+ev["MQTT_VERBOSE_LOGGING"] = environ.get("MQTT_VERBOSE_LOGGING")
 
-# Check to see if mqtt table exists.  If not, create the databse
+def create_mqtt_entry(db,ev):
+    port = 1883 if not ev["MQTT_BROKER_PORT"] else ev["MQTT_BROKER_PORT"]
+    topics = "frigate/+" if not ev["MQTT_TOPICS"] else ev["MQTT_TOPICS"]
+    user = "" if not ev["MQTT_BROKER_USER"] else ev["MQTT_BROKER_USER"]
+    password = "" if not ev["MQTT_BROKER_PASSWORD"] else ev["MQTT_BROKER_PASSWORD"]
+    https = "http" if not ev["MQTT_TRANSPORT"] else ev["MQTT_TRANSPORT"]
+    broker = "mqtt" if not ev["MQTT_BROKER"] else ev["MQTT_BROKER"]
+    key = "" if not ev["MQTT_APIAUTH_KEY"] else ev["MQTT_APIAUTH_KEY"]
+    url = "fevr" if not ev["FEVR_URL"] else ev["FEVR_URL"]
+    FEVR_PORT = "5090" if not ev["FEVR_PORT"] else ev["FEVR_PORT"]
+    fevr = f"{url}:{FEVR_PORT}"
 
-if not inspect(db.engine).has_table("events"):
-    db.create_all()
-    MQTT = mqtt(port=ev_port,topics=ev_topics,user=ev_user,password=ev_password,https=ev_https,fevr=ev_fevr,broker=ev_broker,key=ev_key)
+    MQTT = mqtt(port=port,topics=topics,user=user,
+                password=password,https=https,
+                fevr=fevr,broker=broker,key=key)
     db.session.add(MQTT)
     db.session.commit()
+
+
+# Check to see if mqtt table exists.  If not, create the databse and create a default entry
+if not inspect(db.engine).has_table("mqtt"):
+    db.create_all()
+    create_mqtt_entry(db,ev)
+# Query the mqtt table and if MQTT=None, create an entry
+MQTT= mqtt.query.first()
+if not MQTT:
+    create_mqtt_entry(db,ev)
     
     
-    
-    
-# Query the database
 MQTT= mqtt.query.first()
 command = f"/fevr/venv/bin/python /fevr/app/mqtt_client"
 if MQTT.port != 1883:
     command += f" -p {MQTT.port}"
-elif ev_port:
-    command += f" -p {ev_port}"
-    
 if MQTT.topics != "frigate/+":
     command += f" -t {MQTT.topics}"
-elif ev_topics:
-    command += f" -t {ev_topics}"
-
 if MQTT.user != "" and MQTT.password != "":
-    command += f" -u {MQTT.user} -P {MQTT.password}"
-if ev_user and ev_password:
-    command += f" -u {ev_user}"
-    command += f" -P {ev_password}"
-    
-    
+    command += f" -u {MQTT.user} -P {MQTT.password}" 
 if MQTT.https == "https":
     command += " -s "
-if ev_https and ev_https == "https":
-    command += f" -s"
-    
 if MQTT.fevr != "localhost:5090":
     command += f" -f {MQTT.fevr}"
-if ev_url and ev_port:
-    command += f" -f {ev_fevr}"
-    
-if ev_verbose and ev_verbose == "true":
+if ev["MQTT_VERBOSE_LOGGING"] and ev["MQTT_VERBOSE_LOGGING"] == "true":
     command += " -v"
-    
-if ev_broker:
-    command += f" {ev_broker}"
-else:
+if MQTT.broker != "mqtt":
     command += f" {MQTT.broker}"
 
-if ev_key:
-    command +=f" {ev_key}"
-else:
+if MQTT.key:
     command +=f" {MQTT.key}"
+else:
+    command +=" key"
     
 # Write new run_mqtt_client.sh:
 with open('run_mqtt_client.sh', "w") as myfile:
