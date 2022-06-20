@@ -62,49 +62,70 @@ def convertTZ(time,clockFmt=12,Timezone="America/Anchorage"):
         return outTime
 
 # Setup mqtt_client
+# Gather environment variables
+ev_port = environ.get("MQTT_BROKER_PORT")
+ev_topics = environ.get("MQTT_TOPICS")
+ev_user = environ.get("MQTT_BROKER_USER")
+ev_password = environ.get("MQTT_BROKER_PASSWORD")
+ev_https = environ.get("MQTT_TRANSPORT")
+ev_broker = environ.get("MQTT_BROKER")
+ev_key = environ.get("MQTT_APIAUTH_KEY")
+ev_url = environ.get('FEVR_URL')
+ev_port = environ.get('FEVR_PORT')
+ev_fevr = f"{ev_url}:{ev_port}"
+ev_verbose = environ.get("MQTT_VERBOSE_LOGGING")
+
 # Check to see if mqtt table exists.  If not, create the databse
+
 if not inspect(db.engine).has_table("events"):
     db.create_all()
+    MQTT = mqtt(port=ev_port,topics=ev_topics,user=ev_user,password=ev_password,https=ev_https,fevr=ev_fevr,broker=ev_broker,key=ev_key)
+    db.session.add(MQTT)
+    db.session.commit()
+    
+    
+    
+    
 # Query the database
 MQTT= mqtt.query.first()
 command = f"/fevr/venv/bin/python /fevr/app/mqtt_client"
 if MQTT.port != 1883:
     command += f" -p {MQTT.port}"
-elif environ.get("MQTT_BROKER_PORT"):
-    command += f" -p {environ.get('MQTT_BROKER_PORT')}"
+elif ev_port:
+    command += f" -p {ev_port}"
     
 if MQTT.topics != "frigate/+":
     command += f" -t {MQTT.topics}"
-elif environ.get("MQTT_TOPICS"):
-    command += f" -t {environ.get('MQTT_TOPICS')}"
+elif ev_topics:
+    command += f" -t {ev_topics}"
 
 if MQTT.user != "" and MQTT.password != "":
     command += f" -u {MQTT.user} -P {MQTT.password}"
-if environ.get("MQTT_BROKER_USER") and environ.get("MQTT_BROKER_PASSWORD"):
-    command += f" -u {environ.get('MQTT_BROKER_USER')}"
-    command += f" -P {environ.get('MQTT_BROKER_PASSWORD')}"
+if ev_user and ev_password:
+    command += f" -u {ev_user}"
+    command += f" -P {ev_password}"
     
     
 if MQTT.https == "https":
     command += " -s "
-if environ.get("FEVR_TRANSPORT") and environ.get("FEVR_TRANSPORT") == "true":
+if ev_https and ev_https == "https":
     command += f" -s"
     
 if MQTT.fevr != "localhost:5090":
     command += f" -f {MQTT.fevr}"
-if environ.get("FEVR_URL") and environ.get("FEVR_PORT"):
-    command += f" -f {environ.get('FEVR_URL')}:{environ.get('FEVR_PORT')}"
+if ev_url and ev_port:
+    command += f" -f {ev_fevr}"
     
-if environ.get("MQTT_VERBOSE_LOGGING") and environ.get("MQTT_VERBOSE_LOGGING") == "true":
+if ev_verbose and ev_verbose == "true":
     command += " -v"
     
-if environ.get("MQTT_BROKER"):
-    command += f" {environ.get('MQTT_BROKER')}"
+if ev_broker:
+    command += f" {ev_broker}"
 else:
     command += f" {MQTT.broker}"
 
-if environ.get("MQTT_APIAUTH_KEY"):
-    command +=f" {environ.get('MQTT_APIAUTH_KEY')}"
+if ev_key:
+    command +=f" {ev_key}"
 else:
     command +=f" {MQTT.key}"
     
