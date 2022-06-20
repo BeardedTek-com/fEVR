@@ -68,14 +68,26 @@ def apiFrigate():
 @api.route('/api/events/add/<eventid>/<camera>/<object>/<score>')
 @login_required
 def apiAddEvent(eventid,camera,score,object):
-    def addEvent(eventid,camera,score,object):
-        db.create_all()
-        time = datetime.fromtimestamp(int(eventid.split('.')[0]))
-        Cameras = cameras.query.filter_by(camera=camera).first()
-        if Cameras.show:
-            show = True
-        else:
-            show = False
+    time = datetime.fromtimestamp(int(eventid.split('.')[0]))
+    # Define default JSON return value
+    rVal = {'error':0,
+            'msg':'',
+            'time':time,
+            'eventid':eventid,
+            'camera':camera,
+            'object':object,
+            'score':score}
+    db.create_all()
+    Cameras = cameras.query.filter_by(camera=camera).first()
+    if not Cameras:
+        rVal["msg"] = "Camera Not Defined"
+        rVal["error"] = 1
+    show = True if Cameras.show else False
+    # Check if eventid already exists
+    if events.query.filter_by(eventid=eventid).first():
+        rVal["msg"] = 'Event Already Exists'
+        rVal["error"] = 2
+    else:
         event = events(eventid=eventid,camera=camera,object=object,score=int(score),ack='',time=time,show=show)
         db.session.add(event)
         db.session.commit()
@@ -83,17 +95,9 @@ def apiAddEvent(eventid,camera,score,object):
         frigateConfig = apiFrigate()
         frigateURL = frigateConfig['frigate']
         Fetch(fetchPath,eventid,frigateURL)
-        
-    # Check if eventid already exists
-    if events.query.filter_by(eventid=eventid).first():
-        return jsonify({'msg':'Event Already Exists'})
-    # Are they authorized?
-#    elif apiAuth.exe():
-    else:
-        addEvent(eventid,camera,score,object)
-        return jsonify({'msg':'Success'})
-#    else:
-#        return 'Not Authorized', 200
+        rVal["msg"] = 'OK'
+    return jsonify(rVal)
+
 @api.route('/api/admin/events/add/<eventid>/<camera>/<object>/<score>')
 @login_required
 def apiAdminAddEvent(eventid,camera,score,object):

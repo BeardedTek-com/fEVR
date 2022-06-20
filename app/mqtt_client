@@ -153,14 +153,14 @@ class fevrMQTT:
                 # Make it so
                 addEventResponse = rSession.get(fEVRurl)
                 # Read the response to a variable
-                addEventResponseJSON = json.loads(addEventResponse.content)
+                respJSON = json.loads(addEventResponse.content)
                 # It's log, it's log, it's better than bad it's good.
                 if self.verbose:
                     logit.execute(fEVRurl,src=self.script)
-                if addEventResponseJSON["msg"] == "Success":
+                if respJSON["error"] == 0:
                     logit.execute(f"SUCCESS: {eventid} ({Object} in {camera}) added",src=self.script)
                 else:
-                    logit.execute(f"FAILURE: {eventid} ({Object} in {camera}) not added",src=self.script)
+                    logit.execute(f"FAILURE: {respJSON}",src=self.script)
     def subscribe(self, client: mqtt_client):
         def on_message(client, userdata, msg):
             ## This is where our code goes to do what we want when a message is received
