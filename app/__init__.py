@@ -73,7 +73,7 @@ ev["MQTT_BROKER"] = environ.get("MQTT_BROKER")
 ev["MQTT_APIAUTH_KEY"] = environ.get("MQTT_APIAUTH_KEY")
 ev["FEVR_URL"] = environ.get('FEVR_URL')
 ev["FEVR_PORT"] = environ.get('FEVR_PORT')
-ev["fevr"] = f"{ev['url']}:{ev['port']}"
+ev["fevr"] = f"{ev['FEVR_URL']}:{ev['FEVR_PORT']}"
 ev["MQTT_VERBOSE_LOGGING"] = environ.get("MQTT_VERBOSE_LOGGING")
 
 def create_mqtt_entry(db,ev):
