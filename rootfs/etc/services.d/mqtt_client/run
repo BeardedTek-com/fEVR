@@ -3,45 +3,7 @@
 # If it has not, we will check every 5 seconds
 # After 300 seconds of checking (60 cycles) we will output an error msg
 # telling the user to run the configuration
-if [ -f "/fevr/run_mqtt_client.sh" ]; then
-    EXISTS=1
-else
-    EXISTS=0
-fi
-while [ "$EXITS" != "1" ] # Loop until EXISTS = 1
-do
-
-    for i in {1..60}
-    # Loop 24 times
-    do
-    # Check if /fevr/run_mqtt_client.sh exists
-    # If it exists, set EXISTS to 1
-    if [ -f "/fevr/run_mqtt_client.sh" ]; then
-        EXISTS=1
-        break
-    fi
-    # Wait 5 seconds (60*5 = 300 seconds or every 5 minutes)
-    sleep 5
-    done
-    if [ "$EXISTS" == "1" ]; then
-        break
-    fi
+while :; do
+    if [ -f "/fevr/app/data/config.json" ]; then
+        /fevr/venv/bin/python /fevr/app/mqtt_client -c "/fevr/app/data/config.json"
 done
-if [ -f "/fevr/run_mqtt_client.sh" ]; then
-    echo "Let's Go!"
-else
-    # Print URL to visit to configure fEVR
-    echo ""
-    echo ""
-    echo "########################  SETUP NOT COMPLETE  ##################################"
-    echo "#                                                                              #"
-    echo "# fEVR will not function as intended until you complete this process           #"
-    echo "# Please finish setup by visiting:                                             #"
-    echo "# http://$(hostname -i):${FEVR_PORT:-5090}/setup.                                                #"
-    echo "#                                                                              #"
-    echo "################################################################################"
-    echo ""
-    echo ""
-fi
-chmod +x /fevr/run_mqtt_client.sh
-/fevr/run_mqtt_client.sh
