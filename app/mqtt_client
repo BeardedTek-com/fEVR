@@ -127,7 +127,10 @@ class fevrMQTT:
                 self.username = self.configJSON["mqtt_user"]
                 self.password = self.configJSON["mqtt_password"]
                 self.apikey = self.configJSON["fevr_apikey"]
-                self.verbose = self.configJSON["verbose"]
+                if self.verbose or self.verbose == "true":
+                    self.verbose = True
+                else:
+                    self.verbose = False
                 self.transport = self.configJSON["fevr_transport"]
                 topics = self.configJSON["mqtt_topics"]
 
