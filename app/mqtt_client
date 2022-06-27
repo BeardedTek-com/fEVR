@@ -120,7 +120,7 @@ class fevrMQTT:
         excluded = None
         if args.config:
             if self.getConfig(args.config) == "valid":
-                print("test")
+                logit.execute(self.configJSON,src=self.script)
                 self.fevr = self.configJSON["fevr_url"]
                 self.broker = self.configJSON["mqtt_broker"]
                 self.port = int(self.configJSON["mqtt_port"])
