@@ -1,0 +1,11 @@
+{
+"fevr_url": "localhost:5090",
+"fevr_transport": "http://",
+"fevr_apikey": "value",
+"mqtt_broker": "mqtt",
+"mqtt_port": 1883,
+"mqtt_user": "",
+"mqtt_password": "",
+"mqtt_topics": "frigate/+",
+"verbose": true
+}

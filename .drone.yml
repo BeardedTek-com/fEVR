@@ -7,7 +7,6 @@ trigger:
     - main
   event:
     - push
-    - tag
 steps:
 - name: beardedtek-PUSH
   image: plugins/docker

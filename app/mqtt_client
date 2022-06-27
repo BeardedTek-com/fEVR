@@ -18,9 +18,8 @@
 
 from paho.mqtt import client as mqtt_client
 import argparse
-from os import getenv
+from os import getenv, environ, path, access, R_OK
 from time import time
-from os import environ
 from json import loads, dumps
 from math import floor
 from random import randint
@@ -63,12 +62,45 @@ class fevrMQTT:
         self.script = 'MQTT | client'
         hostname = socket.gethostname()
         self.clientID = f"fevr-{hostname}-{randint(0,100)}"
-        self.getVars()
+        self.verbose=False
+        self.setup()
         self.run()
-    def getVars(self):
+    def getConfig(self,config):
+        if path.isfile(config) and access(config, R_OK):
+            with open(config) as configFile:
+                try:
+                    self.configJSON = json.load(configFile)
+                except ValueError:
+                    return "File Not JSON formatted"
+                values = ['fevr_url','fevr_transport','fevr_apikey','mqtt_broker','mqtt_port','mqtt_user','mqtt_password','mqtt_topics','verbose']
+                validConfig=True
+                for value in values:
+                    try:
+                        test = self.configJSON[value]
+                    except KeyError:
+                        validConfig=False
+                        try:
+                            missing +=f', {value}'
+                        except UnboundLocalError:
+                            missing = value
+
+                if validConfig:
+                    return "valid"
+                else:
+                    return f"Missing keys: {missing}. See docs"
+        else:
+            if path.isfile(config):
+                return "File Does not exist"
+            return "File is not readable by user"
+        
+    def setup(self):
         parser = argparse.ArgumentParser()
-        parser.add_argument('mqtt',type=str, help="MQTT Broker IP/FQDN **Required** (default: None)")
-        parser.add_argument('key',type=str,help="fEVR API Key        **Required** (default: None)")
+        parser.add_argument('-c','--config',type=str,required=False,help="If set, uses command line options instead of the database (default: empty)")
+        parser.set_defaults(db=True)
+        parser.add_argument('-m','--mqtt',type=str,required=False,help="MQTT Broker IP/FQDN (default: mqtt)")
+        parser.set_defaults(mqtt="mqtt")
+        parser.add_argument('-k','--key',type=str,required=False,help="fEVR API Key (default: blank string)")
+        parser.set_defaults(key="")
         parser.add_argument('-p','--port',type=int,required=False,help="MQTT Port (default: 1883)")
         parser.set_defaults(port=1883)
         parser.add_argument('-t','--topics',type=str,required=False,help="MQTT Topics (default: 'frigate/+')")
@@ -79,34 +111,61 @@ class fevrMQTT:
         parser.set_defaults(password="")
         parser.add_argument('-f','--fevr',type=str,required=False,help="fEVR IP Address/FQDN (default: '127.0.0.1:5090)")
         parser.set_defaults(fevr='127.0.0.1:5090')
-        parser.add_argument('-s','--https',action='store_true',help="If set uses https:// for fEVR API Calls (default: http://)")
+        parser.add_argument('-s','--https',action='store_true',required=False,help="If set uses https:// for fEVR API Calls (default: False)")
         parser.set_defaults(https=False)
-        parser.add_argument('-v','--verbose',action='store_true',help="If set, outputs verbosely to stdout")
+        parser.add_argument('-v','--verbose',action='store_true',required=False,help="If set, outputs verbosely to stdout")
         parser.set_defaults(verbose=False)
         args = parser.parse_args()
-        self.fevr = args.fevr
-        self.broker = args.mqtt
-        self.port = args.port
-        self.username = args.user
-        self.password = args.password
-        self.apikey = args.key
-        self.verbose = args.verbose
-        topics = args.topics
-        if args.https:
-            self.transport = "https://"
-        else:
-            self.transport = "http://"
-        self.topics = []
-        topics = topics.split(',',5)
-        count=0
+        
         excluded = None
-        for topic in topics:
-            if 4 >= count:
-                self.topics.append(topic)
+        if args.config:
+            if self.getConfig(args.config) == "valid":
+                print("test")
+                self.fevr = self.configJSON["fevr_url"]
+                self.broker = self.configJSON["mqtt_broker"]
+                self.port = int(self.configJSON["mqtt_port"])
+                self.username = self.configJSON["mqtt_user"]
+                self.password = self.configJSON["mqtt_password"]
+                self.apikey = self.configJSON["fevr_apikey"]
+                self.verbose = self.configJSON["verbose"]
+                self.transport = self.configJSON["fevr_transport"]
+                topics = self.configJSON["mqtt_topics"]
+
+                self.topics = []
+                topics = topics.split(',',5)
+                count=0
+                for topic in topics:
+                    if 4 >= count:
+                        self.topics.append(topic)
+                    else:
+                        if 5 == count:
+                            excluded = f"Topic Limit Exceeded. Excluded Topics: "
+                        excluded += f"'{topic}' "
+        else:
+            self.fevr = args.fevr
+            self.broker = args.mqtt
+            self.port = args.port
+            self.username = args.user
+            self.password = args.password
+            self.apikey = args.key
+            self.verbose = args.verbose
+
+            topics = args.topics
+            if args.https:
+                self.transport = "https://"
             else:
-                if 5 == count:
-                    excluded = f"Topic Limit Exceeded. Excluded Topics: "
-                excluded += f"'{topic}' "
+                self.transport = "http://"
+            self.topics = []
+            topics = topics.split(',',5)
+            count=0
+            excluded = None
+            for topic in topics:
+                if 4 >= count:
+                    self.topics.append(topic)
+                else:
+                    if 5 == count:
+                        excluded = f"Topic Limit Exceeded. Excluded Topics: "
+                    excluded += f"'{topic}' "
         if excluded:
             logit.execute(excluded,src=self.script)
         if self.verbose:

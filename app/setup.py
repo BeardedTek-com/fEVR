@@ -8,6 +8,7 @@ from . import db
 from .rndpwd import randpwd
 from .helpers.cookies import cookies
 from os.path import exists
+import json
 setup = Blueprint('setup', __name__)
 
 
@@ -277,31 +278,20 @@ def setupAddMqttPost():
             if not password:
                 password = ""
             
-            mqttdel = mqtt.query.all()
-            n = 0
-            for entry in mqttdel:
-                db.session.delete(entry)
-                n = n+1
-            if n > 0:
-                db.session.commit()
-            MQTT = mqtt(port=port,topics=topics,user=user,password=password,https=https,fevr=fevr,broker=broker,key=key)
-            db.session.add(MQTT)
-            db.session.commit()
-            MQTT= mqtt.query.first()
-            command = f"/fevr/venv/bin/python /fevr/app/mqtt_client"
-            if MQTT.port != 1883:
-                command += f" -p {MQTT.port}"
-            if MQTT.topics != "frigate/+":
-                command += f" -t {MQTT.topics}"
-            if MQTT.user != "" and MQTT.password != "":
-                command += f" -u {MQTT.user} -P {MQTT.password}"
-            if MQTT.https == "https":
-                command += " -s "
-            if MQTT.fevr != "localhost:5090":
-                command += f" -f {MQTT.fevr}"
-            command += f" {MQTT.broker} {MQTT.key}"
+            config["fevr_url"] = fevr
+            config["fevr_transport"] = https
+            config["fevr_apikey"] = key
+            config["mqtt_broker"] = broker
+            config["mqtt_port"] = port
+            config["mqtt_user"] = user
+            config["mqtt_password"] = password
+            config["mqtt_topics"] = topics
+            config["verbose"] = False
+            with open('/fevr/app/data/config.json', "w") as configFile:
+                json.dump(config,configFile,sort_keys=True,indent=0)
+
             # Write new run_mqtt_client.sh:
             with open('run_mqtt_client.sh', "w") as myfile:
-                myfile.write(f"#!/bin/sh\n{command}")
+                myfile.write(f"#!/bin/sh\n/fevr/venv/bin/python /fevr/app/mqtt_client -c /fevr/app/data/config.json")
         resp = redirect('/setup/mqtt')
         return resp

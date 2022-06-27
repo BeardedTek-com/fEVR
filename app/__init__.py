@@ -1,5 +1,5 @@
 # External Imports
-from flask import Flask, session
+from flask import Flask, session, jsonify
 from flask_sqlalchemy import SQLAlchemy, inspect
 from sqlalchemy import desc
 import json
@@ -8,7 +8,7 @@ from datetime import timedelta
 from datetime import datetime
 from dateutil import tz
 import pytz
-from os import environ
+from os import environ,path,access,R_OK
 
 # Flask app Setup
 app = Flask(__name__)
@@ -64,6 +64,22 @@ def convertTZ(time,clockFmt=12,Timezone="America/Anchorage"):
 
 # Setup mqtt_client
 # Gather environment variables in a dict
+# NOTE: Environment Variables are only used if app/data/config.json does not exist.
+
+def writeConfigFile(file,ev):
+    config = {}
+    config["fevr_url"] = f"{ev['FEVR_URL']}:{ev['FEVR_PORT']"
+    config["fevr_transport"] = ev["MQTT_TRANSPORT"]
+    config["fevr_apikey"] = ev["MQTT_APIAUTH_KEY"]
+    config["mqtt_broker"] = ev["MQTT_BROKER"]
+    config["mqtt_port"] = ev["MQTT_BROKER_PORT"]
+    config["mqtt_user"] = ev["MQTT_BROKER_USER"]
+    config["mqtt_password"] = ev["MQTT_BROKER_PASSWORD"]
+    config["mqtt_topics"] = ev["MQTT_TOPICS"]
+    config["verbose"] = ev["MQTT_VERBOSE_LOGGING"]
+    with open('/fevr/app/data/config.json', "w") as configFile:
+        json.dump(config,configFile,sort_keys=True,indent=0)
+
 ev = {}
 ev["MQTT_BROKER_PORT"] = environ.get("MQTT_BROKER_PORT")
 ev["MQTT_TOPICS"] = environ.get("MQTT_TOPICS")
@@ -76,66 +92,6 @@ ev["FEVR_URL"] = environ.get('FEVR_URL')
 ev["FEVR_PORT"] = environ.get('FEVR_PORT')
 ev["MQTT_VERBOSE_LOGGING"] = environ.get("MQTT_VERBOSE_LOGGING")
 
-def create_mqtt_entry(db,ev):
-    port = 1883 if not ev["MQTT_BROKER_PORT"] else ev["MQTT_BROKER_PORT"]
-    topics = "frigate/+" if not ev["MQTT_TOPICS"] else ev["MQTT_TOPICS"]
-    user = "" if not ev["MQTT_BROKER_USER"] else ev["MQTT_BROKER_USER"]
-    password = "" if not ev["MQTT_BROKER_PASSWORD"] else ev["MQTT_BROKER_PASSWORD"]
-    https = "http" if not ev["MQTT_TRANSPORT"] else ev["MQTT_TRANSPORT"]
-    broker = "mqtt" if not ev["MQTT_BROKER"] else ev["MQTT_BROKER"]
-    key = "" if not ev["MQTT_APIAUTH_KEY"] else ev["MQTT_APIAUTH_KEY"]
-    url = "fevr" if not ev["FEVR_URL"] else ev["FEVR_URL"]
-    FEVR_PORT = "5090" if not ev["FEVR_PORT"] else ev["FEVR_PORT"]
-    fevr = f"{url}:{FEVR_PORT}"
-
-    MQTT = mqtt(port=port,topics=topics,user=user,
-                password=password,https=https,
-                fevr=fevr,broker=broker,key=key)
-    db.session.add(MQTT)
-    db.session.commit()
-
-
-# Check to see if mqtt table exists.  If not, create the databse and create a default entry
-if not inspect(db.engine).has_table("mqtt"):
-    db.create_all()
-    create_mqtt_entry(db,ev)
-# Query the mqtt table and if MQTT=None, create an entry
-MQTT= mqtt.query.first()
-if MQTT:
-    mqttdel = mqtt.query.all()
-    n = 0
-    for entry in mqttdel:
-        db.session.delete(entry)
-        n = n+1
-    if n > 0:
-        db.session.commit()
-create_mqtt_entry(db,ev)
-
-    
-    
-    
-MQTT= mqtt.query.order_by(desc(mqtt.id)).first()
-command = f"/fevr/venv/bin/python /fevr/app/mqtt_client"
-if MQTT.port != 1883:
-    command += f" -p {MQTT.port}"
-if MQTT.topics != "frigate/+":
-    command += f" -t {MQTT.topics}"
-if MQTT.user != "" and MQTT.password != "":
-    command += f" -u {MQTT.user} -P {MQTT.password}" 
-if MQTT.https == "https":
-    command += " -s "
-if MQTT.fevr != "localhost:5090":
-    command += f" -f {MQTT.fevr}"
-if ev["MQTT_VERBOSE_LOGGING"] and ev["MQTT_VERBOSE_LOGGING"] == "true":
-    command += " -v"
-if MQTT.broker != "mqtt":
-    command += f" {MQTT.broker}"
-
-if MQTT.key:
-    command +=f" {MQTT.key}"
-else:
-    command +=" key"
-    
-# Write new run_mqtt_client.sh:
-with open('run_mqtt_client.sh', "w") as myfile:
-    myfile.write(f"#!/bin/sh\n{command}")
+config="/fevr/app/data/config.json"
+if not path.isfile(config) or not access(config, R_OK):
+    writeConfigFile(config,ev)
