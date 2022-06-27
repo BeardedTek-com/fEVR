@@ -6,4 +6,5 @@
 while :; do
     if [ -f "/fevr/app/data/config.json" ]; then
         /fevr/venv/bin/python /fevr/app/mqtt_client -c "/fevr/app/data/config.json"
+    fi
 done
