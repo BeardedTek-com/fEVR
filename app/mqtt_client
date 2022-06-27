@@ -131,6 +131,10 @@ class fevrMQTT:
                     self.verbose = True
                 else:
                     self.verbose = False
+                if self.configJSON == "https" or self.configJSON == "https://":
+                    self.transport = "https://"
+                else:
+                    self.transport = "http://"
                 self.transport = self.configJSON["fevr_transport"]
                 topics = self.configJSON["mqtt_topics"]
 

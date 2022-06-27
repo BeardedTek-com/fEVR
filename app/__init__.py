@@ -69,7 +69,10 @@ def convertTZ(time,clockFmt=12,Timezone="America/Anchorage"):
 def writeConfigFile(file,ev):
     config = {}
     config["fevr_url"] = f"{ev['FEVR_URL']}:{ev['FEVR_PORT']}"
-    config["fevr_transport"] = ev["MQTT_TRANSPORT"]
+    if ev["MQTT_TRANSPORT"] == "https" or ev["MQTT_TRANSPORT"] == "https://":
+        config["fevr_transport"] = "https://"
+    else:
+        config["fevr_transport"] = "http://"
     config["fevr_apikey"] = ev["MQTT_APIAUTH_KEY"]
     config["mqtt_broker"] = ev["MQTT_BROKER"]
     config["mqtt_port"] = ev["MQTT_BROKER_PORT"]
