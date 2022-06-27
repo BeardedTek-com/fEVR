@@ -121,22 +121,16 @@ class fevrMQTT:
         if args.config:
             if self.getConfig(args.config) == "valid":
                 logit.execute(self.configJSON,src=self.script)
-                self.fevr = self.configJSON["fevr_url"]
-                self.broker = self.configJSON["mqtt_broker"]
-                self.port = int(self.configJSON["mqtt_port"])
-                self.username = self.configJSON["mqtt_user"]
-                self.password = self.configJSON["mqtt_password"]
-                self.apikey = self.configJSON["fevr_apikey"]
-                if self.verbose or self.verbose == "true":
-                    self.verbose = True
-                else:
-                    self.verbose = False
-                if self.configJSON == "https" or self.configJSON == "https://":
-                    self.transport = "https://"
-                else:
-                    self.transport = "http://"
-                self.transport = self.configJSON["fevr_transport"]
-                topics = self.configJSON["mqtt_topics"]
+                # Use defaults if env vars aren't set, otherwise, use env vars.
+                self.fevr = "localhost" if not self.broker else self.configJSON["fevr_url"]
+                self.broker = "mqtt" if not self.broker else self.configJSON["mqtt_broker"]
+                self.port = 1883 if not self.port else int(self.configJSON["mqtt_port"])
+                self.username = "" if not self.username else self.configJSON["mqtt_user"]
+                self.password = "" if not self.password else self.configJSON["mqtt_password"]
+                self.apikey = "" if not self.apikey else self.configJSON["fevr_apikey"]
+                self.verbose = True if self.verbose or self.verbose == "true" else False
+                self.transport = "https://" if self.configJSON == "https" or self.configJSON == "https://" else "http://"
+                topics = "frigate/+" if not self.configJSON["mqtt_topics"] else self.configJSON["mqtt_topics"]
 
                 self.topics = []
                 topics = topics.split(',',5)
@@ -148,6 +142,9 @@ class fevrMQTT:
                         if 5 == count:
                             excluded = f"Topic Limit Exceeded. Excluded Topics: "
                         excluded += f"'{topic}' "
+                # Set sane defaults
+                if not self.fevr:
+                    self.fevr = "localhost:5090"
         else:
             self.fevr = args.fevr
             self.broker = args.mqtt
