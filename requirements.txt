@@ -10,3 +10,4 @@ svgwrite
 python-dateutil
 pytz
 uwsgi
+netifaces

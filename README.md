@@ -2,6 +2,7 @@
 
 # fEVR - frigate Event Video Recorder
 
+[![telegram](https://img.shields.io/badge/Support-Telegram-blue)](https://t.me/BeardedTekfEVR)
 [![Build Status](https://drone.beardedtek.com/api/badges/BeardedTek-com/fEVR/status.svg)](https://drone.beardedtek.com/BeardedTek-com/fEVR)
 [![Image Size](https://img.shields.io/docker/image-size/beardedtek/fevr)](https://hub.docker.com/r/beardedtek/fevr)
 [![license](https://img.shields.io/github/license/beardedtek-com/fevr)](https://github.com/BeardedTek-com/fevr/blob/0.1.0/LICENSE)

@@ -24,7 +24,7 @@ if [ "${TAILSCALE_ENABLE:-true}" ]; then
     # Bring up tailscale
     tailscale up --authkey="${TAILSCALE_AUTHKEY}" \
                  --advertise-routes=${TAILSCALE_ADVERTISE_ROUTE} \
-                 --hostname=${TAILSCALE_HOSTNAME:-nefarious} \
+                 --hostname=${TAILSCALE_HOSTNAME:-fEVR} \
                  --advertise-tags=${TAILSCALE_TAGS} \
                  --accept-routes \
                  --exit-node=${TAILSCALE_EXIT_NODE} \
@@ -37,7 +37,7 @@ if [ "${TAILSCALE_ENABLE:-true}" ]; then
         if [[ ! $(ip a show tailscale0 up | grep inet) ]] ;then
             tailscale up --authkey="${TAILSCALE_AUTHKEY}" \
                          --advertise-routes=${TAILSCALE_ADVERTISE_ROUTE} \
-                         --hostname=${TAILSCALE_HOSTNAME:-nefarious} \
+                         --hostname=${TAILSCALE_HOSTNAME:-fEVR} \
                          --advertise-tags=${TAILSCALE_TAGS} \
                          --accept-routes \
                          --exit-node=${TAILSCALE_EXIT_NODE} \
