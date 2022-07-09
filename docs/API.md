@@ -83,10 +83,6 @@ Returns:
     "id": 1, 
     "rtsp": "rtsp://rtsp:5082/front", 
     "show": true
-  }, 
-  "err": {
-    "code": 0, 
-    "msg": "OK"
   }
 }
 ```

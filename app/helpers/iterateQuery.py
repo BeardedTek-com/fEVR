@@ -8,4 +8,4 @@ def iterateQuery(query):
             for item in q.__dict__:
                 if not item.startswith('_') and item != "id":
                     output[q.id][item] = q.__dict__[item]
-    return jsonify(output)
+    return output

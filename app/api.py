@@ -7,7 +7,6 @@ from datetime import datetime
 import os
 from json import dumps
 
-
 from .models.models import events,frigate,cameras
 from . import db
 from .fetch import Fetch
@@ -54,19 +53,7 @@ def apiFrigate():
     if inspect(db.engine).has_table("frigate"):
         db.create_all()
     query = frigate.query.all()
-    internal = ""
-    external = ""
-    for Frigate in query:
-        if Frigate.name == "frigate":
-            internal = Frigate.url
-        if Frigate.name == "external":
-            external = Frigate.url
-    if not internal:
-        internal = "http://frigate.local:5000/"
-    if not external:
-        external = internal
-    
-    return iterateQuery(query)
+    return query
 
 @api.route('/api/events/add/<eventid>/<camera>/<object>/<score>')
 @login_required
@@ -96,14 +83,14 @@ def apiAddEvent(eventid,camera,score,object):
         db.session.commit()
         fetchPath = f"{os.getcwd()}/app/static/events/{eventid}/"
         frigateConfig = apiFrigate()
-        try:
-            frigateURL = frigateConfig['frigate']
-        except:
-            frigateURL = "http://frigate:5090/"
-        try:
-            Fetch(fetchPath,eventid,frigateURL)
-        except:
-            rVal = {"error": 3,"msg": "Unable to Fetch"}
+        fetched = False
+        for frigate in frigateConfig:
+            frigateURL = frigateConfig[frigate]["url"]
+            print(Fetch(fetchPath,eventid,frigateURL))
+            fetched = True
+        if not fetched:
+            rVal["msg"] = "Cannot Fetch"
+            rVal["error"] = 3
     return jsonify(rVal)
 
 @api.route('/api/events/ack/<eventid>')
@@ -188,4 +175,3 @@ def apiCameras(camera):
     else:
         query = cameras.query.filter_by(camera=camera)
     return iterateQuery(query)
-

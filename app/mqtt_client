@@ -83,7 +83,6 @@ class fevrMQTT:
                             missing +=f', {value}'
                         except UnboundLocalError:
                             missing = value
-
                 if validConfig:
                     return "valid"
                 else:
@@ -120,7 +119,6 @@ class fevrMQTT:
         excluded = None
         if args.config:
             if self.getConfig(args.config) == "valid":
-                logit.execute(self.configJSON,src=self.script)
                 # Use defaults if env vars aren't set, otherwise, use env vars.
                 self.fevr = "localhost:5090" if not self.configJSON["fevr_url"] else self.configJSON["fevr_url"]
                 self.broker = "mqtt" if not self.configJSON["mqtt_broker"] else self.configJSON["mqtt_broker"]
@@ -128,7 +126,7 @@ class fevrMQTT:
                 self.username = "" if not self.configJSON["mqtt_user"] else self.configJSON["mqtt_user"]
                 self.password = "" if not self.configJSON["mqtt_password"] else self.configJSON["mqtt_password"]
                 self.apikey = "" if not self.configJSON["fevr_apikey"] else self.configJSON["fevr_apikey"]
-                self.verbose = True if self.configJSON["verbose"] != "false" or self.verbose != "False" else False
+                self.verbose = self.configJSON["verbose"]
                 self.transport = "https://" if self.configJSON["fevr_transport"] == "https" or self.configJSON["fevr_transport"] == "https://" else "http://"
                 topics = "frigate/+" if not self.configJSON["mqtt_topics"] else self.configJSON["mqtt_topics"]
 
@@ -197,10 +195,11 @@ class fevrMQTT:
             rSession = requests.Session()
             event = loads(msg)
             if self.verbose:
-                eventfound = f"\n{json.dumps(event, indent=2)}"
+                eventfound = f"\n{json.dumps(event)}"
             else:
-                eventfound = event["before"]["id"]
-            logit.execute(f"EVENT FOUND: {eventfound}", src=self.script)
+                eventfound = event["after"]["id"]
+            eventtype = event["type"]
+            logit.execute(f"EVENT ({eventtype}) FOUND: {eventfound}", src=self.script)
             
             after = event['after']
             if event['type'] == 'end':
