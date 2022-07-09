@@ -5,12 +5,14 @@ from sqlalchemy import desc
 import subprocess
 from datetime import datetime
 import os
+from json import dumps
 
 
 from .models.models import events,frigate,cameras
 from . import db
 from .fetch import Fetch
 from .helpers.cookies import cookies
+from .helpers.iterateQuery import iterateQuery
 
 # API Routes
 api = Blueprint('api',__name__)
@@ -63,7 +65,8 @@ def apiFrigate():
         internal = "http://frigate.local:5000/"
     if not external:
         external = internal
-    return {'frigate':f"{internal}/",'external':f"{external}/"}
+    
+    return iterateQuery(query)
 
 @api.route('/api/events/add/<eventid>/<camera>/<object>/<score>')
 @login_required
@@ -71,7 +74,7 @@ def apiAddEvent(eventid,camera,score,object):
     time = datetime.fromtimestamp(int(eventid.split('.')[0]))
     # Define default JSON return value
     rVal = {'error':0,
-            'msg':'',
+            'msg':'OK',
             'time':time,
             'eventid':eventid,
             'camera':camera,
@@ -93,42 +96,27 @@ def apiAddEvent(eventid,camera,score,object):
         db.session.commit()
         fetchPath = f"{os.getcwd()}/app/static/events/{eventid}/"
         frigateConfig = apiFrigate()
-        frigateURL = frigateConfig['frigate']
-        Fetch(fetchPath,eventid,frigateURL)
-        rVal["msg"] = 'OK'
+        try:
+            frigateURL = frigateConfig['frigate']
+        except:
+            frigateURL = "http://frigate:5090/"
+        try:
+            Fetch(fetchPath,eventid,frigateURL)
+        except:
+            rVal = {"error": 3,"msg": "Unable to Fetch"}
     return jsonify(rVal)
-
-@api.route('/api/admin/events/add/<eventid>/<camera>/<object>/<score>')
-@login_required
-def apiAdminAddEvent(eventid,camera,score,object):
-    def addEvent(eventid,camera,score,object):
-        db.create_all()
-        time = datetime.fromtimestamp(int(eventid.split('.')[0]))
-        camera = cameras.query.filter_by(camera=camera).first()
-        if camera.show:
-            show = True
-        else:
-            show = False
-        event = events(eventid=eventid,camera=camera,object=object,score=int(score),ack='',time=time,show=show)
-        db.session.add(event)
-        db.session.commit()
-        fetchPath = f"{os.getcwd()}/app/static/events/{eventid}/"
-        frigateConfig = apiFrigate()
-        frigateURL = frigateConfig['frigate']
-        Fetch(fetchPath,eventid,frigateURL)
-    if current_user.group == 'admin':
-        addEvent(eventid,camera,score,object)
-        return jsonify({'msg': 'Success'})
-    else:
-        return jsonify({'msg': 'Not Authorized'})
 
 @api.route('/api/events/ack/<eventid>')
 @login_required
 def apiAckEvent(eventid):
-    query = events.query.filter_by(eventid=eventid).first()
-    query.ack = "true"
-    db.session.commit()
-    return jsonify({'msg': 'Success'})
+    try:
+        query = events.query.filter_by(eventid=eventid).first()
+        query.ack = "true"
+        db.session.commit()
+        rVal = {'msg': 'Success'}
+    except:
+        rVal = {'error': 1, 'msg': 'Failed'}
+    return jsonify(rVal)
 
 @api.route('/api/events/unack/<eventid>')
 @login_required
@@ -141,6 +129,11 @@ def apiUnackEvent(eventid):
 @api.route('/api/events/del/<eventid>')
 @login_required
 def apiDelEvent(eventid):
+    Cameras = cameras.query.all()
+    cookiejar = {}
+    cookiejar['menu'] = cookies.getCookie('menu') if cookies.getCookie('menu') else "closed"
+    cookiejar['page'] = cookies.getCookie('page') if cookies.getCookie('page') else "/"
+    cookiejar['cameras'] = str(Cameras)
     events.query.filter_by(eventid=eventid).delete()
     db.session.commit()
     return redirect(url_for('main.index'))
@@ -151,7 +144,7 @@ def apiShowLatest():
     if not inspect(db.engine).has_table("events"):
         db.create_all()
     query = events.query.order_by(desc(events.time)).limit(12).all()
-    return query
+    return iterateQuery(query)
 
 @api.route('/api/events/all')
 @login_required
@@ -159,27 +152,28 @@ def apiShowAllEvents():
     if not inspect(db.engine).has_table("events"):
         db.create_all()
     query = events.query.order_by(desc(events.time)).all()
-    return query
+    return iterateQuery(query)
 
-@api.route('/api/event/<eventid>/<view>')
+@api.route('/api/event/<eventid>')
 @login_required
 def apiSingleEvent(eventid):
     query = events.query.filter_by(eventid=eventid)
-    return query
+    return iterateQuery(query)
 
 @api.route('/api/events/camera/<camera>')
 @login_required
 def apiEventsByCamera(camera):
     query = events.query.filter_by(camera=camera)
-    return query
+    return iterateQuery(query)
 
-@api.route('/api/cameras/add/<camera>/<server>')
+@api.route('/api/cameras/add/<camera>/<server>/<show>')
 @login_required
-def apiAddCamera(camera,server):
+def apiAddCamera(camera,server,show):
     db.create_all()
     hls = f"http://{server}:5084/{camera}"
     rtsp = f"rtsp://{server}:5082/{camera}"
-    camera = cameras(camera=camera,hls=hls,rtsp=rtsp)
+    show = True if show == "true" or show == "True" else False
+    camera = cameras(camera=camera,hls=hls,rtsp=rtsp,show=show)
     db.session.add(camera)
     db.session.commit()
     return jsonify({'msg': 'Camera Added Successfully'})
@@ -193,4 +187,5 @@ def apiCameras(camera):
         query = cameras.query.all()
     else:
         query = cameras.query.filter_by(camera=camera)
-    return query
+    return iterateQuery(query)
+

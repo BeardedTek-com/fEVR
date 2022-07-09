@@ -53,20 +53,13 @@ def viewAll():
 @login_required
 def viewEventsbyCamera(Camera):
     Cameras = cameras.query.all()
-    if request.cookies.get('menu'):
-        menu = request.cookies.get('menu')
-    else:
-        menu = 'closed'
-    cookiejar = {'menu':menu}
-    if cookies.getCookie('page'):
-        page = cookies.getCookie('page')
-    else:
-        page = "/"
-    cookiejar['page'] = page
+    cookiejar = {}
+    cookiejar['menu'] = request.cookies.get('menu') if request.cookies.get('menu') else "closed"
+    cookiejar['page'] = cookies.getCookie('page') if cookies.getCookie('page') else "/"
     cookiejar['cameras'] = str(Cameras)
     title=f"{Camera.title()} Events"
     Events = events.query.filter(events.camera==Camera).order_by(desc(events.time)).all()
-    resp = make_response(render_template('events.html',Menu=menu,page=cookiejar['page'],title=title,events=Events,cameras=Cameras,camera=Camera))
+    resp = make_response(render_template('events.html',Menu=cookiejar['menu'],page=cookiejar['page'],title=title,events=Events,cameras=Cameras,camera=Camera))
     for cookie in cookiejar:
             resp.set_cookie(cookie,cookiejar[cookie])
     return resp
@@ -132,15 +125,14 @@ def viewEventsbyCameraFiltered(Camera,filter,value):
 def viewSingle(eventid,view):
     cookiejar = {}
     Cameras = cameras.query.all()
-    if request.cookies.get('menu'):
-        menu = request.cookies.get('menu')
-    else:
-        menu = 'closed'
-    cookiejar['menu'] = menu
-    page = f"/event/{eventid}/{view}"
-    cookiejar['page'] = page
+    cookiejar['menu'] = request.cookies.get('menu') if request.cookies.get('menu') else "closed"
+    cookiejar['page'] = f"/event/{eventid}/{view}"
+    cookiejar['cameras'] = str(Cameras)
     Frigate = api.apiFrigate()
-    frigateURL = Frigate['external']
+    try: 
+        frigateURL = Frigate['external']
+    except:
+        frigateURL = "http://frigate:5000/"
     if view == 'ack':
         api.apiAckEvent(eventid)
     elif view == 'unack':
@@ -152,7 +144,7 @@ def viewSingle(eventid,view):
     if event:
         if event.ack == "" and view != 'unack':
             event.ack = "true"
-        resp = make_response(render_template('event.html',Menu=menu,page=page,event=event,view=view,frigateURL=frigateURL,cameras=Cameras))
+        resp = make_response(render_template('event.html',Menu=cookiejar['menu'],page=cookiejar['page'],event=event,view=view,frigateURL=frigateURL,cameras=Cameras))
     else:
         resp = redirect(url_for('main.index'))
     return cookies.setCookies(cookiejar,resp)
