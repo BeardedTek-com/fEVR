@@ -53,7 +53,7 @@ def apiFrigate():
     if inspect(db.engine).has_table("frigate"):
         db.create_all()
     query = frigate.query.all()
-    return query
+    return iterateQuery(query)
 
 @api.route('/api/events/add/<eventid>/<camera>/<object>/<score>')
 @login_required
@@ -77,20 +77,28 @@ def apiAddEvent(eventid,camera,score,object):
     if events.query.filter_by(eventid=eventid).first():
         rVal["msg"] = 'Event Already Exists'
         rVal["error"] = 2
-    else:
-        event = events(eventid=eventid,camera=camera,object=object,score=int(score),ack='',time=time,show=show)
-        db.session.add(event)
-        db.session.commit()
-        fetchPath = f"{os.getcwd()}/app/static/events/{eventid}/"
-        frigateConfig = apiFrigate()
-        fetched = False
-        for frigate in frigateConfig:
-            frigateURL = frigateConfig[frigate]["url"]
-            print(Fetch(fetchPath,eventid,frigateURL))
-            fetched = True
-        if not fetched:
-            rVal["msg"] = "Cannot Fetch"
-            rVal["error"] = 3
+    else: 
+        try:
+            fetchPath = f"{os.getcwd()}/app/static/events/{eventid}/"
+            frigateConfig = apiFrigate()
+            fetched = False
+            for frigate in frigateConfig:
+                frigateURL = frigateConfig[frigate]["url"]
+                print(Fetch(fetchPath,eventid,frigateURL))
+                fetched = True
+            if not fetched:
+                rVal["msg"] = "Cannot Fetch"
+                rVal["error"] = 3
+        except Exception as e:
+            rVal["error"] = 4
+            rVal["msg"] = str(e).replace('"','')
+        try:
+            event = events(eventid=eventid,camera=camera,object=object,score=int(score),ack='',time=time,show=show)
+            db.session.add(event)
+            db.session.commit()
+        except Exception as e:
+            rVal["error"] = 5
+            rVal["msg"] = str(e).replace('"','')
     return jsonify(rVal)
 
 @api.route('/api/events/ack/<eventid>')
