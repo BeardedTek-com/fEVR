@@ -5,7 +5,7 @@ from sqlalchemy import desc
 import subprocess
 from datetime import datetime
 import os
-from json import dumps
+import shutil
 
 from .models.models import events,frigate,cameras
 from . import db
@@ -122,6 +122,10 @@ def apiDelEvent(eventid):
     cookiejar['page'] = cookies.getCookie('page') if cookies.getCookie('page') else "/"
     cookiejar['cameras'] = str(Cameras)
     events.query.filter_by(eventid=eventid).delete()
+    # Delete Event Files if they exist
+    eventPath = f"{os.getcwd()}/app/static/events/{eventid}"
+    if os.path.exists(eventPath):
+        shutil.rmtree(eventPath)
     db.session.commit()
     return redirect(url_for('main.index'))
 

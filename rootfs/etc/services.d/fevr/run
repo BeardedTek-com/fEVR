@@ -20,5 +20,5 @@ if [ $FEVR_DEVELOPMENT="true"]; then
     /fevr/venv/bin/flask run -h "0.0.0.0" -p $FEVR_PORT
 else
     export UWSGI_STARTING=1
-    uwsgi --http $FEVR_HOST:$FEVR_PORT --wsgi-file fevr.py --callable app --workers $UWSGI_WORKERS --uid 1000 --gid 1000
+    uwsgi --http $FEVR_HOST:$FEVR_PORT --workers $UWSGI_WORKERS --ini uwsgi.ini
 fi
