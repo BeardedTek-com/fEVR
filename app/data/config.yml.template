@@ -1,0 +1,30 @@
+#  See docs for setup instructions
+#  This yaml file will be used for both fEVR and mqtt_client
+fevr_development:
+    false
+fevr_port:
+    5090
+fevr_host:
+    fevr
+fevr_transport:
+    http://
+mqtt_broker:
+    mqtt
+mqtt_port:
+    1883
+mqtt_user:
+mqtt_password:
+mqtt_topics:
+    frigate/+
+mqtt_apikey:
+    value
+tailscale_enable:
+    true
+tailscale_tags:
+    # tags:fevr
+tailscale_hostname:
+    fevr
+tailscale_authkey:
+    tskey-XXXXXXXXXXXX-XXXXXXXXXXXXXXXXXXXXXX
+verbose:
+    true

@@ -15,14 +15,17 @@
 #    You should have received a copy of the GNU AfferoGeneral Public License
 #    along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-from flask import jsonify
+import yaml
 
-def iterateQuery(query):
-    output={}
-    if query:
-        for q in query:
-            output[q.id] = {}
-            for item in q.__dict__:
-                if not item.startswith('_') and item != "id":
-                    output[q.id][item] = q.__dict__[item]
-    return output
+def load_config(config_file):
+    with open(config_file, "r") as config_fh:
+        config = config_fh.read()
+    myConfig = {}
+    try:
+        myConfig = yaml.safe_load(config)
+    except:
+        myConfig = {}
+    return myConfig
+
+if __name__ == "__main__":
+    print(load_config("/home/localadmin/Documents/GitHub/fEVR/app/data/config.yml.template"))

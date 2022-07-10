@@ -1,3 +1,20 @@
+#    This code is a portion of frigate Event Video Recorder (fEVR)
+#
+#    Copyright (C) 2021-2022  The Bearded Tek (http://www.beardedtek.com) William Kenny
+#
+#    This program is free software: you can redistribute it and/or modify
+#    it under the terms of the GNU Affero General Public License as published by
+#    the Free Software Foundation, either version 3 of the License, or
+#    (at your option) any later version.
+#
+#    This program is distributed in the hope that it will be useful,
+#    but WITHOUT ANY WARRANTY; without even the implied warranty of
+#    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#    GNU General Public License for more details.
+#
+#    You should have received a copy of the GNU AfferoGeneral Public License
+#    along with this program.  If not, see <https://www.gnu.org/licenses/>.
+
 from flask import Blueprint, render_template, redirect, url_for, make_response, flash, request
 from flask_login import login_required
 from sqlalchemy import desc
@@ -113,17 +130,19 @@ def viewEventsbyCameraFiltered(Camera,filter,value,currentPage):
         title=f"{Camera.title()} Events by {value.title()}"
         if Camera == "all":
             if filter == 'object':
-                Events = events.query.filter(events.object==value).order_by(desc(events.time)).paginate(currentPage,perPage,error_out=False)
+                Events = events.query.filter(events.object==value,events.show==True).order_by(desc(events.time)).paginate(currentPage,perPage,error_out=False)
             if filter == 'score':
-                Events = events.query.filter(events.score==int(value)).order_by(desc(events.time)).paginate(currentPage,perPage,error_out=False)
+                Events = events.query.filter(events.score==int(value),events.show==True).order_by(desc(events.time)).paginate(currentPage,perPage,error_out=False)
             if filter == 'ack':
-                Events = events.query.filter(events.ack==value).order_by(desc(events.time)).paginate(currentPage,perPage,error_out=False)
+                value = "" if value == "false" else value
+                Events = events.query.filter(events.ack==value,events.show==True).order_by(desc(events.time)).paginate(currentPage,perPage,error_out=False)
         else:
             if filter == 'object':
                 Events = events.query.filter(events.camera==Camera,events.object==value).order_by(desc(events.time)).paginate(currentPage,perPage,error_out=False)
             if filter == 'score':
                 Events = events.query.filter(events.camera==Camera,events.score==int(value)).order_by(desc(events.time)).paginate(currentPage,perPage,error_out=False)
             if filter == 'ack':
+                value = "" if value == "false" else value
                 Events = events.query.filter(events.camera==Camera,events.ack==value).order_by(desc(events.time)).paginate(currentPage,perPage,error_out=False)
     else:
         flashMessage = f"Invalid filter selected. Valid filters are:"
@@ -171,6 +190,7 @@ def viewSingle(eventid,view):
     if event:
         if event.ack == "" and view != 'unack':
             event.ack = "true"
+            db.session.commit()
         resp = make_response(render_template('event.html',Menu=cookiejar['menu'],page=cookiejar['page'],event=event,view=view,frigateURL=frigateURL,cameras=Cameras))
     else:
         resp = redirect(url_for('main.index'))

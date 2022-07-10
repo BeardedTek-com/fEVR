@@ -68,6 +68,7 @@ services:
       - /export/fevr:/fevr/app/static/events
       - /export/fevr/data:/fevr/app/data
       - ./fevr/varlib:/var/lib
+      - ./fevr/config:/fevr/app/data/config:ro
     depends_on:
       - mqtt
       - rtsp-relay

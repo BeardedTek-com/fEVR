@@ -1,10 +1,10 @@
-#!/fevr/venv/bin/python
-#    fEVR (frigate Event Video Recorder)
+#!/usr/bin/env python
+#    This code is a portion of frigate Event Video Recorder (fEVR)
 #
 #    Copyright (C) 2021-2022  The Bearded Tek (http://www.beardedtek.com) William Kenny
 #
 #    This program is free software: you can redistribute it and/or modify
-#    it under the terms of the GNU General Public License as published by
+#    it under the terms of the GNU Affero General Public License as published by
 #    the Free Software Foundation, either version 3 of the License, or
 #    (at your option) any later version.
 #
@@ -13,7 +13,7 @@
 #    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 #    GNU General Public License for more details.
 #
-#    You should have received a copy of the GNU General Public License
+#    You should have received a copy of the GNU AfferoGeneral Public License
 #    along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 from paho.mqtt import client as mqtt_client
@@ -29,6 +29,7 @@ from math import floor
 from logit import logit
 import socket
 import json
+import yaml
 
 class getLocalIP:
     s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
@@ -62,31 +63,43 @@ class fevrMQTT:
         self.script = 'MQTT | client'
         hostname = socket.gethostname()
         self.clientID = f"fevr-{hostname}-{randint(0,100)}"
-        self.verbose=False
-        self.setup()
-        self.run()
+        self.verbose = False
+        self.setupComplete = False
+        try:
+            self.setup()
+            self.setupComplete = True
+        except Exception as e:
+            logit.execute(f"ERROR: {e}",src= self.script)
+        try:
+            if self.setupComplete:
+                self.run()
+        except socket.gaierror as e:
+            if "Errno -2" in str(e):
+                logit.execute(f"ERROR: MQTT Broker 'mqtt://{self.broker}:{self.port}' cannot be reached.")
+        except Exception as e:
+            logit.execute(f"ERROR: {e}",src= self.script)
+            pass
     def getConfig(self,config):
+        validConfig = True
         if path.isfile(config) and access(config, R_OK):
             with open(config) as configFile:
                 try:
-                    self.configJSON = json.load(configFile)
-                except ValueError:
-                    return "File Not JSON formatted"
-                values = ['fevr_url','fevr_transport','fevr_apikey','mqtt_broker','mqtt_port','mqtt_user','mqtt_password','mqtt_topics','verbose']
+                    self.Config = yaml.safe_load(configFile)
+                except:
+                    self.Config = {}
+                values = ['fevr_url','fevr_transport','mqtt_apikey','mqtt_broker','mqtt_port','mqtt_user','mqtt_password','mqtt_topics','verbose']
                 validConfig=True
                 for value in values:
                     try:
-                        test = self.configJSON[value]
+                        test = self.Config[value]
                     except KeyError:
                         validConfig=False
                         try:
                             missing +=f', {value}'
                         except UnboundLocalError:
                             missing = value
-                if validConfig:
-                    return "valid"
-                else:
-                    return f"Missing keys: {missing}. See docs"
+                msg = missing if missing else ""
+                return {"valid": validConfig,"message": msg}
         else:
             if path.isfile(config):
                 return "File Does not exist"
@@ -119,16 +132,16 @@ class fevrMQTT:
         excluded = None
         if args.config:
             if self.getConfig(args.config) == "valid":
-                # Use defaults if env vars aren't set, otherwise, use env vars.
-                self.fevr = "localhost:5090" if not self.configJSON["fevr_url"] else self.configJSON["fevr_url"]
-                self.broker = "mqtt" if not self.configJSON["mqtt_broker"] else self.configJSON["mqtt_broker"]
-                self.port = 1883 if not self.configJSON["mqtt_port"] else int(self.configJSON["mqtt_port"])
-                self.username = "" if not self.configJSON["mqtt_user"] else self.configJSON["mqtt_user"]
-                self.password = "" if not self.configJSON["mqtt_password"] else self.configJSON["mqtt_password"]
-                self.apikey = "" if not self.configJSON["fevr_apikey"] else self.configJSON["fevr_apikey"]
-                self.verbose = self.configJSON["verbose"]
-                self.transport = "https://" if self.configJSON["fevr_transport"] == "https" or self.configJSON["fevr_transport"] == "https://" else "http://"
-                topics = "frigate/+" if not self.configJSON["mqtt_topics"] else self.configJSON["mqtt_topics"]
+                # Use defaults if yaml values are not set
+                self.fevr = "localhost:5090" if not self.Config["fevr_host"] and self.Config["fevr_port"] else f"{self.Config['fevr_host']}:{self.Config['fevr_port']}"
+                self.broker = "mqtt" if not self.Config["mqtt_broker"] else self.Config["mqtt_broker"]
+                self.port = 1883 if not self.Config["mqtt_port"] else int(self.Config["mqtt_port"])
+                self.username = "" if not self.Config["mqtt_user"] else self.Config["mqtt_user"]
+                self.password = "" if not self.Config["mqtt_password"] else self.Config["mqtt_password"]
+                self.apikey = "" if not self.Config["mqtt_apikey"] else self.Config["mqtt_apikey"]
+                self.verbose = self.Config["verbose"]
+                self.transport = "https://" if self.Config["fevr_transport"] == "https" or self.Config["fevr_transport"] == "https://" else "http://"
+                topics = "frigate/+" if not self.Config["mqtt_topics"] else self.Config["mqtt_topics"]
 
                 self.topics = []
                 topics = topics.split(',',5)

@@ -52,7 +52,7 @@ Feature comparison to leading cloud event detection providers
 
 # Documentation
 ## **[Main API Calls](docs/API.md)**
-
+## **[mqtt_client](docs/MQTT_CLIENT.md)**
 ---
 
 # Installation

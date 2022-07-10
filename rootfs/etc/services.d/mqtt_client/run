@@ -1,10 +1,23 @@
 #!/usr/bin/with-contenv bash
-# This will check if run_mqtt_client.sh has been generated.
-# If it has not, we will check every 5 seconds
-# After 300 seconds of checking (60 cycles) we will output an error msg
-# telling the user to run the configuration
+#    This code is a portion of frigate Event Video Recorder (fEVR)
+#
+#    Copyright (C) 2021-2022  The Bearded Tek (http://www.beardedtek.com) William Kenny
+#
+#    This program is free software: you can redistribute it and/or modify
+#    it under the terms of the GNU Affero General Public License as published by
+#    the Free Software Foundation, either version 3 of the License, or
+#    (at your option) any later version.
+#
+#    This program is distributed in the hope that it will be useful,
+#    but WITHOUT ANY WARRANTY; without even the implied warranty of
+#    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#    GNU General Public License for more details.
+#
+#    You should have received a copy of the GNU AfferoGeneral Public License
+#    along with this program.  If not, see <https://www.gnu.org/licenses/>.
+
 while :; do
     if [ -f "/fevr/app/data/config.json" ]; then
-        /fevr/venv/bin/python /fevr/app/mqtt_client -c "/fevr/app/data/config.json"
+        /fevr/venv/bin/python /fevr/app/mqtt_client -c "/fevr/app/data/config"
     fi
 done
