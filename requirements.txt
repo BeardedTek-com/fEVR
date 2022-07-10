@@ -1,5 +1,5 @@
-requests~=2.27.1
-Pillow~=9.1.1
+requests~=2.28.1
+Pillow~=9.2.0
 paho-mqtt~=1.6.1
 Flask~=2.1.2
 flasK_sqlalchemy~=2.5.1
@@ -11,3 +11,4 @@ python-dateutil
 pytz
 uwsgi
 netifaces
+PyYAML
