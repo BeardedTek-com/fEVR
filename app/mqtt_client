@@ -75,6 +75,8 @@ class fevrMQTT:
                 try:
                     Config = yaml.safe_load(configFile)
                     self.Config = json.dumps(Config)
+                    #self.Config['mqtt_user'] = "" if not self.Config['mqtt_user'] else self.Config['mqtt_user']
+                    #self.Config['mqtt_password'] = "" if not self.Config['mqtt_password'] else self.Config['mqtt_user']
                     print(self.Config)
                 except Exception as e:
                     print(f"ERROR: {e}")
@@ -132,8 +134,8 @@ class fevrMQTT:
                 self.fevr = "localhost:5090" if not self.Config["fevr_host"] and self.Config["fevr_port"] else f"{self.Config['fevr_host']}:{self.Config['fevr_port']}"
                 self.broker = "mqtt" if not self.Config["mqtt_broker"] else self.Config["mqtt_broker"]
                 self.port = 1883 if not self.Config["mqtt_port"] else int(self.Config["mqtt_port"])
-                self.username = "" if self.Config["mqtt_user"] == None else self.Config["mqtt_user"]
-                self.password = "" if self.Config["mqtt_password"] == None else self.Config["mqtt_password"]
+                self.username = "" if not self.Config["mqtt_user"] else self.Config["mqtt_user"]
+                self.password = "" if not self.Config["mqtt_password"] else self.Config["mqtt_password"]
                 self.apikey = "" if not self.Config["mqtt_apikey"] else self.Config["mqtt_apikey"]
                 self.verbose = self.Config["verbose"]
                 self.transport = "https://" if self.Config["fevr_transport"] == "https" or self.Config["fevr_transport"] == "https://" else "http://"
