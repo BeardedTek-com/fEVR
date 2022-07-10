@@ -3,18 +3,37 @@
 {% block content %}
 <div class="filters">
     {% if camera == "all" %}
-    <div class="filter"><a href="/">Latest</a></div>
-
     <div class="filter"><a href="/all">All</a></div>
+    <div class="filter"><a href="/events/camera/all/object/person">Person</a></div>
+    <div class="filter"><a href="/events/camera/all/object/animal">Animal</a></div>
+    <div class="filter"><a href="/events/camera/all/object/car">Vehicle</a></div>
+    <div class="filter"><a href="/events/camera/all/ack/false">New</a></div>
     {% else %}
     <div class="filter"><a href="/events/camera/{{camera}}">All</a></div>
-    {% endif %}
     <div class="filter"><a href="/events/camera/{{camera}}/object/person">Person</a></div>
     <div class="filter"><a href="/events/camera/{{camera}}/object/animal">Animal</a></div>
     <div class="filter"><a href="/events/camera/{{camera}}/object/car">Vehicle</a></div>
-    
+    <div class="filter"><a href="/events/camera/{{camera}}/ack/false">New</a></div>
+    {% endif %}
+    <div class='pages'>
+        {{ Pages["eventCount"] }} events total
+    </div>
+    <div class='pages'>
+    {% if Pages["prevURL"] %}
+        <a href="{{ Pages["prevURL"] }}">Prev</a>
+    {% else %}
+        Prev
+    {% endif %}
+        Page {{ Pages["page"] }} of {{ Pages["pageCount"] }}
+    {% if Pages["nextURL"] %}
+        <a href="{{ Pages["nextURL"] }}">Next</a>
+    {% else %}
+        Next
+    {% endif %}
+    </div>
 </div>
-{% if events|length > 0 %}
+
+{% if events %}
     {% for event in events %}
         {% for Camera in cameras %}
             {% if event.camera == Camera.camera %}

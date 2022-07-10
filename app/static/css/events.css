@@ -13,6 +13,15 @@ a:hover{
     filter: drop-shadow(0 0 0.03em rgb(49, 55, 66));
     color: rgb(200, 200, 200);
 }
+.pages{
+    flex-grow: 1;
+    text-align: right;
+}
+.pages a{
+    font-size: 1em;
+    color: white;  
+    padding: 0em 0.5em 0em 0.5em;
+}
 .danger a{
     color: rgb(255, 125, 125);
 }
@@ -450,6 +459,7 @@ select:hover{
     justify-content: flex-start;
     align-items: baseline;
     padding-left: 2em;
+    padding-right: 2em;
     padding-bottom: 1em;
     width: 100%;
 }
