@@ -13,3 +13,4 @@ vol
 run_mqtt_client.sh
 events/*
 data/*
+test

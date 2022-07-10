@@ -50,13 +50,10 @@ class auth:
         JsonPost = {'key':self.apikey,'ip':getLocalIP.addr}
         # Send the post using our session
         fevrUrl = f"{self.transport}{self.fevr}/apiAuth"
-        logit.execute(f"Authenticating with {fevrUrl}",src=self.script)
         apiAuth = self.rSession.post(f"{fevrUrl}", json=JsonPost)
         apiAuthJSON = json.loads(apiAuth.content)
-        if apiAuthJSON['auth']:
-            logit.execute(f"AUTH SUCCESS: source: {apiAuthJSON['authIP']} name: {apiAuthJSON['name']}",src=self.script)
-        else:
-            logit.execute(f"AUTH FAILURE: source:{apiAuthJSON['authIP']} name: {apiAuthJSON['name']}",src=self.script)
+        authResult = "SUCCESS" if apiAuthJSON['auth'] else "FAILURE"
+        logit.execute(f"{fevrUrl} AUTH {authResult}: {apiAuthJSON['authIP']} name: {apiAuthJSON['name']}",src=self.script)
     
 class fevrMQTT:
     def __init__(self):
@@ -73,13 +70,11 @@ class fevrMQTT:
         if path.isfile(config) and access(config, R_OK):
             with open(config) as configFile:
                 try:
-                    Config = yaml.safe_load(configFile)
-                    self.Config = json.dumps(Config)
-                    #self.Config['mqtt_user'] = "" if not self.Config['mqtt_user'] else self.Config['mqtt_user']
-                    #self.Config['mqtt_password'] = "" if not self.Config['mqtt_password'] else self.Config['mqtt_user']
-                    print(self.Config)
+                    self.Config = yaml.safe_load(configFile)
+                    if self.verbose:
+                        logit.execute(self.Config,src=self.script)
                 except Exception as e:
-                    print(f"ERROR: {e}")
+                    logit.execute(f"ERROR: {e}",src=self.script)
                     self.Config = {}
                 values = ['fevr_host','fevr_port','fevr_transport','mqtt_apikey','mqtt_broker','mqtt_port','mqtt_user','mqtt_password','mqtt_topics','verbose']
                 validConfig=True
@@ -92,13 +87,14 @@ class fevrMQTT:
                             missing +=f', {value}'
                         except UnboundLocalError:
                             missing = value
-                logit.execute(f"DATA:: valid: {validConfig} msg: {missing}", src=self.script)
                 msg = missing if missing else ""
-                return {"valid": validConfig,"message": msg}
+                
         else:
+            validConfig = False
             if path.isfile(config):
-                return "File Does not exist"
-            return "File is not readable by user"
+                msg = "File Does not exist"
+            msg = "File is not readable by user"
+        return {"valid": validConfig,"message": msg}
         
     def setup(self):
         parser = argparse.ArgumentParser()
@@ -126,10 +122,7 @@ class fevrMQTT:
         
         excluded = None
         if args.config:
-            logit.execute("DEBUG: args.config exists",src=self.script)
-            if self.getConfig(args.config) == "valid":
-                logit.execute("DEBUG: args.config VALID",src=self.script)
-                logit.execute(f"DEBUG:: self.Config: {self.Config}")
+            if self.getConfig(args.config)['valid']:
                 # Use defaults if yaml values are not set
                 self.fevr = "localhost:5090" if not self.Config["fevr_host"] and self.Config["fevr_port"] else f"{self.Config['fevr_host']}:{self.Config['fevr_port']}"
                 self.broker = "mqtt" if not self.Config["mqtt_broker"] else self.Config["mqtt_broker"]
@@ -180,16 +173,14 @@ class fevrMQTT:
                         excluded = f"Topic Limit Exceeded. Excluded Topics: "
                     excluded += f"'{topic}' "
         if excluded:
-            logit.execute(excluded,src=self.script)
+            logit.execute(f"Only 5 topics allowd.  Excluded Topics: {excluded}",src=self.script)
         if self.verbose:
-            if self.apikey:
-                key=True
+            key=True if self.apikey else False
             logit.execute(f"fevr:{self.fevr} | broker: {self.broker} | port: {self.port} | user: {self.username} | password: {self.password} | https: {args.https} | apiKey: {key} | topics: {self.topics}", src=self.script)
     def connect_mqtt(self) -> mqtt_client:
         def on_connect(client, userdata, flags, rc):
                 if rc == 0:
                     logit.execute(f"Connected to {self.broker}:{self.port} as {self.clientID}",src=self.script)
-                    logit.execute(f"Subscribed to:{self.topics}".replace('[','\t').replace(']','').replace(', ','\t').replace("'",""),src=self.script)
                 else:
                     logit.execute("Failed to connect, return code %d", rc,src=self.script)
         client = mqtt_client.Client(self.clientID)
@@ -205,12 +196,8 @@ class fevrMQTT:
             # Create Session to share cookies
             rSession = requests.Session()
             event = loads(msg)
-            if self.verbose:
-                eventfound = f"\n{json.dumps(event)}"
-            else:
-                eventfound = event["after"]["id"]
-            eventtype = event["type"]
-            logit.execute(f"EVENT ({eventtype}) FOUND: {eventfound}", src=self.script)
+            eventfound = f"\n{json.dumps(event)}" if self.verbose else event["after"]["id"]
+            logit.execute(f"EVENT ({event['type']}) FOUND: {eventfound}", src=self.script)
             
             after = event['after']
             if event['type'] == 'end':
@@ -230,10 +217,8 @@ class fevrMQTT:
                 # It's log, it's log, it's better than bad it's good.
                 if self.verbose:
                     logit.execute(fEVRurl,src=self.script)
-                if respJSON["error"] == 0:
-                    logit.execute(f"SUCCESS: {eventid} ({Object} in {camera}) added",src=self.script)
-                else:
-                    logit.execute(f"FAILURE: {respJSON}",src=self.script)
+                LogMsg = f"SUCCESS: {eventid} ({Object} in {camera}) added" if respJSON["error"] == 0 else f"FAILURE: {respJSON}"
+                logit.execute(LogMsg,src=self.script)
     def subscribe(self, client: mqtt_client):
         def on_message(client, userdata, msg):
             ## This is where our code goes to do what we want when a message is received
@@ -241,8 +226,7 @@ class fevrMQTT:
                 logit.execute(f"{msg.topic}: Message Received",src=self.script)
             self.processMsg(msg.payload.decode(),msg.topic)
         for topic in self.topics:
-            if self.verbose:
-                logit.execute(f"Subscribed to: {topic}",src=self.script)
+            logit.execute(f"Subscribing to: {topic}",src=self.script)
             client.subscribe(topic)
         client.on_message = on_message
     def run(self):
