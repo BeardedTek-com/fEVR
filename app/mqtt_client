@@ -67,7 +67,7 @@ class fevrMQTT:
                             'mqtt_port':1883,
                             'mqtt_user':'',
                             'mqtt_password':'',
-                            'mqtt_apikey':'',
+                            'mqtt_apikey': '',
                             'verbose': False,
                             'fevr_transport': 'http://',
                             'mqtt_topics': "frigate/+"
@@ -109,25 +109,15 @@ class fevrMQTT:
     def cla(self):
         parser = argparse.ArgumentParser()
         parser.add_argument('-c','--config',type=str,required=False,help="If set, uses command line options instead of the database (default: empty)")
-        parser.set_defaults(db=True)
         parser.add_argument('-m','--mqtt_broker',type=str,required=False,help="MQTT Broker IP/FQDN (default: mqtt)")
-        parser.set_defaults(mqtt="mqtt")
         parser.add_argument('-k','--mqtt_apikey',type=str,required=False,help="fEVR API Key (default: blank string)")
-        parser.set_defaults(key="")
         parser.add_argument('-p','--mqtt_port',type=int,required=False,help="MQTT Port (default: 1883)")
-        parser.set_defaults(port=1883)
         parser.add_argument('-t','--mqtt_topics',type=str,required=False,help="MQTT Topics (default: 'frigate/+')")
-        parser.set_defaults(topics="frigate/+")
         parser.add_argument('-u','--mqtt_user',type=str,required=False,help="MQTT Username (default: '')")
-        parser.set_defaults(user="")
         parser.add_argument('-P','--mqtt_password',type=str,required=False,help="MQTT Password (default: '')")
-        parser.set_defaults(password="")
         parser.add_argument('-f','--fevr',type=str,required=False,help="fEVR IP Address/FQDN (default: '127.0.0.1:5090)")
-        parser.set_defaults(fevr='127.0.0.1:5090')
         parser.add_argument('-s','--fevr_transport',action='store_true',required=False,help="If set uses https:// for fEVR API Calls (default: False)")
-        parser.set_defaults(https=False)
         parser.add_argument('-v','--verbose',action='store_true',required=False,help="If set, outputs verbosely to stdout")
-        parser.set_defaults(verbose=False)
         args = parser.parse_args()
         return vars(args)
     
@@ -158,14 +148,21 @@ class fevrMQTT:
             # If we set the command line argument, override the config file
             if self.Args[key]:
                 self.config[key] = self.Args[key]
-            else:
+            elif self.configFile[key]:
                 self.config[key] = self.configFile[key]
-        if self.config['verbose']:
-            key=True if self.config['mqtt_apikey'] else False
+            if key == "mqtt_apikey":
+                if self.config[key] and self.config[key] != "":
+                    Key = True
+                else:
+                    Key = False
+                value = Key
+            else:
+                value = self.config[key]
+            logit.execute(f"{key}: {value}")
         # Parse the topics into a list if it's a string.
         if isinstance(self.config['mqtt_topics'],str):
             self.config['mqtt_topics'] = self.parseTopics()
-        logit.execute(f"fevr:{self.config['fevr']} | broker: {self.config['mqtt_broker']} | port: {self.config['mqtt_port']} | user: {self.config['mqtt_user']} | password: {self.config['mqtt_password']} | https: {self.config['fevr_transport']} | apiKey: {key} | topics: {self.config['mqtt_topics']}", src=self.script)
+        logit.execute(f"fevr:{self.config['fevr']} | broker: {self.config['mqtt_broker']} | port: {self.config['mqtt_port']} | user: {self.config['mqtt_user']} | password: {self.config['mqtt_password']} | https: {self.config['fevr_transport']} | apiKey: {self.config['mqtt_apikey']} | topics: {self.config['mqtt_topics']}", src=self.script)
         
     def connect_mqtt(self) -> mqtt_client:
         def on_connect(client, userdata, flags, rc):
