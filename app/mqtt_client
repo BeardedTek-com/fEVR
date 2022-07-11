@@ -162,7 +162,7 @@ class fevrMQTT:
         # Parse the topics into a list if it's a string.
         if isinstance(self.config['mqtt_topics'],str):
             self.config['mqtt_topics'] = self.parseTopics()
-        logit.execute(f"fevr:{self.config['fevr']} | broker: {self.config['mqtt_broker']} | port: {self.config['mqtt_port']} | user: {self.config['mqtt_user']} | password: {self.config['mqtt_password']} | https: {self.config['fevr_transport']} | apiKey: {self.config['mqtt_apikey']} | topics: {self.config['mqtt_topics']}", src=self.script)
+        logit.execute(f"fevr:{self.config['fevr']} | broker: {self.config['mqtt_broker']} | port: {self.config['mqtt_port']} | user: {self.config['mqtt_user']} | password: {self.config['mqtt_password']} | https: {self.config['fevr_transport']} | apiKey: {Key} | topics: {self.config['mqtt_topics']}", src=self.script)
         
     def connect_mqtt(self) -> mqtt_client:
         def on_connect(client, userdata, flags, rc):
