@@ -196,8 +196,8 @@ class fevrMQTT:
             if event['type'] == 'end':
                 # If the event is over, we create a session variable, authenticate, and tell fEVR via it's API to get the event.
                 rSession = requests.Session()
-                auth(transport=self.transport,apikey=self.config['mqtt_apikey'],fevr=self.config['fevr'],rSession=rSession)
-                fEVRurl = f"{self.transport}{self.config['fevr']}/api/events/add/{event['after']['id']}/{event['after']['camera']}/{event['after']['label']}/{floor(float(event['after']['score'])*100)}"
+                auth(transport=self.config['fevr_transport'],apikey=self.config['mqtt_apikey'],fevr=self.config['fevr'],rSession=rSession)
+                fEVRurl = f"{self.config['fevr_transport']}{self.config['fevr']}/api/events/add/{event['after']['id']}/{event['after']['camera']}/{event['after']['label']}/{floor(float(event['after']['score'])*100)}"
                 addEventResponse = rSession.get(fEVRurl)
                 respJSON = json.loads(addEventResponse.content)
                 if self.config['verbose']:
