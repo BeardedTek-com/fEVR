@@ -7,24 +7,31 @@ mqtt_client is an integral part of fEVR.  It functions as the link between fEVR 
 - Configurable by yaml, json, or command line arguments
 
 # What is it doing?
-- Loads config from either yaml, Json, or command line arguments
+- Loads config from either yaml, Json, command line arguments, or leaves the default
     - Priority:
-        1. Yaml
-        2. Json
-        3. Command Line
+        1. Command Line Argument
+        2. Config File
+        3. Defaults
+    - Defaults:
+        - 'fevr': "localhost:5090"
+        - 'mqtt_broker': "mqtt"
+        - 'mqtt_port': 1883
+        - 'mqtt_user': ''
+        - 'mqtt_password': ''
+        - 'mqtt_apikey': ''
+        - 'verbose': False
+        - 'fevr_transport': 'http://'
+        - 'mqtt_topics': "frigate/+"
 - Connects to MQTT Broker
 - Subscribes to topics
 - Listens for frigate/events
     - When it sees an event type of "end" it connects to fEVR's API
-        - **http(s)://`<fevr_host>`:`<fevr_port>`/api/events/add/`<eventid>`/`<camera>`/`<object>`/`<score>`**
-        - fEVR then contacts frigate to pull down the event snapshot and video clip
-        - fEVR generates a thumbnail
-        - fEVR inserts data about the event into it's database
-        - fEVR notifies mqtt_client of the status of these actions
-        - mqtt_client goes back to listening
+        - sends an http request to **http(s)://`<fevr_host>`:`<fevr_port>`/api/events/add/`<eventid>`/`<camera>`/`<object>`/`<score>`**
+        - waits for a response from fEVR's API
+        - goes back to listening
 
 # Why is it a separate program?
-If mqtt_client fails, it attempts to restart itself independently of fEVR so it does not take down the entire stack.
+    1. If mqtt_client fails, it can restart itself independently of fEVR so it does not take down the entire stack.
 
 # Configuration
 
@@ -33,7 +40,6 @@ Here is a sample yaml configuration file:
 [yaml 1.2 specification](https://yaml.org/spec/1.2.2/)
 [yamllint.com](https://yamllint.com) - Test to see if your yaml is properly formatted.
 ```
-# See docs for setup instructions
 fevr_host:
     localhost
 fevr_port:
@@ -47,7 +53,9 @@ mqtt_port:
 mqtt_user:
 mqtt_password:
 mqtt_topics:
-    frigate/+
+    - frigate/available
+    - frigate/events
+    - frigate/stats
 mqtt_apikey:
     128-bit-apikey-from-fevr
 verbose:
@@ -65,7 +73,7 @@ Here is a sample Json configuration file:
     "mqtt_port": 1883,
     "mqtt_user": null,
     "mqtt_password": null,
-    "mqtt_topics": "frigate/+",
+    "mqtt_topics": ["frigate/available","frigate/events","frigate/stats"],
     "mqtt_apikey": "128-char-apikey-from-fevr",
     "verbose": true
 }
