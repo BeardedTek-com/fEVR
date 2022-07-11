@@ -16,16 +16,15 @@
 #    along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 # External Imports
-from flask import Flask, session, jsonify
-from flask_sqlalchemy import SQLAlchemy, inspect
-from sqlalchemy import desc
+from flask import Flask, session
+from flask_sqlalchemy import SQLAlchemy
 import json
 from flask_login import LoginManager
 from datetime import timedelta
-from datetime import datetime
-from dateutil import tz
 import pytz
-from os import environ,path,access,R_OK
+
+# Config File
+configFile = "data/config"
 
 # Flask app Setup
 app = Flask(__name__)
@@ -36,37 +35,43 @@ login_mgr.login_view = 'login'
 login_mgr.refresh_view = 'relogin'
 login_mgr.needs_refresh_message = (u"Session timedout, please re-login")
 login_mgr.needs_refresh_message_category = "info"
+
+# Setup Session Timeout
 @app.before_request
 def before_request():
     session.permanent = True
     app.permanent_session_lifetime = timedelta(minutes=30)
 
 # Database Setup
-
 db = SQLAlchemy(app)
 app.SQLALCHEMY_TRACK_MODIFICATIONS=False
 
+from app.models.user import User
+
+# Flask Login Setup
 login_manager = LoginManager()
 login_manager.login_view = 'auth.login'
 login_manager.init_app(app)
 
-from .models.models import User, mqtt
-
 @login_manager.user_loader
 def load_user(user_id):
     return User.query.get(int(user_id))
-from .api import api as api_blueprint
+
+# Import Blueprints
+from app.blueprints.api import api as api_blueprint
 app.register_blueprint(api_blueprint)
 
-from .main import main as main_blueprint
+from app.blueprints.main import main as main_blueprint
 app.register_blueprint(main_blueprint)
 
-from .auth import auth as auth_blueprint
+from app.blueprints.auth import auth as auth_blueprint
 app.register_blueprint(auth_blueprint)
 
-from .setup import setup as setup_blueprint
+from app.blueprints.setup import setup as setup_blueprint
 app.register_blueprint(setup_blueprint)
 
+
+# Define Templates
 @app.template_filter('timezone')
 def convertTZ(time,clockFmt=12,Timezone="America/Anchorage"):
         dt_utc = time
@@ -78,40 +83,3 @@ def convertTZ(time,clockFmt=12,Timezone="America/Anchorage"):
             outformat = "%-m/%-d/%y %H:%M:%S"
         outTime = dt.strftime(outformat).lower()
         return outTime
-
-# Setup mqtt_client
-# Gather environment variables in a dict
-# NOTE: Environment Variables are only used if app/data/config.json does not exist.
-
-def writeConfigFile(file,ev):
-    config = {}
-    config["fevr_url"] = f"{ev['FEVR_URL']}:{ev['FEVR_PORT']}"
-    if ev["MQTT_TRANSPORT"] == "https" or ev["MQTT_TRANSPORT"] == "https://":
-        config["fevr_transport"] = "https://"
-    else:
-        config["fevr_transport"] = "http://"
-    config["fevr_apikey"] = ev["MQTT_APIAUTH_KEY"]
-    config["mqtt_broker"] = ev["MQTT_BROKER"]
-    config["mqtt_port"] = ev["MQTT_BROKER_PORT"]
-    config["mqtt_user"] = ev["MQTT_BROKER_USER"]
-    config["mqtt_password"] = ev["MQTT_BROKER_PASSWORD"]
-    config["mqtt_topics"] = ev["MQTT_TOPICS"]
-    config["verbose"] = ev["MQTT_VERBOSE_LOGGING"]
-    with open('/fevr/app/data/config.json', "w") as configFile:
-        json.dump(config,configFile,sort_keys=True,indent=0)
-
-ev = {}
-ev["MQTT_BROKER_PORT"] = environ.get("MQTT_BROKER_PORT")
-ev["MQTT_TOPICS"] = environ.get("MQTT_TOPICS")
-ev["MQTT_BROKER_USER"] = environ.get("MQTT_BROKER_USER")
-ev["MQTT_BROKER_PASSWORD"] = environ.get("MQTT_BROKER_PASSWORD")
-ev["MQTT_TRANSPORT"] = environ.get("MQTT_TRANSPORT")
-ev["MQTT_BROKER"] = environ.get("MQTT_BROKER")
-ev["MQTT_APIAUTH_KEY"] = environ.get("MQTT_APIAUTH_KEY")
-ev["FEVR_URL"] = environ.get('FEVR_URL')
-ev["FEVR_PORT"] = environ.get('FEVR_PORT')
-ev["MQTT_VERBOSE_LOGGING"] = environ.get("MQTT_VERBOSE_LOGGING")
-
-config="/fevr/app/data/config.json"
-if not path.isfile(config) or not access(config, R_OK):
-    writeConfigFile(config,ev)

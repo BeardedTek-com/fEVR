@@ -18,15 +18,16 @@
 from flask import Blueprint, render_template, redirect, url_for, make_response, flash, request
 from flask_login import login_required
 from sqlalchemy import desc
-from math import ceil
 
-from .models.models import frigate, cameras, events, User, apiAuth, config
-from . import api
-from .helpers.cookies import cookies
-from .logit import logit
-from . import db
+from app.models.cameras import cameras
+from app.models.events import events
+import app.blueprints.api as api
+from app.helpers.cookies import cookies
+from app.helpers.logit import logit
+from app import db
+
+
 main = Blueprint('main',__name__)
-
 
 # Main Routes
 @main.route('/', defaults={'currentPage': 1})

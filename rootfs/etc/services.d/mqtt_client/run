@@ -17,7 +17,7 @@
 #    along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 while :; do
-    if [ -f "/fevr/app/data/config.json" ]; then
+    if [ -f "/fevr/app/data/config" ]; then
         /fevr/venv/bin/python /fevr/app/mqtt_client -c "/fevr/app/data/config"
     fi
 done

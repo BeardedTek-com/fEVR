@@ -15,16 +15,17 @@
 #    You should have received a copy of the GNU AfferoGeneral Public License
 #    along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import ipaddress
 from flask import Blueprint, render_template, redirect, url_for, request, flash, jsonify, make_response
 from werkzeug.security import generate_password_hash, check_password_hash
 from flask_login import login_user, logout_user, login_required, current_user
 from IPy import IP
 
-from .models.models import User, apiAuth, cameras
-from . import db
-from .rndpwd import randpwd
-from  .helpers.cookies import cookies
+from app.models.user import User
+from app.models.apiauth import apiAuth
+from app.models.cameras import cameras
+from app import db
+from app.helpers.rndpwd import randpwd
+from app.helpers.cookies import cookies
 
 auth = Blueprint('auth', __name__)
 

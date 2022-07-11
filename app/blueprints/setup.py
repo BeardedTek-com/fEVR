@@ -18,16 +18,20 @@
 from flask import Blueprint, render_template, redirect, url_for, request, flash, jsonify
 from flask_login import login_required, current_user
 from werkzeug.security import generate_password_hash
-from .models.models import User,frigate,cameras,events,apiAuth,config,mqtt
-from sqlalchemy import desc, exc
-from .helpers.drawSVG import drawSVG
-from . import db
-from .rndpwd import randpwd
-from .helpers.cookies import cookies
-from os.path import exists
-import json
-setup = Blueprint('setup', __name__)
+from sqlalchemy import exc
 
+from app.models.user import User
+from app.models.frigate import frigate
+from app.models.cameras import cameras
+from app.models.config import config
+
+from app import db
+from app.helpers.rndpwd import randpwd
+from app.helpers.cookies import cookies
+from app.helpers.logit import logit
+
+
+setup = Blueprint('setup', __name__)
 
 @setup.route('/setup')
 def setupFwd():
@@ -60,11 +64,10 @@ def setupfEVR(Item):
     for row in cameras.query.all():
         Cameras.append(row.camera)
     menu=cookies.getCookie('menu')
-    status = {'db':{'cameras':False,'frigate':False,'mqtt':False,'other':False}}
+    status = {'db':{'cameras':False,'frigate':False,'other':False}}
     tables = {
         'frigate':frigate,
         'cameras':cameras,
-        'mqtt':apiAuth,
         'other':config
     }
     for table in tables:
@@ -86,23 +89,9 @@ def setupfEVR(Item):
             template = "setupcameras.html"
             resp = render_template(template,Cameras=cameras.query.all(),cameras=Cameras,menu=menu,next=next,label=label,page=page,items=status,Item=Item,user=user)
         elif Item == 'frigate':
-            next="/setup/mqtt"
+            next="/setup/other"
             template = "setupfrigate.html"
             resp = render_template(template,frigate=frigate.query.all(),cameras=Cameras,menu=menu,next=next,label=label,page=page,items=status,Item=Item,user=user)
-        elif Item == 'mqtt':
-            label = 'MQTT Client Setup'
-            next = '/setup/config'
-            template = "setupmqtt.html"            
-            MQTT = mqtt.query.first()
-            command = f"BROKER   : {MQTT.broker}<br/> \
-                        PORT     : {MQTT.port}<br/> \
-                        MQTT USER: {MQTT.user}<br/> \
-                        MQTT PASS: {MQTT.password}<br/> \
-                        TOPIC    : {MQTT.topics}<br/> \
-                        FEVR     : {MQTT.fevr}<br/> \
-                        PROTOCOL : {MQTT.https}<br/> \
-                        API KEY  : {MQTT.key}<br/>"
-            resp = render_template(template,cameras=Cameras,menu=menu,next=next,label=label,page=page,items=status,Item=Item,user=user,command=command)
         elif Item == 'config' or Item == 'other':
             label = "Other"
             next = '/'
@@ -159,14 +148,16 @@ def apiAddCameraPost():
         camera = request.form.get('camera')
         hls = request.form.get('hls')
         rtsp = request.form.get('rtsp')
-        if request.form.get('show') == "true":
-            show = True
-        else:
-            show = False
+        show = True if request.form.get('show') else False
+        logit.execute(f"Show: {show}",src="SETUP | Camera")
         camera = cameras(camera=camera,hls=hls,rtsp=rtsp,show=show)
-        db.session.add(camera)
-        db.session.commit()
-        resp = redirect('/setup/cameras')
+        try:
+            db.session.add(camera)
+            db.session.commit()
+            resp = redirect('/setup/cameras')
+        except Exception as e:
+            flash(e)
+            resp = redirect('/setup/cameras')
     else:
         resp = redirect('/')
     return resp
@@ -193,7 +184,9 @@ def apiEditCameraPost(camera):
                 edit = True
         if edit:
             db.session.commit()
-    resp = redirect('/setup/cameras')
+        resp = redirect('/setup/cameras')
+    else:
+        resp = redirect('/')
     return resp
         
 @setup.route('/setup/frigate/add',methods=['POST'])
@@ -224,91 +217,7 @@ def setupEditFrigatePost(Frigate):
             edit = True
         if edit:
             db.session.commit()
-    resp = redirect('/setup/frigate')
+        resp = redirect('/setup/frigate')
+    else:
+        resp = redirect('/')
     return resp
-
-@setup.route('/setup/mqtt/add',methods=['POST'])
-@login_required
-def setupAddMqttPost():
-    if current_user.group == "admin":
-        db.create_all()
-        broker = request.form.get('broker')
-        port = request.form.get('port')
-        brokerU = request.form.get('brokerU')
-        if not brokerU:
-            brokerU == "\"\""
-        brokerP = request.form.get('brokerP')
-        if not brokerP:
-            brokerP == "\"\""
-        topics = request.form.get('topics')
-        https = request.form.get('https')
-        fevr = request.form.get('fevr')
-        fevrport = request.form.get('fevrport')
-        key = request.form.get('key')
-        user = ""
-        password = ""
-        fields = {"broker":broker,"port":port,"user":brokerU,"password":brokerP,"topics":topics,"https":https,"fevr":fevr,"fevrport":fevrport,"key":key}
-        Valid = True
-        for field in fields:
-            if not fields[field] and field == "broker" and field == "key":
-                flash(f"{field.title()} is a required field.")
-                Valid = False
-            else:
-                if field == "https":
-                    if fields[field] != "http" and fields[field] != "https":
-                        flash(f"https field must be either http or https")
-                        flash(f"defaulting to 'http://'")
-                        https="http://"
-                elif field == "key":
-                    if 128 > len(fields[field]) > 128:
-                        flash(f"key must be exactly 128 characters long.")
-                        Valid = False
-                elif field == "port":
-                    try:
-                        port = int(port)
-                    except:
-                        flash("Port must be an integer.  If unsure, just enter 1883.")
-                        Valid = False
-                elif field == "user":
-                    if not fields[field]:
-                        user=""
-                    else:
-                        user = brokerU
-                elif field == "password":
-                    if not fields[field]:
-                        password=""
-                    else:
-                        password = brokerP
-                elif field == "fevrport":
-                    if https == "https://":
-                        if fevrport != "443":
-                            fevr = f"{fevr}:{fevrport}"
-                    elif https == "http":
-                        if fevrport != "80":
-                            fevr = f"{fevr}:{fevrport}"
-                    else:
-                        fevr = f"{fevr}:{fevrport}"
-                        
-        if Valid:
-            if not user:
-                user = ""
-            if not password:
-                password = ""
-            
-            config["fevr_url"] = fevr
-            config["fevr_transport"] = https
-            config["fevr_apikey"] = key
-            config["mqtt_broker"] = broker
-            config["mqtt_port"] = port
-            config["mqtt_user"] = user
-            config["mqtt_password"] = password
-            config["mqtt_topics"] = topics
-            config["verbose"] = False
-            with open('/fevr/app/data/config.json', "w") as configFile:
-                json.dump(config,configFile,sort_keys=True,indent=0)
-
-            # Write new run_mqtt_client.sh:
-            with open('run_mqtt_client.sh', "w") as myfile:
-                myfile.write(f"#!/bin/sh\n/fevr/venv/bin/python /fevr/app/mqtt_client -c /fevr/app/data/config.json")
-        resp = redirect('/setup/mqtt')
-        return resp

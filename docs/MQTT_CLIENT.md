@@ -31,7 +31,7 @@ mqtt_client is an integral part of fEVR.  It functions as the link between fEVR 
         - goes back to listening
 
 # Why is it a separate program?
-    1. If mqtt_client fails, it can restart itself independently of fEVR so it does not take down the entire stack.
+- If mqtt_client fails, it can restart itself independently of fEVR so it does not take down the entire stack.
 
 # Configuration
 

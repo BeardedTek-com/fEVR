@@ -16,7 +16,7 @@
 #    along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 from flask import request, make_response
-from app.logit import logit
+from app.helpers.logit import logit
 class cookies:
     def getCookie(cookie):
         if request.cookies.get(cookie):
