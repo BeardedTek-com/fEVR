@@ -63,20 +63,7 @@ docker-compose is the preferred installation method
 ### Environment Variables
 The following environment variables can be used to configure fEVR:
 If not set, configuration can be done via the Web UI.
-- MQTT_BROKER
-  - fqdn or ip of MQTT Broker.
-- MQTT_BROKER_PORT
-  - port number of the MQTT Broker.  If unset, it defaults to 1883
-- MQTT_BROKER_USER
-  - Leave unset if there is no username
-- MQTT_BROKER_PASSWORD
-  - Leave unset if there is no password
-- MQTT_TOPICS
-  - Comma separated string of MQTT Topics mqtt_client will listen to.  If unset, it will default to "frigate/+"
-- MQTT_VERBOSE_LOGGING (BOOLEAN)
-  - If set to true, will output verbosely to stdout and docker logs
-- MQTT_APIAUTH_KEY
-  - Obtain APIAUTH Key from http(s)://<fevr_url:port>/profile
+
 - FEVR_TRANSPORT
   - http or https
 - FEVR_URL
@@ -201,17 +188,21 @@ Procedure:
     - This is 100% Optional.  It does, however, enable live view outside your network.
     - If you don't have an externally accessible frigate URL, you can skip this step.
   - Click Next
-- Configure MQTT Client
-  - You need to generate an API Auth Key to configure this step.
-    - This can be done on your profile page.  Click the Bearded Tek logo to drop down the menu and click on profile.
-    - Scroll down and fill in the fields:
-      - Name: Enter a name to remember this is for the mqtt client (mqtt_client)
-      - ipv4 Address: OPTIONAL
-      - Limit: Enter 0
-        - If anything above 0 is entered, it is a limited use key.  It can only be used that many times to authenticate with the system.  Once it has been used x amount of times, it will be disabled.
-  - Click Add and then Next
 - Other is not populated yet, There are future plans for this page, just click Next again and you'll be brought to the main interface.
-
+- Generate API Key for mqtt_client
+  - mqtt_client authenticates with fEVR using a 128 character API Key.
+  - You can generate an API Key from `/profile` or click on the beard icon to drop down the menu, and click Profile.
+  - Here you can view any API keys you have generated in the past and generate a new one.
+  - There are 3 fields to fill out:
+    - Name: A unique name to identify this key (no duplicates allowed)
+    - IPv4 Address: Not used as of now but required to be a valid IP or network (without cidr notation)
+      - Enter 0.0.0.0 to future proof.
+    - Login Count: this can be used to limit the amount of times this API Key can be used.  While not used at the moment, it will function as the base of a limited login solution (say one time passwords for law enforcement and the like)
+      - Enter 0 for unlimited usage
+  - Configure mqtt_client
+    - Once you have your API Key you can generate your config file for the mqtt_client.
+      - [See mqtt_client docs here](docs/MQTT_CLIENT.md) for an example
+    - This should be automated further in 0.6.1
 
 # Home Assistant Notifications
 As of right now it's a bit complicated. For each notification type you want for each camera, a helper entity must be added.
