@@ -229,8 +229,11 @@ def setupEditFrigatePost(Frigate):
     if current_user.group == "admin":
         edit = False
         frigateEdit = frigate.query.filter_by(name=Frigate).first()
-        if frigateEdit.name != request.form.get('url'):
-            frigateEdit.name = request.form.get('url')
+        if frigateEdit.name != request.form.get('name'):
+            frigateEdit.name = request.form.get('name')
+            edit = True
+        if frigateEdit.url != request.form.get('url'):
+            frigateEdit.url = request.form.get('url')
             edit = True
         if edit:
             db.session.commit()
