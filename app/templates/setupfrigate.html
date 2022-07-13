@@ -21,9 +21,9 @@
 
     <div>
         <form method="POST" action="/setup/frigate/edit/{{ server.name }}">
-            <input type="hidden" name="name" value="{{ server.name }}"> <a href="/api/frigate/delete/{{server.name}}">{{server.name}} Delete</a>
-            <input type="text" name="url" value="{{ server.url }}">
-            <button>Edit</button>
+            <span class="label">MQTT Name::</span><input type="text" name="name" value="{{ server.name }}"> 
+            <span class="label">URL:</span><input type="text" name="url" value="{{ server.url }}">
+            <button class='editButton'>Edit</button>
         </form>
     </div>
     {% endfor %}

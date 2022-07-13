@@ -32,6 +32,7 @@ from app import db
 from app.helpers.fetch import Fetch
 from app.helpers.cookies import cookies
 from app.helpers.iterateQuery import iterateQuery
+from app.helpers.logit import logit
 
 # API Routes
 api = Blueprint('api',__name__)
@@ -78,6 +79,7 @@ def apiFrigate():
 @api.route('/api/events/add/<eventid>/<camera>/<object>/<score>')
 @login_required
 def apiAddEvent(eventid,camera,score,object):
+    source = "fEVR | EVENT ADD"
     time = datetime.fromtimestamp(int(eventid.split('.')[0]))
     # Define default JSON return value
     rVal = {'error':0,
@@ -89,36 +91,40 @@ def apiAddEvent(eventid,camera,score,object):
             'score':score}
     db.create_all()
     Cameras = cameras.query.filter_by(camera=camera).first()
-    if not Cameras:
-        rVal["msg"] = "Camera Not Defined"
+    if Cameras:
+        show = True if Cameras.show else False
+        # Check if eventid already exists
+        if events.query.filter_by(eventid=eventid).first():
+            rVal["msg"] = 'Event Already Exists'
+            rVal["error"] = 2
+        else: 
+            try:
+                fetchPath = f"{os.getcwd()}/app/static/events/{eventid}/"
+                logit.execute(f"Fetching event into {fetchPath}",src=source)
+                frigateConfig = apiFrigate()
+                fetched = False
+                for frigate in frigateConfig:
+                    logit.execute(f"Trying to fetch from {frigateConfig[frigate]['url']}",src=source)
+                    frigateURL = frigateConfig[frigate]["url"]
+                    Fetched = Fetch(fetchPath,eventid,frigateURL)
+                    logit.execute(f"Fetched {Fetched.event}", src=source)
+                    fetched = True
+                if not fetched:
+                    rVal["msg"] = "Cannot Fetch"
+                    rVal["error"] = 3
+            except Exception as e:
+                rVal["error"] = 4
+                rVal["msg"] = str(e).replace('"','')
+            try:
+                event = events(eventid=eventid,camera=camera,object=object,score=int(score),ack='',time=time,show=show)
+                db.session.add(event)
+                db.session.commit()
+            except Exception as e:
+                rVal["error"] = 5
+                rVal["msg"] = str(e).replace('"','')
+    else:
+        rVal["msg"] = f"Camera '{camera}' Not Defined"
         rVal["error"] = 1
-    show = True if Cameras.show else False
-    # Check if eventid already exists
-    if events.query.filter_by(eventid=eventid).first():
-        rVal["msg"] = 'Event Already Exists'
-        rVal["error"] = 2
-    else: 
-        try:
-            fetchPath = f"{os.getcwd()}/app/static/events/{eventid}/"
-            frigateConfig = apiFrigate()
-            fetched = False
-            for frigate in frigateConfig:
-                frigateURL = frigateConfig[frigate]["url"]
-                print(Fetch(fetchPath,eventid,frigateURL))
-                fetched = True
-            if not fetched:
-                rVal["msg"] = "Cannot Fetch"
-                rVal["error"] = 3
-        except Exception as e:
-            rVal["error"] = 4
-            rVal["msg"] = str(e).replace('"','')
-        try:
-            event = events(eventid=eventid,camera=camera,object=object,score=int(score),ack='',time=time,show=show)
-            db.session.add(event)
-            db.session.commit()
-        except Exception as e:
-            rVal["error"] = 5
-            rVal["msg"] = str(e).replace('"','')
     return jsonify(rVal)
 
 @api.route('/api/events/ack/<eventid>')
@@ -155,7 +161,7 @@ def apiDelEvent(eventid):
     if os.path.exists(eventPath):
         shutil.rmtree(eventPath)
     db.session.commit()
-    return redirect(url_for('main.index'))
+    return redirect(cookiejar['page'])
 
 @api.route('/api/events/latest')
 @login_required

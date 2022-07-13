@@ -142,7 +142,7 @@ def setupAdminProcessForm():
 
 @setup.route('/setup/cameras/add',methods=['POST'])
 @login_required
-def apiAddCameraPost():
+def setupAddCameraPost():
     if current_user.group == "admin":
         db.create_all()
         camera = request.form.get('camera')
@@ -164,7 +164,7 @@ def apiAddCameraPost():
 
 @setup.route('/setup/cameras/edit/<camera>',methods=['POST'])
 @login_required
-def apiEditCameraPost(camera):
+def setupEditCameraPost(camera):
     if current_user.group == "admin":
         edit = False
         camEdit = cameras.query.filter_by(camera=camera).first()
@@ -175,15 +175,32 @@ def apiEditCameraPost(camera):
             camEdit.rtsp = request.form.get('rtsp')
             edit = True
         if camEdit.show:
-            if request.form.get('show') != "true":
+            if not request.form.get('show'):
                 camEdit.show = False
                 edit = True
         else:
-            if request.form.get('show') == "true":
+            if request.form.get('show'):
                 camEdit.show = True
                 edit = True
         if edit:
             db.session.commit()
+        resp = redirect('/setup/cameras')
+    else:
+        resp = redirect('/')
+    return resp
+
+
+@setup.route('/setup/cameras/del/<Camera>',methods=['POST'])
+@login_required
+def setupDelCameraPost(Camera):
+    Cameras = cameras.query.all()
+    cookiejar = {}
+    cookiejar['menu'] = cookies.getCookie('menu') if cookies.getCookie('menu') else "closed"
+    cookiejar['page'] = cookies.getCookie('page') if cookies.getCookie('page') else "/"
+    cookiejar['cameras'] = str(Cameras)
+    if current_user.group == "admin":
+        cameras.query.filter_by(name=Camera).delete()
+        db.session.commit()
         resp = redirect('/setup/cameras')
     else:
         resp = redirect('/')
@@ -211,13 +228,29 @@ def setupAddFrigatePost():
 def setupEditFrigatePost(Frigate):
     if current_user.group == "admin":
         edit = False
-        frigateEdit = frigate.query.filter_by(Frigate=Frigate).first()
+        frigateEdit = frigate.query.filter_by(name=Frigate).first()
         if frigateEdit.name != request.form.get('url'):
             frigateEdit.name = request.form.get('url')
             edit = True
         if edit:
             db.session.commit()
         resp = redirect('/setup/frigate')
+    else:
+        resp = redirect('/')
+    return resp
+
+@setup.route('/setup/frigate/del/<Frigate>',methods=['POST'])
+@login_required
+def setupDelFrigatePost(Frigate):
+    Cameras = cameras.query.all()
+    cookiejar = {}
+    cookiejar['menu'] = cookies.getCookie('menu') if cookies.getCookie('menu') else "closed"
+    cookiejar['page'] = cookies.getCookie('page') if cookies.getCookie('page') else "/"
+    cookiejar['cameras'] = str(Cameras)
+    if current_user.group == "admin":
+        frigate.query.filter_by(name=Frigate).delete()
+        db.session.commit()
+        resp = redirect('/setup/cameras')
     else:
         resp = redirect('/')
     return resp
