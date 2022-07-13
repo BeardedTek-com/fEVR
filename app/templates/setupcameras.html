@@ -8,7 +8,8 @@
                 <input type="text" name="camera" placeholder="Camera Name">
                 <input type="text" name="hls" placeholder="http(s)://url:port/camera">
                 <input type="text" name="rtsp" placeholder="rtsp://user:pass@url:port">
-                <input type="text" name="show" placeholder="true/false show in latest/all views">
+                <input type="checkbox" id="show" name="show" checked>
+                <label for="show"> Show Camera in Main View</label>
                 <button>Add Camera</button>
             </form>
         </div>
@@ -18,11 +19,14 @@
 
     <div>
         <form method="POST" action="/setup/cameras/edit/{{ camera.camera }}">
-            <span class="label">Name:</span><input type="hidden" name="camera" value="{{ camera.camera }}"> <a href="/api/cameras/delete/{{camera.camera}}">{{camera.camera}} Delete</a><br/>
+            <span class="label">Name:</span><input type="text" name="camera" value="{{ camera.camera }}"> 
             <span class="label">HLS:</span><input type="text" name="hls" value="{{ camera.hls }}">
             <span class="label">RTSP:</span><input type="text" name="rtsp" value="{{ camera.rtsp }}">
-            <span class="label">Hidden:</span><input type="text" name="show" value="{{ camera.show }}">
-            <button>Edit Camera</button>
+            <div class="show">
+                <input type="checkbox" id="show" name="show" {{ 'checked' if camera.show else '' }}>
+                <label for="show"> Show Camera in Main View</label>
+            </div>
+            <button class='editButton'>Edit</button>
         </form>
     </div>
     {% endfor %}

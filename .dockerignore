@@ -1,0 +1,13 @@
+.cache
+.env
+.git
+.gitattributes
+.gitignore
+.github
+docs
+docker-compose.yml
+install.sh
+README.md
+template.env
+test
+venv

@@ -10,8 +10,8 @@ services:
     volumes:
       - ./events:/fevr/app/static/events
       - ./data:/fevr/app/data
-      - ./fevr/varlib:/var/lib
-      - ./fevr/config:/fevr/app/data/config:ro
+      - ./varlib:/var/lib
+      - ./config.yml:/fevr/app/data/config:ro
     environment:
       FEVR_DEVELOPMENT: ${FEVR_DEVELOPMENT:-false}
       FEVR_URL: ${FEVR_URL}

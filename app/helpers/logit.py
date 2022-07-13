@@ -15,17 +15,14 @@
 #    You should have received a copy of the GNU AfferoGeneral Public License
 #    along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import yaml
+from time import time
+import sys
 
-def load_config(config_file):
-    with open(config_file, "r") as config_fh:
-        config = config_fh.read()
-    myConfig = {}
-    try:
-        myConfig = yaml.safe_load(config)
-    except:
-        myConfig = {}
-    return myConfig
-
-if __name__ == "__main__":
-    print(load_config("/home/localadmin/Documents/GitHub/fEVR/app/data/config.yml.template"))
+class logit:
+    def execute(msg,src='fEVR',debug=True):
+        def to_stderr(*a):
+            print(*a, file=sys.stderr)
+        logtime = "{:.2f}".format(time())
+        logentry = f"{logtime} {str(msg)}"
+        if debug:
+            to_stderr(f"[ {src:16} ] {logentry}")

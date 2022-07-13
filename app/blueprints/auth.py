@@ -15,16 +15,19 @@
 #    You should have received a copy of the GNU AfferoGeneral Public License
 #    along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import ipaddress
 from flask import Blueprint, render_template, redirect, url_for, request, flash, jsonify, make_response
 from werkzeug.security import generate_password_hash, check_password_hash
 from flask_login import login_user, logout_user, login_required, current_user
 from IPy import IP
+import sqlite3
 
-from .models.models import User, apiAuth, cameras
-from . import db
-from .rndpwd import randpwd
-from  .helpers.cookies import cookies
+from app.models.user import User
+from app.models.apiauth import apiAuth
+from app.models.cameras import cameras
+from app import db
+from app.helpers.rndpwd import randpwd
+from app.helpers.cookies import cookies
+from app.helpers.logit import logit
 
 auth = Blueprint('auth', __name__)
 
@@ -79,6 +82,7 @@ def apiAuthKeyAddPost():
 
 @auth.route('/apiAuth',methods=['POST'])
 def apiAuthenticate():
+    source = "fEVR | AUTH"
     ip = request.remote_addr
     auth = {"auth":False,"name":None,"authIP":ip,"changed":False,"remember":False}
     requestData = request.get_json()
@@ -113,6 +117,9 @@ def apiAuthenticate():
                         # If we changed they key limit or set it to expired, commit it to the database.
                         if auth['changed']:
                             db.session.commit()
+    success = "successful" if auth['auth'] else "failed"
+    keyname = f"{auth['name']} " if auth['name'] else ""
+    logit.execute(f"Authentication {success} by key {keyname}from {auth['authIP']}",src=source)
     return jsonify(auth)
 
 @auth.route('/login',methods=['GET'])
@@ -133,7 +140,7 @@ def login():
     
 @auth.route('/login', methods=['POST'])
 def loginProcessForm():
-    
+    source="fEVR | LOGIN"
     # login code goes here
     email = request.form.get('email')
     password = request.form.get('password')
@@ -142,16 +149,20 @@ def loginProcessForm():
         fwd = request.form.get('fwd')
     else:
         fwd = "/"
-
-    user = User.query.filter_by(email=email).first()
-
-    # check if the user actually exists
-    # take the user-supplied password, hash it, and compare it to the hashed password in the database
-    if not user or not check_password_hash(user.password, password):
-        flash('Please check your login details and try again.')
-        return redirect(url_for('auth.login')) # if the user doesn't exist or password is wrong, reload the page
-    # if the above check passes, then we know the user has the right credentials
-    login_user(user, remember=remember)
+    try:
+        user = User.query.filter_by(email=email).first()
+        # check if the user actually exists
+        # take the user-supplied password, hash it, and compare it to the hashed password in the database
+        if not user or not check_password_hash(user.password, password):
+            flash('Please check your login details and try again.')
+            return redirect(url_for('auth.login')) # if the user doesn't exist or password is wrong, reload the page
+        # if the above check passes, then we know the user has the right credentials
+        login_user(user, remember=remember)
+    except Exception as e:
+        if "no such table" in str(e):
+            logit.execute("Database is missing. Please visit `/setup` to complete setup.",src=source)
+        else:
+            logit.execute(e,src=source)
     return redirect(fwd)
 
 @auth.route('/signup')

@@ -443,6 +443,9 @@ a:hover{
     font-size: 1em;
     width: 98%;
 }
+.login input[type="checkbox" i] {
+    width: 1.25em;
+}
 .login .checkbox{
     height: 1em;
     width: 1em;
@@ -459,7 +462,6 @@ a:hover{
     width: 100%;
     margin: unset;
     margin-top: 0.5em;
-
     border: none;
     cursor: pointer;
     display: inline-block;
@@ -676,4 +678,11 @@ a:hover{
     font-size:0.75em;
     padding: 1em;
     background-color: var(--codeBackground);
+}
+
+button.deleteButton{
+    background-color: rgb(211, 28, 28);
+}
+.show{
+    width: 100%;
 }

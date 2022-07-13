@@ -26,10 +26,19 @@ from random import randint
 import socket
 import requests
 from math import floor
-from logit import logit
 import socket
 import json
 import yaml
+import sys
+
+class logit:
+    def execute(msg,src='fEVR',debug=True):
+        def to_stderr(*a):
+            print(*a, file=sys.stderr)
+        logtime = "{:.2f}".format(time())
+        logentry = f"{logtime} {str(msg)}"
+        if debug:
+            to_stderr(f"[ {src:16} ] {logentry}")
 
 class getLocalIP:
     s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
@@ -42,22 +51,22 @@ class auth:
         self.fevr = fevr
         self.rSession = rSession
         self.apikey = apikey
-        self.script = "MQTT | auth"
-        self.api()
 
     def api(self):
+        source = "MQTT | AUTH"
         # Construct the json for the post request
         JsonPost = {'key':self.apikey,'ip':getLocalIP.addr}
         # Send the post using our session
         fevrUrl = f"{self.transport}{self.fevr}/apiAuth"
         apiAuth = self.rSession.post(f"{fevrUrl}", json=JsonPost)
         apiAuthJSON = json.loads(apiAuth.content)
-        authResult = "SUCCESS" if apiAuthJSON['auth'] else "FAILURE"
-        logit.execute(f"{fevrUrl} AUTH {authResult}: {apiAuthJSON['authIP']} name: {apiAuthJSON['name']}",src=self.script)
+        authResult = True if apiAuthJSON['auth'] else False
+        logit.execute(f"{fevrUrl} {authResult}: {apiAuthJSON['authIP']} name: {apiAuthJSON['name']}",src=source)
+        return authResult
     
 class fevrMQTT:
     def __init__(self):
-        self.script = 'MQTT | client'
+        source = "MQTT | DEFAULTS"
         hostname = socket.gethostname()
         self.clientID = f"fevr-{hostname}-{randint(0,100)}"
         # Initialize our Config variable as a dict and set sane default values in self.config
@@ -72,6 +81,7 @@ class fevrMQTT:
                             'fevr_transport': 'http://',
                             'mqtt_topics': "frigate/+"
                         }
+        logit.execute(self.config,src=source)
         # Get the Command Line Arguments in a dict
         self.Args = self.cla()
         # If using the -c/--config option, get the config from the specified file
@@ -83,12 +93,13 @@ class fevrMQTT:
         self.run()
         
     def getConfig(self,config):
+        source = "MQTT | CONFIG"
         if path.isfile(config) and access(config, R_OK):
             with open(config) as configFile:
                 try:
                     Config = yaml.safe_load(configFile)
                 except Exception as e:
-                    logit.execute(f"ERROR: {e}",src=self.script)
+                    logit.execute(f"ERROR: {e}",src=source)
                     Config = {}
                 values = ['fevr_host','fevr_port','fevr_transport','mqtt_apikey','mqtt_broker','mqtt_port','mqtt_user','mqtt_password','mqtt_topics','verbose']
                 for value in values:
@@ -107,6 +118,7 @@ class fevrMQTT:
     
     
     def cla(self):
+        source = "MQTT | CMDLINE"
         parser = argparse.ArgumentParser()
         parser.add_argument('-c','--config',type=str,required=False,help="If set, uses command line options instead of the database (default: empty)")
         parser.add_argument('-m','--mqtt_broker',type=str,required=False,help="MQTT Broker IP/FQDN (default: mqtt)")
@@ -119,9 +131,11 @@ class fevrMQTT:
         parser.add_argument('-s','--fevr_transport',action='store_true',required=False,help="If set uses https:// for fEVR API Calls (default: False)")
         parser.add_argument('-v','--verbose',action='store_true',required=False,help="If set, outputs verbosely to stdout")
         args = parser.parse_args()
+        logit.execute(vars(args),src=source)
         return vars(args)
     
     def parseTopics(self):
+        source = "MQTT | TOPICS"
         excluded = None
         Topics = self.config['mqtt_topics'].split(',',5)
         topics = []
@@ -134,7 +148,7 @@ class fevrMQTT:
                     excluded = f"Topic Limit Exceeded. Excluded Topics: "
                 excluded += f"'{topic}' "
         if excluded:
-            logit.execute(f"Only 5 topics allowd.  Excluded Topics: {excluded}",src=self.script)
+            logit.execute(f"Only 5 topics allowd.  Excluded Topics: {excluded}",src=source)
         return topics
     
     def setup(self):
@@ -144,6 +158,7 @@ class fevrMQTT:
         If there is not a command line argument, we fall back to the config file.
         Whatever is not set the default gets used.
         '''
+        source = "MQTT | SETUP"
         for key in self.config:
             # If we set the command line argument, override the config file
             if self.Args[key]:
@@ -158,18 +173,18 @@ class fevrMQTT:
                 value = Key
             else:
                 value = self.config[key]
-            logit.execute(f"{key}: {value}")
+            logit.execute(f"{key}: {value}", src=source)
         # Parse the topics into a list if it's a string.
         if isinstance(self.config['mqtt_topics'],str):
             self.config['mqtt_topics'] = self.parseTopics()
-        logit.execute(f"fevr:{self.config['fevr']} | broker: {self.config['mqtt_broker']} | port: {self.config['mqtt_port']} | user: {self.config['mqtt_user']} | password: {self.config['mqtt_password']} | https: {self.config['fevr_transport']} | apiKey: {Key} | topics: {self.config['mqtt_topics']}", src=self.script)
         
     def connect_mqtt(self) -> mqtt_client:
         def on_connect(client, userdata, flags, rc):
-                if rc == 0:
-                    logit.execute(f"Connected to {self.config['mqtt_broker']}:{self.config['mqtt_port']} as {self.clientID}",src=self.script)
-                else:
-                    logit.execute("Failed to connect, return code %d", rc,src=self.script)
+            source = "MQTT | CONNECT"
+            if rc == 0:
+                logit.execute(f"Connected to {self.config['mqtt_broker']}:{self.config['mqtt_port']} as {self.clientID}",src=source)
+            else:
+                logit.execute("Failed to connect, return code %d", rc,src=source)
         client = mqtt_client.Client(self.clientID)
         if self.config['mqtt_user'] and self.config['mqtt_password']:
             client.username_pw_set(self.config['mqtt_user'], self.config['mqtt_password'])
@@ -182,34 +197,51 @@ class fevrMQTT:
         If it does, we respond
         '''
         if 'available' in topic:
+            source = "MQTT | status"
         # If frigate says its available, we output to the logs
-            logit.execute('frigate is online',src=self.script)
+            logit.execute('frigate is online',src=source)
         elif 'event' in topic:
+            source = "MQTT | EVENT"
             # If it's an event we take action
             event = loads(msg)
             eventfound = f"\n{json.dumps(event)}" if self.config['verbose'] else event["after"]["id"]
             if self.config['verbose']:
-                logit.execute(f"EVENT ({event['type']}) FOUND: {eventfound}", src=self.script)
+                logit.execute(f"{eventfound} ({event['type']})", src="MQTT | EVENT")
+            else:
+                if event['type'] == "new" or event['type'] == "end": 
+                    logit.execute(f"{eventfound} ({event['type']})", src="MQTT | EVENT")
             if event['type'] == 'end':
                 # If the event is over, we create a session variable, authenticate, and tell fEVR via it's API to get the event.
                 rSession = requests.Session()
-                auth(transport=self.config['fevr_transport'],apikey=self.config['mqtt_apikey'],fevr=self.config['fevr'],rSession=rSession)
-                fEVRurl = f"{self.config['fevr_transport']}{self.config['fevr']}/api/events/add/{event['after']['id']}/{event['after']['camera']}/{event['after']['label']}/{floor(float(event['after']['score'])*100)}"
-                addEventResponse = rSession.get(fEVRurl)
-                respJSON = json.loads(addEventResponse.content)
-                if self.config['verbose']:
-                    logit.execute(fEVRurl,src=self.script)
-                LogMsg = f"SUCCESS: {event['after']['id']} ({event['after']['label']} in {event['after']['camera']}) added" if respJSON["error"] == 0 else f"FAILURE: {respJSON}"
-                logit.execute(LogMsg,src=self.script)
+                Auth = auth(transport=self.config['fevr_transport'],apikey=self.config['mqtt_apikey'],fevr=self.config['fevr'],rSession=rSession)
+                if Auth.api():
+                    fEVRuri = f"{self.config['fevr_transport']}{self.config['fevr']}"
+                    fEVRurl = f"{fEVRuri}/api/events/add/{event['after']['id']}/{event['after']['camera']}/{event['after']['label']}/{floor(float(event['after']['score'])*100)}"
+                    addEventResponse = rSession.get(fEVRurl)
+                    respJSON = json.loads(addEventResponse.content)
+                    if self.config['verbose']:
+                        logit.execute(fEVRurl,src=source)
+                    if respJSON["error"] == 0:
+                        LogMsg = f"SUCCESS: {event['after']['id']} ({event['after']['label']} in {event['after']['camera']}) added"
+                    else: 
+                        LogMsg = f"FAILURE: {respJSON}"
+                    logit.execute(LogMsg,src="MQTT | EVENT ADD")
+                else:
+                    if fEVRurl:
+                        logit.execute(f"Failed to Authenticate - visit {fEVRurl}/profile to generate an API Auth Key and insert it in your config", src="MQTT | ERROR")
+                    else:
+                        logit.execute(f"It appears your instance of fEVR is not setup yet.  please visit `/setup` to complete setup.", src="MQTT | ERROR")
                 
     def subscribe(self, client: mqtt_client):
         def on_message(client, userdata, msg):
+            source = "MQTT | RCVD"
             ## This is where our code goes to do what we want when a message is received
             if self.config['verbose']:
-                logit.execute(f"{msg.topic}: Message Received",src=self.script)
+                logit.execute(f"{msg.topic}: Message Received",src=source)
             self.processMsg(msg.payload.decode(),msg.topic)
         for topic in self.config['mqtt_topics']:
-            logit.execute(f"Subscribing to: {topic}",src=self.script)
+            source = "MQTT | SUBSCRIBE"
+            logit.execute(f"Subscribing to: {topic}",src=source)
             client.subscribe(topic)
         client.on_message = on_message
     def run(self):

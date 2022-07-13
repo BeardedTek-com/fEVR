@@ -52,7 +52,7 @@
             <div class="description">
                 <div class="tagline">
                 {% if event %}
-                    <div class='back'><a href='' onclick='history.back()'><img src='/static/img/back.svg'></a></div><div class='objcam'>{{ event.object|title }} in {{ event.camera|title }}</div>
+                    <div class='back'><a href='{{ page if page else '/' }}'><img src='/static/img/back.svg'></a></div><div class='objcam'>{{ event.object|title }} in {{ event.camera|title }}</div>
                     {% if view == "clip" or view == "snap" %}
                     <div class='view20'>Event {{ view|title }}</div>
                     {% elif view == "live" %}
