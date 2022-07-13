@@ -50,6 +50,24 @@ Feature comparison to leading cloud event detection providers
 
 ---
 
+# Support
+Please note, I will generally answer questions within 24 hours, and most times even faster unless I'm on vacation or going on adventures with the family.
+Any abuse, harassment, bullying, or just being mean about a free project that I do in my spare time will get you blocked and reported.  I have no tolerance for this.
+
+- [Submit an Issue](https://github.com/BeardedTek-com/fEVR/issues)
+  - This is the preferred method if you find an error in the code or something that crashes fEVR.
+  
+- [Start a discussion](https://github.com/BeardedTek-com/fEVR/discussions)
+  - For discussing configuration issues or things that bug you (UI tweaks or process improvements)
+  
+- [Telegram Support Channel](https://t.me/BeardedTekfEVR)
+  - For troubleshooting, a quick question, or you just want to say hi!
+
+- [Sponsors get priority support](https://github.com/sponsors/BeardedTek-com)
+  - Any tier of monthly sponsorship will get you priority support and a mention in the README
+
+---
+
 # Documentation
 ## **[Main API Calls](docs/API.md)**
 ## **[mqtt_client](docs/MQTT_CLIENT.md)**
@@ -199,10 +217,10 @@ Procedure:
       - Enter 0.0.0.0 to future proof.
     - Login Count: this can be used to limit the amount of times this API Key can be used.  While not used at the moment, it will function as the base of a limited login solution (say one time passwords for law enforcement and the like)
       - Enter 0 for unlimited usage
-  - Configure mqtt_client
-    - Once you have your API Key you can generate your config file for the mqtt_client.
-      - [See mqtt_client docs here](docs/MQTT_CLIENT.md) for an example
-    - This should be automated further in 0.6.1
+- Configure mqtt_client
+  - Once you have your API Key you can generate your config file for the mqtt_client.
+    - [See mqtt_client docs here](docs/MQTT_CLIENT.md) for an example
+  - This should be automated further in 0.6.1
 
 # Home Assistant Notifications
 As of right now it's a bit complicated. For each notification type you want for each camera, a helper entity must be added.
