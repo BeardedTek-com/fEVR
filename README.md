@@ -115,28 +115,16 @@ FEVR_DEVELOPMENT=false
 # Changes the port fEVR runs on DEFAULT: 5090
 FEVR_PORT=5090
 
-# Should be set to image name to use local transport, or an accessible url to feed an external instance of fEVR 
-FEVR_URL=fevr
+### Tailscale #######################################################
 
-# Set to http or https depending on use.  For internal docker network, use http.
-FEVR_TRANSPORT=http
+# Set to false to disable tailscale
+TAILSCALE_ENABLE=true
 
-### MQTT Client Setup ###############################################
+TAILSCALE_TAGS=tag:fevr
+TAILSCALE_HOSTNAME=fevr
 
-MQTT_BROKER=mqtt
-MQTT_BROKER_PORT=1883
-
-# If there is no user/password, leave unset
-MQTT_BROKER_USER=
-MQTT_BROKER_PASSWORD=
-
-# Comma seperated string of MQTT topics to subscribe to.  LIMIT 5!!!
-MQTT_TOPICS="frigate/+"
-
-MQTT_VERBOSE_LOGGING=false
-
-# Obtain this key from http(s)://<fevr_url:port>/profile or leave unset to use web ui setup values
-MQTT_APIAUTH_KEY=
+# Obtain Auth Key from https://login.tailscale.com/admin/authkeys
+TAILSCALE_AUTHKEY=tskey-XXXXXXXXXXXX-XXXXXXXXXXXXXXXXXXXXXX
 
 
 ### Tailscale #######################################################
@@ -163,27 +151,15 @@ services:
     ports:
       - 5090:${FEVR_PORT:-5090}
     volumes:
-      - /export/fevr:/fevr/app/static/events
-      - /export/fevr/data:/fevr/app/data
-      - ./fevr/varlib:/var/lib
-    depends_on:
-      - mqtt
-      - frigate
+      - ./events:/fevr/app/static/events
+      - ./data:/fevr/app/data
+      - ./varlib:/var/lib
     environment:
       FEVR_DEVELOPMENT: ${FEVR_DEVELOPMENT:-false}
-      FEVR_URL: ${FEVR_URL}
-      FEVR_PORT: ${FEVR_PORT}
-      TAILSCALE_ENABLE: ${TAILSCALE_ENABLE:-true}
+      TAILSCALE_ENABLE: ${TAILSCALE_ENABLE:-false}
       TAILSCALE_AUTHKEY: ${TAILSCALE_AUTHKEY}
       TAILSCALE_HOSTNAME: ${TAILSCALE_HOSTNAME:-fevr}
       TAILSCALE_TAGS: ${TAILSCALE_TAGS}
-      MQTT_BROKER: ${MQTT_BROKER:-mqtt}
-      MQTT_BROKER_PORT: ${MQTT_BROKER_PORT}
-      MQTT_BROKER_USER: ${MQTT_BROKER_USER}
-      MQTT_BROKER_PASSWORD: ${MQTT_BROKER_PASSWORD}
-      MQTT_TOPICS: ${MQTT_TOPICS:-frigate/+}
-      MQTT_VERBOSE_LOGGING: ${MQTT_VERBOSE_LOGGING:-true}
-      MQTT_APIAUTH_KEY: ${MQTT_APIAUTH_KEY}
 ```
 
 Bring the system up:
@@ -192,7 +168,6 @@ docker-compose up -d
 ```
 
 # Setup
-Procedure:
 
 - Visit http(s)://<fevr_url>/setup
 - Create admin account

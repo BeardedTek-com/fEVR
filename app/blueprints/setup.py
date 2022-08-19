@@ -199,7 +199,7 @@ def setupDelCameraPost(Camera):
     cookiejar['page'] = cookies.getCookie('page') if cookies.getCookie('page') else "/"
     cookiejar['cameras'] = str(Cameras)
     if current_user.group == "admin":
-        cameras.query.filter_by(name=Camera).delete()
+        cameras.query.filter_by(camera=Camera).delete()
         db.session.commit()
         resp = redirect('/setup/cameras')
     else:
@@ -253,7 +253,7 @@ def setupDelFrigatePost(Frigate):
     if current_user.group == "admin":
         frigate.query.filter_by(name=Frigate).delete()
         db.session.commit()
-        resp = redirect('/setup/cameras')
+        resp = redirect('/setup/frigate')
     else:
         resp = redirect('/')
     return resp
