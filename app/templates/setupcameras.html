@@ -28,6 +28,9 @@
             </div>
             <button class='editButton'>Edit</button>
         </form>
+        <form method="POST" action="/setup/cameras/del/{{camera.camera}}">
+            <button class='delButton'>Delete</button>
+        </form>
     </div>
     {% endfor %}
 </div>

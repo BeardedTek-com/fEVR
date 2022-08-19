@@ -210,6 +210,9 @@ button{
     margin: 1%;
     width: 48%;
 }
+button.delButton{
+    background: rgb(201, 14, 14)
+}
 button.buttonAction{
     background: rgb(160,168,170);
     border-radius: 0.25em;

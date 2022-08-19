@@ -25,6 +25,9 @@
             <span class="label">URL:</span><input type="text" name="url" value="{{ server.url }}">
             <button class='editButton'>Edit</button>
         </form>
+        <form method="POST" action="/setup/frigate/del/{{server.name}}">
+            <button class='delButton'>Delete</button>
+        </form>
     </div>
     {% endfor %}
 </div>
