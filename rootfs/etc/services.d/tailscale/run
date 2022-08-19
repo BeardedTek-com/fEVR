@@ -16,7 +16,7 @@
 #    You should have received a copy of the GNU AfferoGeneral Public License
 #    along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-if [ ${TAILSCALE_ENABLE} ]; then
+if [ "$TAILSCALE_ENABLE" == "true" ]; then
     # Get local docker network to forward so all containers are accessible via tailscale
 
     if [ ! $TAILSCALE_ADVERTISE_ROUTE ]; then
