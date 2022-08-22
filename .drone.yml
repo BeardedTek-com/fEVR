@@ -4,7 +4,7 @@ image_pull_secrets:
   - docker-auth-beardedtek.com
 trigger:
   branch:
-    - v0.6-cleanup
+    - main
   event:
     - push
 steps:
