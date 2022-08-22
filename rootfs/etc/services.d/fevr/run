@@ -31,7 +31,7 @@ FEVR_PORT=${FEVR_PORT:-5090}
 UWSGI_WORKERS=${UWSGI_WORKERS:-4}
 echo "Starting fEVR on $FEVR_HOST:$FEVR_PORT with $UWSGI_WORKERS workers."
 FEVR_DEVELOPMENT=${FEVR_DEVELOPMENT}
-if [ $FEVR_DEVELOPMENT="true" ]; then
+if [ "$FEVR_DEVELOPMENT" == "true" ]; then
     export FLASK_ENV='development'
     /fevr/venv/bin/flask run -h "0.0.0.0" -p $FEVR_PORT
 else
