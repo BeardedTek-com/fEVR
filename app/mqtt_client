@@ -237,7 +237,7 @@ class fevrMQTT:
                 logit.execute(f"{eventfound} ({event['type']})", src="MQTT | EVENT")
             elif event['type'] == "new":
                 logit.execute(f"{eventfound} ({event['type']})", src="MQTT | EVENT")
-                if 'ntfy_enable' in self.config
+                if 'ntfy_enable' in self.config:
                     if self.config['ntfy_enable']:
                         notifier = ntfy()
                         notifier.server = self.config['ntfy_server']
@@ -250,7 +250,7 @@ class fevrMQTT:
                         notifier.notify()
             elif event['type'] == "end": 
                 logit.execute(f"{eventfound} ({event['type']})", src="MQTT | EVENT")
-                if 'ntfy_enable' in self.config
+                if 'ntfy_enable' in self.config:
                     if self.config['ntfy_enable']:
                         notifier = ntfy()
                         notifier.server = self.config['ntfy_server']
