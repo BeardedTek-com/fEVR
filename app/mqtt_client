@@ -18,9 +18,8 @@
 
 from paho.mqtt import client as mqtt_client
 import argparse
-from os import getenv, environ, path, access, R_OK
+from os import path, access, R_OK
 from time import time
-from json import loads, dumps
 from math import floor
 from random import randint
 import socket
@@ -97,7 +96,10 @@ class fevrMQTT:
                             'mqtt_apikey': '',
                             'verbose': False,
                             'fevr_transport': 'http://',
-                            'mqtt_topics': "frigate/+"
+                            'mqtt_topics': "frigate/+",
+                            'ntfy_enable': True,
+                            'ntfy_server': "https://ntfy.fevr.video",
+                            'ntfy_topic': "fEVR-CHANGEME"
                         }
         logit.execute(self.config,src=source)
         # Get the Command Line Arguments in a dict
@@ -177,16 +179,6 @@ class fevrMQTT:
         Whatever is not set the default gets used.
         '''
         source = "MQTT | SETUP"
-        if "ntfy_server" in self.config:
-            if self.config['ntfy_server'] == None:
-                self.config['ntfy_server'] = 'https://ntfy.fevr.video'
-        else:
-            self.config['ntfy_server'] = 'https://ntfy.fevr.video'
-        if "ntfy_topic" in self.config:
-            if self.config['ntfy_topic'] == None:
-                self.config['ntfy_topic']= 'fEVR'
-        else:
-            self.config['ntfy_topic'] = 'fEVR'
         for key in self.config:
             # If we set the command line argument, override the config file
             if self.Args[key]:
@@ -231,7 +223,7 @@ class fevrMQTT:
         elif 'event' in topic:
             source = "MQTT | EVENT"
             # If it's an event we take action
-            event = loads(msg)
+            event = json.loads(msg)
             eventfound = f"\n{json.dumps(event)}" if self.config['verbose'] else event["after"]["id"]
             if self.config['verbose']:
                 logit.execute(f"{eventfound} ({event['type']})", src="MQTT | EVENT")
