@@ -119,7 +119,7 @@ class fevrMQTT:
                 except Exception as e:
                     logit.execute(f"ERROR: {e}",src=source)
                     Config = {}
-                values = ['fevr_host','fevr_port','fevr_transport','mqtt_apikey','mqtt_broker','mqtt_port','mqtt_user','mqtt_password','mqtt_topics','verbose','ntfy_server','ntfy_topic']
+                values = ['fevr_host','fevr_port','fevr_transport','mqtt_apikey','mqtt_broker','mqtt_port','mqtt_user','mqtt_password','mqtt_topics','verbose','ntfy_enable','ntfy_server','ntfy_topic']
                 for value in values:
                     try:
                         # Check if value exists
@@ -231,26 +231,28 @@ class fevrMQTT:
                 logit.execute(f"{eventfound} ({event['type']})", src="MQTT | EVENT")
             elif event['type'] == "new":
                 logit.execute(f"{eventfound} ({event['type']})", src="MQTT | EVENT")
-                notifier = ntfy()
-                notifier.server = self.config['ntfy_server']
-                notifier.payload['topic'] = self.config['ntfy_topic']
-                notifier.payload['message'] = f"{event['before']['label'].title()} in {event['before']['camera'].title()}"
-                notifier.payload['title'] = "fEVR | Jeandr"
-                notifier.payload['attach'] = f"http://192.168.2.240:5090/static/events/{event['before']['id']}/snapshot.jpg"
-                notifier.payload['actions'].append({"action": "view", "label": "View Event", "url": f"http://192.168.2.240:5090/event/{event['before']['id']}/snap"})
-                notifier.payload['priority'] = 5
-                notifier.notify()
+                if self.config['ntfy_enable']:
+                    notifier = ntfy()
+                    notifier.server = self.config['ntfy_server']
+                    notifier.payload['topic'] = self.config['ntfy_topic']
+                    notifier.payload['message'] = f"{event['before']['label'].title()} in {event['before']['camera'].title()}"
+                    notifier.payload['title'] = "fEVR | Jeandr"
+                    notifier.payload['attach'] = f"http://192.168.2.240:5090/static/events/{event['before']['id']}/snapshot.jpg"
+                    notifier.payload['actions'].append({"action": "view", "label": "View Event", "url": f"http://192.168.2.240:5090/event/{event['before']['id']}/snap"})
+                    notifier.payload['priority'] = 5
+                    notifier.notify()
             elif event['type'] == "end": 
                 logit.execute(f"{eventfound} ({event['type']})", src="MQTT | EVENT")
-                notifier = ntfy()
-                notifier.server = self.config['ntfy_server']
-                notifier.payload['topic'] = self.config['ntfy_topic']
-                notifier.payload['message'] = f"{event['after']['label'].title()} in {event['after']['camera'].title()}"
-                notifier.payload['title'] = "fEVR | Jeandr"
-                notifier.payload['attach'] = f"http://192.168.2.240:5090/static/events/{event['after']['id']}/snapshot.jpg"
-                notifier.payload['actions'].append({"action": "view", "label": "View Event", "url": f"http://192.168.2.240:5090/event/{event['after']['id']}/snap"})
-                notifier.payload['priority'] = 5
-                notifier.notify()
+                if self.config['ntfy_enable']:
+                    notifier = ntfy()
+                    notifier.server = self.config['ntfy_server']
+                    notifier.payload['topic'] = self.config['ntfy_topic']
+                    notifier.payload['message'] = f"{event['after']['label'].title()} in {event['after']['camera'].title()}"
+                    notifier.payload['title'] = "fEVR | Jeandr"
+                    notifier.payload['attach'] = f"http://192.168.2.240:5090/static/events/{event['after']['id']}/snapshot.jpg"
+                    notifier.payload['actions'].append({"action": "view", "label": "View Event", "url": f"http://192.168.2.240:5090/event/{event['after']['id']}/snap"})
+                    notifier.payload['priority'] = 5
+                    notifier.notify()
                     
             if event['type'] == 'end':
                 # If the event is over, we create a session variable, authenticate, and tell fEVR via it's API to get the event.

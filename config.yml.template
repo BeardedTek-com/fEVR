@@ -1,11 +1,10 @@
 #  See docs for setup instructions
 #  This yaml file will be used for both fEVR and mqtt_client
-fevr_development:
-    false
-fevr_port:
-    5090
+
 fevr_host:
     fevr
+fevr_port:
+    5090
 fevr_transport:
     http://
 mqtt_broker:
@@ -18,13 +17,11 @@ mqtt_topics:
     frigate/+
 mqtt_apikey:
     value
-tailscale_enable:
-    true
-tailscale_tags:
-    # tags:fevr
-tailscale_hostname:
-    fevr
-tailscale_authkey:
-    tskey-XXXXXXXXXXXX-XXXXXXXXXXXXXXXXXXXXXX
 verbose:
     true
+ntfy_enable:
+    true
+ntfy_server:
+    "https://ntfy.fevr.video"
+ntfy_topic:
+    CHANGE_ME_TO_RANDOM_STRING
