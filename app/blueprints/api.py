@@ -224,14 +224,15 @@ def apiCameras(camera):
         query = cameras.query.filter_by(camera=camera)
     return iterateQuery(query)
 
-@api.route('/api/cameras/<camera>/snapshot')
+@api.route('/api/cameras/<camera>/snapshot/<height>')
 @login_required
-def apiSnapshot(camera):
+def apiSnapshot(camera,height):
     frigateConfig = apiFrigate()
     snapshot = None
     for frigate in frigateConfig:
         try:
-            snapshot = requests.get(frigateConfig[frigate]['url'], allow_redirects=True).content
-        except:
-            pass
-    return snapshot
+            snapshot = requests.get(f"frigateConfig[frigate]['url']/api/{camera}/latest.jpg?height={height}", allow_redirects=True).content
+            value = {"error":None,"snapshot":snapshot}
+        except Exception as error:
+            value = {"error":error,"snapshot":snapshot}
+    return value
