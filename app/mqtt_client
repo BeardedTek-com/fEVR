@@ -238,7 +238,7 @@ class fevrMQTT:
         for key in displayConfig:
             if self.config['verbose']:
                 displayConfig['mqtt']['apikey'] = True if displayConfig['mqtt']['apikey'] else False
-            logit.execute(f"{key}: {displayConfig['key']}", src=source)
+            logit.execute(f"{key}: {displayConfig[key]}", src=source)
         
         #Setup Notifications:
         self.notify = notifications()
