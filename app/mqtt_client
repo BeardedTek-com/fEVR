@@ -190,13 +190,9 @@ class fevrMQTT:
                         if not subkey in Config[key]:
                             Config[key][subkey] = self.defaultConfig[key][subkey]
                 if key == "notifications":
-                    for subkey in ["enabled","service"]:
+                    for subkey in ["enabled","cooldown","service","server","topic"]:
                         if not subkey in Config[key]:
-                            Config[key][subkey] = self.defaultConfig[key][subkey]
-                        else:
-                            for subkey2 in ["ntfy"]:
-                                if not subkey2 in Config[key][subkey]:
-                                    Config[key][subkey][subkey2] = self.defaultConfig[key][subkey][subkey2]                 
+                            Config[key][subkey] = self.defaultConfig[key][subkey]            
             else:
                 try:
                     Config[key] = self.defaultConfig[key]
