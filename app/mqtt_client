@@ -33,16 +33,37 @@ import sys
 
 class notifications:
     def __init__(self,config={}):
-        self.config = config
-        self.service = config['service']    # Which service to use
-        self.cooldown = config['cooldown']  # Cooldown period so we don't overload notifications
+        self.config = config['notifications']
+        self.fevr = config['fevr']
+        self.mqtt = config['mqtt']
+        self.service = self.config['service']    # Which service to use
+        self.cooldownTime = self.config['cooldown']  # Cooldown period so we don't overload notifications
         self.snap = None                    # Does Snapshot Exist?
         self.clip = None                    # Does Clip Exist
         self.event = None                   # Event dict from mqtt event
+        self.lastnotify = {
+            "camera":
+                {
+                    "time"  : 0,
+                    "id"    : "event-id",
+                    "label" : "person",
+                    "type"  : "new"         # new update or end
+                }
+        }
         self.lastnotification = 0
         self.source = f"MQTT | {self.service}"
         self.configured = False
-    
+        
+    def cooldown(self,camera,label):
+        last = self.lastnotify[camera] if camera in self.lastnotify else 0
+        byTime = True if (last['time'] + self.cooldownTime) > time() else False
+        byType = True if last['type'] == 'end' else False
+        byLabel = True if last['label'] == label else False
+        # All must be true to enter cooldown period for this camera.
+        return True if byTime and byType and byLabel else False
+        
+        
+        
     def setup(self):
         if self.service == "ntfy":
             try:
@@ -76,20 +97,45 @@ class notifications:
                             "Authorization": None
                         }
         
-    def notify(self,method="post"):
+    def notify(self,event):
         url = f"{self.server}/{self.topic}"
-        try:
-            if method == "put":
-                requests.put(url,data=self.data,headers=self.headers)
-            elif method == "get":
-                pass
-            elif method == "post":
-                requests.post(url,data=json.dumps(self.headers))
-            self.lastnotification = int(time())
-            logit.execute(f"{url}: Notification SUCCESS",src=self.source)
-        except Exception as error:
-            logit.execute(f"{url}: Notification FAILED",src=self.source)
-            logit.execute(f"Error: {error}",src=self.source)
+        if self.config['enabled']:
+            target = "after" if event['type'] == "end" else "before"
+            camera = event[target]['camera']
+            label = event[target]['label']
+            eventType = event['type']
+            eventid = event[target]['id']
+            nTime = time()
+            
+            if not self.cooldown(camera,label):
+                # Determine which data to send
+                if eventType == "end":
+                    # Evemt Video Clip if event is over
+                    dataURL = f"{self.fevr['url']}/api/event/clip/{eventid}"
+                else:
+                    # Take snapshot from camera if event is not over
+                    dataURL = f"{self.fevr['url']}/api/cameras/{camera}/snapshot/320"
+                
+                # Authenticate with fEVR
+                rSession = requests.Session()
+                if auth(url=f"{self.fevr['url']}/apiAuth",apikey=self.mqtt['apikey'],rSession=rSession).api():
+                    #If authenticated, get notification data
+                    self.data = rSession.get(dataURL).content
+                    self.server = self.config['notifications']['server']
+                    self.topic = self.config['notifications']['topic']
+                    self.headers['Title'] = f"{self.config['fevr']['name']}: {event['before']['label'].title()} in {event['before']['camera']}"
+                    try:
+                        nURL = f"{self.config['server']}/{self.config['topic']}"
+                        requests.put(nURL,data=self.data,headers=self.headers)
+                        self.lastnotify[camera]['time'] = nTime
+                        self.lastnotify[camera]['id'] = eventid
+                        self.lastnotify[camera]['label'] = label
+                        self.lastnotify[camera]['type'] = eventType
+                        logit.execute(f"{nURL}: Notification SUCCESS",src=self.source)
+
+                    except Exception as error:
+                        logit.execute(f"{nURL}: Notification FAILED",src=self.source)
+                        logit.execute(f"Error: {error}",src=self.source)
 
 class logit:
     def execute(msg,src='fEVR',debug=True):
@@ -237,7 +283,7 @@ class fevrMQTT:
             self.config['mqtt']['topics'] = self.parseTopics()
         
         #Setup Notifications:
-        self.notify = notifications(config=self.config['notifications'])
+        self.notify = notifications(config=self.config)
         self.notify.setup()
         
     def connect_mqtt(self) -> mqtt_client:
@@ -300,29 +346,11 @@ class fevrMQTT:
             # Take Action on the event
             if event['type'] == "new":
                 # Trigger Notification
-                if self.notify.config['enabled']:
-                    if not self.notify.lastnotification or (int(time()) - self.notify.lastnotification) > self.notify.config['cooldown']:
-                        rSession = requests.Session()
-                        Auth = auth(url=self.config['fevr']['url'],apikey=self.config['mqtt']['apikey'],rSession=rSession)
-                        if Auth.api():
-                            self.notify.data = rSession.get(f"{self.config['fevr']['url']}/api/cameras/{event['before']['camera']}/snapshot/320").content
-                        self.notify.server = self.config['notifications']['server']
-                        self.notify.topic = self.config['notifications']['topic']
-                        self.notify.headers['Title'] = f"{self.config['fevr']['name']}: {event['before']['label'].title()} in {event['before']['camera']}"
-                        self.notify.notify("put")
+                self.notify.notify(event)
             elif event['type'] == 'end':
                 # Use event['after'] to add event
                 self.addEvent(event['after'])
-                if self.notify.config['enabled']:
-                    if not self.notify.lastnotification or (int(time()) - self.notify.lastnotification) > self.notify.config['cooldown']:
-                        rSession = requests.Session()
-                        Auth = auth(url=self.config['fevr']['url'],apikey=self.config['mqtt']['apikey'],rSession=rSession)
-                        if Auth.api():
-                            self.notify.data = requests.get(f"{self.config['fevr']['url']}/api/event/clip/{event['after']['camera']}").content
-                        self.notify.server = self.config['notifications']['server']
-                        self.notify.topic = self.config['notifications']['topic']
-                        self.notify.headers['Title'] = f"{self.config['fevr']['name']}: {event['before']['label'].title()} in {event['before']['camera']}"
-                        self.notify.notify("put")
+                self.notify.notify(event)
     def subscribe(self, client: mqtt_client):
         def on_message(client, userdata, msg):
             source = "MQTT | RCVD"
