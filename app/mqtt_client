@@ -61,7 +61,7 @@ class notifications:
         self.headers =  {
                             "Title": "",
                             "Message": "",
-                            "Priority": 3,
+                            "Priority": "3",
                             "Tags": None,
                             "Delay": None,
                             "Actions": None,
@@ -85,8 +85,9 @@ class notifications:
             elif method == "post":
                 requests.post(self.server,data=json.dumps(self.headers))
             self.lastnotification = int(time())
-        except:
+        except Exception as error:
             logit.execute("Failed to send notification",src=self.source)
+            logit.execute(f"Error: {error}",src=self.source)
 
 class logit:
     def execute(msg,src='fEVR',debug=True):
@@ -232,13 +233,6 @@ class fevrMQTT:
         # Parse the topics into a list if it's a string.
         if isinstance(self.config['mqtt']['topics'],str):
             self.config['mqtt']['topics'] = self.parseTopics()
-            
-        # Make a copy of self.config so we can hide secrets from the log
-        displayConfig = self.config
-        for key in displayConfig:
-            if self.config['verbose']:
-                displayConfig['mqtt']['apikey'] = True if displayConfig['mqtt']['apikey'] else False
-            logit.execute(f"{key}: {displayConfig[key]}", src=source)
         
         #Setup Notifications:
         self.notify = notifications(config=self.config['notifications'])
@@ -320,7 +314,7 @@ class fevrMQTT:
                         rSession = requests.Session()
                         Auth = auth(url=self.config['fevr']['url'],apikey=self.config['mqtt']['apikey'],rSession=rSession)
                         if Auth.api():
-                            self.notify.data = requests.get(f"self.config['fevr']['url']/api/cameras/{event['before']['camera']}/clip").content
+                            self.notify.data = requests.get(f"{self.config['fevr']['url']}/api/cameras/{event['before']['camera']}/clip").content
                         self.notify.headers['Title'] = f"{self.config['fevr']['name']}: {event['before']['label'].title()} in {event['before']['camera']}"
                         self.notify.notify("put")
     def subscribe(self, client: mqtt_client):
