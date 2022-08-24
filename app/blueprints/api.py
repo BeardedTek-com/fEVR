@@ -186,7 +186,7 @@ def apiSingleEvent(eventid):
     query = events.query.filter_by(eventid=eventid)
     return iterateQuery(query)
 
-@api.route('/api/event/<eventid>/clip')
+@api.route('/api/event/<eventid>/clip.mp4')
 def apiEventClip(eventid):
     clip = f"{os.getcwd()}/app/static/events/{eventid}/clip.mp4"
     try:
@@ -232,6 +232,8 @@ def apiSnapshot(camera,height):
     for frigate in frigateConfig:
         try:
             snapshot = requests.get(f"{frigateConfig[frigate]['url']}/api/{camera}/latest.jpg?height={height}", allow_redirects=True).content
-            return send_file(snapshot,attachment_filename="snapshot.jpg")
+            with open(f'/tmp/{camera}.jpg','wb') as snap:
+                snap.write(snapshot)
+            return send_file(f'/tmp/{camera}.jpg',attachment_filename="snapshot.jpg")
         except Exception as error:
             return jsonify({"error": error})
