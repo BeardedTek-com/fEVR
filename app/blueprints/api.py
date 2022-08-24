@@ -186,7 +186,7 @@ def apiSingleEvent(eventid):
     query = events.query.filter_by(eventid=eventid)
     return iterateQuery(query)
 
-@api.route('/api/event/<eventid>/clip.mp4')
+@api.route('/api/event/clip/<eventid>/clip')
 def apiEventClip(eventid):
     clip = f"{os.getcwd()}/app/static/events/{eventid}/clip.mp4"
     try:

@@ -276,7 +276,7 @@ class fevrMQTT:
                 LogMsg = f"FAILURE: {respJSON}"
             logit.execute(LogMsg,src="MQTT | EVENT ADD")
         else:
-            if fEVRurl:
+            if 'fEVRurl' in locals():
                 logit.execute(f"Failed to Authenticate - visit {fEVRurl}/profile to generate an API Auth Key and insert it in your config", src="MQTT | ERROR")
             else:
                 logit.execute(f"It appears your instance of fEVR is not setup yet.  please visit `/setup` to complete setup.", src="MQTT | ERROR")
