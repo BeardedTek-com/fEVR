@@ -56,7 +56,7 @@ class notifications:
     def ntfy(self):
         self.source = "MQTT | ntfy"
         self.server = "https://ntfy.fevr.video"
-        self.topic = "fEVR-hostname" # TODO: Get hostname from variable or system
+        self.topic = f"{self.config['topic']}"
         self.data = None
         self.headers =  {
                             "Title": "",
@@ -77,16 +77,18 @@ class notifications:
                         }
         
     def notify(self,method="post"):
+        url = f"{self.server}/{self.topic}"
         try:
             if method == "put":
-                requests.put(self.server,data=self.data,headers=self.headers)
+                requests.put(url,data=self.data,headers=self.headers)
             elif method == "get":
                 pass
             elif method == "post":
-                requests.post(self.server,data=json.dumps(self.headers))
+                requests.post(url,data=json.dumps(self.headers))
             self.lastnotification = int(time())
+            logit.execute(f"{url}: Notification SUCCESS",src=self.source)
         except Exception as error:
-            logit.execute("Failed to send notification",src=self.source)
+            logit.execute(f"{url}: Notification FAILED",src=self.source)
             logit.execute(f"Error: {error}",src=self.source)
 
 class logit:
@@ -304,6 +306,8 @@ class fevrMQTT:
                         Auth = auth(url=self.config['fevr']['url'],apikey=self.config['mqtt']['apikey'],rSession=rSession)
                         if Auth.api():
                             self.notify.data = rSession.get(f"self.config['fevr']['url']/api/cameras/{event['before']['camera']}/snapshot").content
+                        self.notify.server = self.config['notifications']['server']
+                        self.notify.topic = self.config['notifications']['topic']
                         self.notify.headers['Title'] = f"{self.config['fevr']['name']}: {event['before']['label'].title()} in {event['before']['camera']}"
                         self.notify.notify("put")
             elif event['type'] == 'end':
@@ -315,6 +319,8 @@ class fevrMQTT:
                         Auth = auth(url=self.config['fevr']['url'],apikey=self.config['mqtt']['apikey'],rSession=rSession)
                         if Auth.api():
                             self.notify.data = requests.get(f"{self.config['fevr']['url']}/api/cameras/{event['before']['camera']}/clip").content
+                        self.notify.server = self.config['notifications']['server']
+                        self.notify.topic = self.config['notifications']['topic']
                         self.notify.headers['Title'] = f"{self.config['fevr']['name']}: {event['before']['label'].title()} in {event['before']['camera']}"
                         self.notify.notify("put")
     def subscribe(self, client: mqtt_client):
