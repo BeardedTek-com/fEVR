@@ -1,27 +1,22 @@
 #  See docs for setup instructions
 #  This yaml file will be used for both fEVR and mqtt_client
 
-fevr_host:
-    fevr
-fevr_port:
-    5090
-fevr_transport:
-    http://
-mqtt_broker:
-    mqtt
-mqtt_port:
-    1883
-mqtt_user:
-mqtt_password:
-mqtt_topics:
-    frigate/+
-mqtt_apikey:
-    value
-verbose:
-    true
-ntfy_enable:
-    true
-ntfy_server:
-    "https://ntfy.fevr.video"
-ntfy_topic:
-    CHANGE_ME_TO_RANDOM_STRING
+broker:
+  host: mqtt
+  port: 1883
+  user: ~
+  password: ~
+  topics: frigate/+
+  apikey: value
+
+fevr:
+  url: http://localhost:5090
+
+notifications:
+  enabled: true
+  cooldown: 30
+  service: "ntfy"
+  server: "https://ntfy.fevr.video"
+  topic: CHANGE_TO_YOUR_TOPIC
+
+verbose: true

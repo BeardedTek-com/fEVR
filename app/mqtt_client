@@ -16,6 +16,7 @@
 #    You should have received a copy of the GNU AfferoGeneral Public License
 #    along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
+from urllib.parse import _NetlocResultMixinStr
 from paho.mqtt import client as mqtt_client
 import argparse
 from os import path, access, R_OK
@@ -30,23 +31,62 @@ import json
 import yaml
 import sys
 
-class ntfy:
-    def __init__(self):
+class notifications:
+    def __init__(self,config={}):
+        self.config = config
+        self.service = config['service']    # Which service to use
+        self.cooldown = config['cooldown']  # Cooldown period so we don't overload notifications
+        self.snap = None                    # Does Snapshot Exist?
+        self.clip = None                    # Does Clip Exist
+        self.event = None                   # Event dict from mqtt event
+        self.lastnotification = 0
+        self.source = f"MQTT | {self.service}"
+        self.configured = False
+    
+    def setup(self):
+        if self.service == "ntfy":
+            try:
+                self.ntfy()
+                self.configured = True
+            except Exception as error:
+                pass
+        entry = f"{self.service.title()} configured and ready" if self.configured else f"{self.service.title()} not configured.  Error: {error}"
+        logit.execute(entry,src=self.source)
+   
+    def ntfy(self):
+        self.source = "MQTT | ntfy"
         self.server = "https://ntfy.fevr.video"
-        self.payload = {
-                    "topic": "",
-                    "message": "",
-                    "title": "",
-                    "tags": [],
-                    "priority": 4,
-                    "attach": "",
-                    "filename": "",
-                    "click": "",
-                    "actions": []
-        }
+        self.topic = "fEVR-hostname" # TODO: Get hostname from variable or system
+        self.data = None
+        self.headers =  {
+                            "Title": "",
+                            "Message": "",
+                            "Priority": 3,
+                            "Tags": None,
+                            "Delay": None,
+                            "Actions": None,
+                            "Click": None,
+                            "Attach": None,
+                            "Filename": None,
+                            "Email": None,
+                            "Cache": None,
+                            "Firebase": None,
+                            "UnifiedPush": None,
+                            "Poll-ID": None,
+                            "Authorization": None
+                        }
         
-    def notify(self):
-        requests.post(self.server,data=json.dumps(self.payload))
+    def notify(self,method="post"):
+        try:
+            if method == "put":
+                requests.put(self.server,data=self.data,headers=self.headers)
+            elif method == "get":
+                pass
+            elif method == "post":
+                requests.post(self.server,data=json.dumps(self.headers))
+            self.lastnotification = int(time())
+        except:
+            logit.execute("Failed to send notification",src=self.source)
 
 class logit:
     def execute(msg,src='fEVR',debug=True):
@@ -58,23 +98,28 @@ class logit:
             to_stderr(f"[ {src:16} ] {logentry}")
 
 class getLocalIP:
-    s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-    s.connect(("8.8.8.8", 80))
-    addr = s.getsockname()[0]
+    def __init__(self,url):
+        if "://" in url:
+            host = url.split(":")[1].replace("//","")
+        else:
+            host = "1.1.1.1"
+        s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+        s.connect((host, 80))
+        self.addr = s.getsockname()[0]
 
 class auth:
-    def __init__(self,transport="http://",fevr="localhost:5090",rSession=requests.Session(),apikey=""):
-        self.transport = transport
-        self.fevr = fevr
+    def __init__(self,url="http://localhost:5090",rSession=requests.Session(),apikey=""):
+        self.url = url
         self.rSession = rSession
         self.apikey = apikey
+        self.myip = getLocalIP(self.url)
 
     def api(self):
         source = "MQTT | AUTH"
         # Construct the json for the post request
-        JsonPost = {'key':self.apikey,'ip':getLocalIP.addr}
+        JsonPost = {'key':self.apikey,'ip':self.myip.addr}
         # Send the post using our session
-        fevrUrl = f"{self.transport}{self.fevr}/apiAuth"
+        fevrUrl = f"{self.url}/apiAuth"
         apiAuth = self.rSession.post(f"{fevrUrl}", json=JsonPost)
         apiAuthJSON = json.loads(apiAuth.content)
         authResult = True if apiAuthJSON['auth'] else False
@@ -82,33 +127,38 @@ class auth:
         return authResult
     
 class fevrMQTT:
-    def __init__(self):
-        source = "MQTT | DEFAULTS"
+    def __init__(self,configFile='data/config.yml'):
+        self.source = "MQTT | DEFAULTS"
         hostname = socket.gethostname()
         self.clientID = f"fevr-{hostname}-{randint(0,100)}"
-        # Initialize our Config variable as a dict and set sane default values in self.config
-        self.config =  {
-                            'fevr':"localhost:5090",
-                            'mqtt_broker':"mqtt",
-                            'mqtt_port':1883,
-                            'mqtt_user':'',
-                            'mqtt_password':'',
-                            'mqtt_apikey': '',
-                            'verbose': False,
-                            'fevr_transport': 'http://',
-                            'mqtt_topics': "frigate/+",
-                            'ntfy_enable': True,
-                            'ntfy_server': "https://ntfy.fevr.video",
-                            'ntfy_topic': "fEVR-CHANGEME"
-                        }
-        logit.execute(self.config,src=source)
+        # Initialize our Config variable as a dict and set sane default values in self.defaultConfig
+        self.defaultConfig = {
+                    "fevr":{
+                            "url"  : "http://localhost:5090",
+                            "name" : "fEVR"
+                           },
+                    "mqtt":{
+                            "host"      : "mqtt",
+                            "port"      : "1883",
+                            "user"      : None,
+                            "password"  : None,
+                            "topics"    : ['frigate/+'],
+                            "apikey"    : None
+                           },
+                    "notifications":{
+                            "enabled": True,
+                            "cooldown": 30,
+                            "service": "ntfy",
+                            "server": "https://ntfy.fevr.video",
+                            "topic"     : f"fEVR-{socket.gethostname()}"
+                           },
+                    "verbose": True
+        }
         # Get the Command Line Arguments in a dict
         self.Args = self.cla()
         # If using the -c/--config option, get the config from the specified file
-        if self.Args['config']:
-            self.configFile = self.getConfig(self.Args['config'])
-            if self.configFile['fevr_host'] and self.configFile['fevr_port']:
-                self.configFile["fevr"] = f"{self.configFile['fevr_host']}:{self.configFile['fevr_port']}"
+        
+        self.config = self.getConfig(self.Args['config']) if self.Args['config'] else self.getConfig(configFile)
         self.setup()
         self.run()
         
@@ -121,38 +171,44 @@ class fevrMQTT:
                 except Exception as e:
                     logit.execute(f"ERROR: {e}",src=source)
                     Config = {}
-                values = ['fevr_host','fevr_port','fevr_transport','mqtt_apikey','mqtt_broker','mqtt_port','mqtt_user','mqtt_password','mqtt_topics','verbose','ntfy_enable','ntfy_server','ntfy_topic']
-                for value in values:
-                    try:
-                        # Check if value exists
-                        test = Config[value]
-                    except KeyError:
-                        # If not, set it to None
-                        Config[value] = None
             Config["error"] = None
         else:
             if path.isfile(config):
                 Config["error"] = "File not readable"
             Config["error"] = "File does not exist"
-        return Config
+        return self.validateConfig(Config)
     
+    def validateConfig(self,Config={}):
+        for key in ["mqtt","fevr","notifications","verbose"]:
+            if key in Config:
+                if key == "mqtt":
+                    for subkey in ["host","port","user","password","topics","apikey"]:
+                        if not subkey in Config[key]:
+                            Config[key][subkey] = self.defaultConfig[key][subkey]
+                if key == "fevr":
+                    for subkey in ["url"]:
+                        if not subkey in Config[key]:
+                            Config[key][subkey] = self.defaultConfig[key][subkey]
+                if key == "notifications":
+                    for subkey in ["enabled","service"]:
+                        if not subkey in Config[key]:
+                            Config[key][subkey] = self.defaultConfig[key][subkey]
+                        else:
+                            for subkey2 in ["ntfy"]:
+                                if not subkey2 in Config[key][subkey]:
+                                    Config[key][subkey][subkey2] = self.defaultConfig[key][subkey][subkey2]                 
+            else:
+                try:
+                    Config[key] = self.defaultConfig[key]
+                except:
+                    Config[key] = None
+        return Config
     
     def cla(self):
         source = "MQTT | CMDLINE"
         parser = argparse.ArgumentParser()
         parser.add_argument('-c','--config',type=str,required=False,help="If set, uses command line options instead of the database (default: empty)")
-        parser.add_argument('-m','--mqtt_broker',type=str,required=False,help="MQTT Broker IP/FQDN (default: mqtt)")
-        parser.add_argument('-k','--mqtt_apikey',type=str,required=False,help="fEVR API Key (default: blank string)")
-        parser.add_argument('-p','--mqtt_port',type=int,required=False,help="MQTT Port (default: 1883)")
-        parser.add_argument('-t','--mqtt_topics',type=str,required=False,help="MQTT Topics (default: 'frigate/+')")
-        parser.add_argument('-u','--mqtt_user',type=str,required=False,help="MQTT Username (default: '')")
-        parser.add_argument('-P','--mqtt_password',type=str,required=False,help="MQTT Password (default: '')")
-        parser.add_argument('-f','--fevr',type=str,required=False,help="fEVR IP Address/FQDN (default: '127.0.0.1:5090)")
-        parser.add_argument('-s','--fevr_transport',action='store_true',required=False,help="If set uses https:// for fEVR API Calls (default: False)")
         parser.add_argument('-v','--verbose',action='store_true',required=False,help="If set, outputs verbosely to stdout")
-        parser.add_argument('--ntfy_enable',action='store_true',required=False,help="If set, enables ntfy.sh notifications")
-        parser.add_argument('--ntfy_server',type=str,required=False,help="ntfy.sh server address 'https://ntfy.fevr.video'")
-        parser.add_argument('--ntfy_topic',type=str,required=False,help="Unique topic for notifications")
         args = parser.parse_args()
         logit.execute(vars(args),src=source)
         return vars(args)
@@ -160,7 +216,7 @@ class fevrMQTT:
     def parseTopics(self):
         source = "MQTT | TOPICS"
         excluded = None
-        Topics = self.config['mqtt_topics'].split(',',5)
+        Topics = self.config['mqtt']['topics'].split(',',5)
         topics = []
         count=0
         for topic in Topics:
@@ -175,45 +231,60 @@ class fevrMQTT:
         return topics
     
     def setup(self):
-        '''
-        We have our possible config sources gathered and default values set in self.config
-        Now we overwrite the defaults with the command line arguments.
-        If there is not a command line argument, we fall back to the config file.
-        Whatever is not set the default gets used.
-        '''
         source = "MQTT | SETUP"
-        for key in self.config:
-            # If we set the command line argument, override the config file
-            if self.Args[key]:
-                self.config[key] = self.Args[key]
-            elif self.configFile[key]:
-                self.config[key] = self.configFile[key]
-            if key == "mqtt_apikey":
-                if self.config[key] and self.config[key] != "":
-                    Key = True
-                else:
-                    Key = False
-                value = Key
-            else:
-                value = self.config[key]
-            logit.execute(f"{key}: {value}", src=source)
+        
         # Parse the topics into a list if it's a string.
-        if isinstance(self.config['mqtt_topics'],str):
-            self.config['mqtt_topics'] = self.parseTopics()
+        if isinstance(self.config['mqtt']['topics'],str):
+            self.config['mqtt']['topics'] = self.parseTopics()
+            
+        # Make a copy of self.config so we can hide secrets from the log
+        displayConfig = self.config
+        for key in displayConfig:
+            if self.config['verbose']:
+                displayConfig['mqtt']['apikey'] = True if displayConfig['mqtt']['apikey'] else False
+            logit.execute(f"{key}: {displayConfig['key']}", src=source)
+        
+        #Setup Notifications:
+        self.notify = notifications()
+        self.notify.setup(config = self.config['notifications'])
         
     def connect_mqtt(self) -> mqtt_client:
         def on_connect(client, userdata, flags, rc):
             source = "MQTT | CONNECT"
             if rc == 0:
-                logit.execute(f"Connected to {self.config['mqtt_broker']}:{self.config['mqtt_port']} as {self.clientID}",src=source)
+                logit.execute(f"Connected to {self.config['mqtt']['host']}:{self.config['mqtt']['port']} as {self.clientID}",src=source)
             else:
                 logit.execute("Failed to connect, return code %d", rc,src=source)
         client = mqtt_client.Client(self.clientID)
-        if self.config['mqtt_user'] and self.config['mqtt_password']:
-            client.username_pw_set(self.config['mqtt_user'], self.config['mqtt_password'])
+        if self.config['mqtt']['user'] and self.config['mqtt']['password']:
+            client.username_pw_set(self.config['mqtt']['user'], self.config['mqtt']['password'])
         client.on_connect = on_connect
-        client.connect(self.config['mqtt_broker'], self.config['mqtt_port'])
+        client.connect(self.config['mqtt']['host'], self.config['mqtt']['port'])
         return client
+    
+    def addEvent(self,event):
+        #Adds an event to fEVR from frigate
+        source = "MQTT | AddEvent"
+        # Create a session variable, authenticate, and tell fEVR via it's API to get the event.
+        rSession = requests.Session()
+        Auth = auth(url=self.config['fevr']['url'],apikey=self.config['mqtt']['apikey'],rSession=rSession)
+        if Auth.api():
+            fEVRurl = f"{self.config['fevr']['url']}/api/events/add/{event['id']}/{event['camera']}/{event['label']}/{floor(float(event['score'])*100)}"
+            addEventResponse = rSession.get(fEVRurl)
+            respJSON = json.loads(addEventResponse.content)
+            if self.config['verbose']:
+                logit.execute(fEVRurl,src=source)
+            if respJSON["error"] == 0:
+                LogMsg = f"SUCCESS: {event['id']} ({event['label']} in {event['camera']}) added"
+            else: 
+                LogMsg = f"FAILURE: {respJSON}"
+            logit.execute(LogMsg,src="MQTT | EVENT ADD")
+        else:
+            if fEVRurl:
+                logit.execute(f"Failed to Authenticate - visit {fEVRurl}/profile to generate an API Auth Key and insert it in your config", src="MQTT | ERROR")
+            else:
+                logit.execute(f"It appears your instance of fEVR is not setup yet.  please visit `/setup` to complete setup.", src="MQTT | ERROR")
+    
     def processMsg(self,msg,topic):
         '''
         If we receive a message from the server we check if it matches our watched topics
@@ -228,57 +299,28 @@ class fevrMQTT:
             # If it's an event we take action
             event = json.loads(msg)
             eventfound = f"\n{json.dumps(event)}" if self.config['verbose'] else event["after"]["id"]
+            # Log the event
             if self.config['verbose']:
                 logit.execute(f"{eventfound} ({event['type']})", src="MQTT | EVENT")
-            elif event['type'] == "new":
-                logit.execute(f"{eventfound} ({event['type']})", src="MQTT | EVENT")
-                if 'ntfy_enable' in self.config:
-                    if self.config['ntfy_enable']:
-                        notifier = ntfy()
-                        notifier.server = self.config['ntfy_server']
-                        notifier.payload['topic'] = self.config['ntfy_topic']
-                        notifier.payload['message'] = f"{event['before']['label'].title()} in {event['before']['camera'].title()}"
-                        notifier.payload['title'] = "fEVR | Jeandr"
-                        notifier.payload['attach'] = f"http://192.168.2.240:5090/static/events/{event['before']['id']}/snapshot.jpg"
-                        notifier.payload['actions'].append({"action": "view", "label": "View Event", "url": f"http://192.168.2.240:5090/event/{event['before']['id']}/snap"})
-                        notifier.payload['priority'] = 5
-                        notifier.notify()
-            elif event['type'] == "end": 
-                logit.execute(f"{eventfound} ({event['type']})", src="MQTT | EVENT")
-                if 'ntfy_enable' in self.config:
-                    if self.config['ntfy_enable']:
-                        notifier = ntfy()
-                        notifier.server = self.config['ntfy_server']
-                        notifier.payload['topic'] = self.config['ntfy_topic']
-                        notifier.payload['message'] = f"{event['after']['label'].title()} in {event['after']['camera'].title()}"
-                        notifier.payload['title'] = "fEVR | Jeandr"
-                        notifier.payload['attach'] = f"http://192.168.2.240:5090/static/events/{event['after']['id']}/snapshot.jpg"
-                        notifier.payload['actions'].append({"action": "view", "label": "View Event", "url": f"http://192.168.2.240:5090/event/{event['after']['id']}/snap"})
-                        notifier.payload['priority'] = 5
-                        notifier.notify()
-                    
-            if event['type'] == 'end':
-                # If the event is over, we create a session variable, authenticate, and tell fEVR via it's API to get the event.
-                rSession = requests.Session()
-                Auth = auth(transport=self.config['fevr_transport'],apikey=self.config['mqtt_apikey'],fevr=self.config['fevr'],rSession=rSession)
-                if Auth.api():
-                    fEVRuri = f"{self.config['fevr_transport']}{self.config['fevr']}"
-                    fEVRurl = f"{fEVRuri}/api/events/add/{event['after']['id']}/{event['after']['camera']}/{event['after']['label']}/{floor(float(event['after']['score'])*100)}"
-                    addEventResponse = rSession.get(fEVRurl)
-                    respJSON = json.loads(addEventResponse.content)
-                    if self.config['verbose']:
-                        logit.execute(fEVRurl,src=source)
-                    if respJSON["error"] == 0:
-                        LogMsg = f"SUCCESS: {event['after']['id']} ({event['after']['label']} in {event['after']['camera']}) added"
-                    else: 
-                        LogMsg = f"FAILURE: {respJSON}"
-                    logit.execute(LogMsg,src="MQTT | EVENT ADD")
-                else:
-                    if fEVRurl:
-                        logit.execute(f"Failed to Authenticate - visit {fEVRurl}/profile to generate an API Auth Key and insert it in your config", src="MQTT | ERROR")
-                    else:
-                        logit.execute(f"It appears your instance of fEVR is not setup yet.  please visit `/setup` to complete setup.", src="MQTT | ERROR")
-                
+            else:
+                if event['type'] == "new" or event['type'] == "end":
+                    logit.execute(f"{eventfound} ({event['type']})", src="MQTT | EVENT")
+            # Take Action on the event
+            if event['type'] == "new":
+                # Trigger Notification
+                if self.notify.config['enabled']:
+                    if not self.notify.lastnotification or (int(time()) - self.notify.lastnotification) > self.notify.config['cooldown']:
+                        self.notify.data = requests.get(f"self.config['fevr']['url']/api/cameras/{event['before']['camera']}/snapshot").content
+                        self.notify.headers['Title'] = f"{self.config['fevr']['name']}: {event['before']['label'].title()} in {event['before']['camera']}"
+                        self.notify.notify("put")
+            elif event['type'] == 'end':
+                # Use event['after'] to add event
+                self.addEvent(event['after'])
+                if self.notify.config['enabled']:
+                    if not self.notify.lastnotification or (int(time()) - self.notify.lastnotification) > self.notify.config['cooldown']:
+                        self.notify.data = requests.get(f"self.config['fevr']['url']/api/cameras/{event['before']['camera']}/clip").content
+                        self.notify.headers['Title'] = f"{self.config['fevr']['name']}: {event['before']['label'].title()} in {event['before']['camera']}"
+                        self.notify.notify("put")
     def subscribe(self, client: mqtt_client):
         def on_message(client, userdata, msg):
             source = "MQTT | RCVD"
@@ -286,7 +328,7 @@ class fevrMQTT:
             if self.config['verbose']:
                 logit.execute(f"{msg.topic}: Message Received",src=source)
             self.processMsg(msg.payload.decode(),msg.topic)
-        for topic in self.config['mqtt_topics']:
+        for topic in self.config['mqtt']['topics']:
             source = "MQTT | SUBSCRIBE"
             logit.execute(f"Subscribing to: {topic}",src=source)
             client.subscribe(topic)

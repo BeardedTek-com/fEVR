@@ -23,6 +23,7 @@ import subprocess
 from datetime import datetime
 import os
 import shutil
+import requests
 
 from app.models.frigate import frigate
 from app.models.events import events
@@ -185,6 +186,15 @@ def apiSingleEvent(eventid):
     query = events.query.filter_by(eventid=eventid)
     return iterateQuery(query)
 
+@api.route('/api/event/<eventid>/clip')
+def apiEventClip(eventid):
+    with open(f"{os.getcwd()}/app/static/events/{eventid}/clip.mp4", mode=rb) as Clip:
+        try:
+            return Clip.read()
+        except Exception as error:
+            return error
+            
+
 @api.route('/api/events/camera/<camera>')
 @login_required
 def apiEventsByCamera(camera):
@@ -213,3 +223,15 @@ def apiCameras(camera):
     else:
         query = cameras.query.filter_by(camera=camera)
     return iterateQuery(query)
+
+@api.route('/api/cameras/<camera>/snapshot')
+@login_required
+def apiSnapshot(camera):
+    frigateConfig = apiFrigate()
+    snapshot = None
+    for frigate in frigateConfig:
+        try:
+            snapshot = requests.get(frigateConfig[frigate]['url'], allow_redirects=True).content
+        except:
+            pass
+    return snapshot
