@@ -241,8 +241,8 @@ class fevrMQTT:
             logit.execute(f"{key}: {displayConfig[key]}", src=source)
         
         #Setup Notifications:
-        self.notify = notifications()
-        self.notify.setup(config = self.config['notifications'])
+        self.notify = notifications(config=self.config['notifications'])
+        self.notify.setup()
         
     def connect_mqtt(self) -> mqtt_client:
         def on_connect(client, userdata, flags, rc):
