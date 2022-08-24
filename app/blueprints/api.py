@@ -15,7 +15,7 @@
 #    You should have received a copy of the GNU AfferoGeneral Public License
 #    along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-from flask import Blueprint, render_template, escape, redirect, url_for, jsonify, make_response
+from flask import Blueprint, render_template, escape, redirect, url_for, jsonify, make_response,send_file
 from flask_login import login_required, current_user
 from flask_sqlalchemy import inspect
 from sqlalchemy import desc
@@ -188,11 +188,11 @@ def apiSingleEvent(eventid):
 
 @api.route('/api/event/<eventid>/clip')
 def apiEventClip(eventid):
-    with open(f"{os.getcwd()}/app/static/events/{eventid}/clip.mp4", mode=rb) as Clip:
-        try:
-            return Clip.read()
-        except Exception as error:
-            return error
+    clip = f"{os.getcwd()}/app/static/events/{eventid}/clip.mp4"
+    try:
+        return send_file(clip,attachment_filename="clip.mp4")
+    except Exception as error:
+        return jsonify({"error": error})
             
 
 @api.route('/api/events/camera/<camera>')
@@ -232,7 +232,6 @@ def apiSnapshot(camera,height):
     for frigate in frigateConfig:
         try:
             snapshot = requests.get(f"{frigateConfig[frigate]['url']}/api/{camera}/latest.jpg?height={height}", allow_redirects=True).content
-            value = snapshot
+            return send_file(snapshot,attachment_filename="snapshot.jpg")
         except Exception as error:
-            value = jsonify({"error":error,"snapshot":snapshot})
-    return value
+            return jsonify({"error": error})
