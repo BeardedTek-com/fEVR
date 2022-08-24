@@ -231,7 +231,7 @@ def apiSnapshot(camera,height):
     snapshot = None
     for frigate in frigateConfig:
         try:
-            snapshot = requests.get(f"frigateConfig[frigate]['url']/api/{camera}/latest.jpg?height={height}", allow_redirects=True).content
+            snapshot = requests.get(f"{frigateConfig[frigate]['url']}/api/{camera}/latest.jpg?height={height}", allow_redirects=True).content
             value = snapshot
         except Exception as error:
             value = jsonify({"error":error,"snapshot":snapshot})
