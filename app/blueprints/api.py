@@ -231,7 +231,7 @@ def apiSnapshot(camera,height):
     snapshot = None
     for frigate in frigateConfig:
         try:
-            snapshot = requests.get(f"{frigateConfig[frigate]['url']}/api/{camera}/latest.jpg?height={height}", allow_redirects=True).content
+            snapshot = requests.get(f"{frigateConfig[frigate]['url']}/api/{camera}/latest.jpg?h={height}", allow_redirects=True).content
             with open(f'/tmp/{camera}.jpg','wb') as snap:
                 snap.write(snapshot)
             return send_file(f'/tmp/{camera}.jpg',attachment_filename="snapshot.jpg")

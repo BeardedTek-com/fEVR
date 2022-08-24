@@ -305,7 +305,7 @@ class fevrMQTT:
                         rSession = requests.Session()
                         Auth = auth(url=self.config['fevr']['url'],apikey=self.config['mqtt']['apikey'],rSession=rSession)
                         if Auth.api():
-                            self.notify.data = rSession.get(f"{self.config['fevr']['url']}/api/cameras/{event['before']['camera']}/snapshot").content
+                            self.notify.data = rSession.get(f"{self.config['fevr']['url']}/api/cameras/{event['before']['camera']}/snapshot/320").content
                         self.notify.server = self.config['notifications']['server']
                         self.notify.topic = self.config['notifications']['topic']
                         self.notify.headers['Title'] = f"{self.config['fevr']['name']}: {event['before']['label'].title()} in {event['before']['camera']}"
