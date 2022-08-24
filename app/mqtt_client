@@ -306,7 +306,10 @@ class fevrMQTT:
                 # Trigger Notification
                 if self.notify.config['enabled']:
                     if not self.notify.lastnotification or (int(time()) - self.notify.lastnotification) > self.notify.config['cooldown']:
-                        self.notify.data = requests.get(f"self.config['fevr']['url']/api/cameras/{event['before']['camera']}/snapshot").content
+                        rSession = requests.Session()
+                        Auth = auth(url=self.config['fevr']['url'],apikey=self.config['mqtt']['apikey'],rSession=rSession)
+                        if Auth.api():
+                            self.notify.data = rSession.get(f"self.config['fevr']['url']/api/cameras/{event['before']['camera']}/snapshot").content
                         self.notify.headers['Title'] = f"{self.config['fevr']['name']}: {event['before']['label'].title()} in {event['before']['camera']}"
                         self.notify.notify("put")
             elif event['type'] == 'end':
@@ -314,7 +317,10 @@ class fevrMQTT:
                 self.addEvent(event['after'])
                 if self.notify.config['enabled']:
                     if not self.notify.lastnotification or (int(time()) - self.notify.lastnotification) > self.notify.config['cooldown']:
-                        self.notify.data = requests.get(f"self.config['fevr']['url']/api/cameras/{event['before']['camera']}/clip").content
+                        rSession = requests.Session()
+                        Auth = auth(url=self.config['fevr']['url'],apikey=self.config['mqtt']['apikey'],rSession=rSession)
+                        if Auth.api():
+                            self.notify.data = requests.get(f"self.config['fevr']['url']/api/cameras/{event['before']['camera']}/clip").content
                         self.notify.headers['Title'] = f"{self.config['fevr']['name']}: {event['before']['label'].title()} in {event['before']['camera']}"
                         self.notify.notify("put")
     def subscribe(self, client: mqtt_client):
