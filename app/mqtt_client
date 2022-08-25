@@ -42,12 +42,12 @@ class notifications:
         self.clip = None                    # Does Clip Exist
         self.event = None                   # Event dict from mqtt event
         self.lastnotify = {
-            "camera":
+            "default":
                 {
-                    "time"  : 0,
-                    "id"    : "event-id",
-                    "label" : "person",
-                    "type"  : "new"         # new update or end
+                    "time"  : 0,            # int(time())
+                    "id"    : "",           # event id
+                    "label" : "",           # person, animal, car, etc...
+                    "type"  : ""            # new update or end
                 }
         }
         self.lastnotification = 0
@@ -55,7 +55,7 @@ class notifications:
         self.configured = False
         
     def cooldown(self,camera,label):
-        last = self.lastnotify[camera] if camera in self.lastnotify else 0
+        last = self.lastnotify[camera] if camera in self.lastnotify else self.lastnotify['default']
         byTime = True if (last['time'] + self.cooldownTime) > time() else False
         byType = True if last['type'] == 'end' else False
         byLabel = True if last['label'] == label else False
@@ -98,42 +98,49 @@ class notifications:
                         }
         
     def notify(self,event):
-        url = f"{self.server}/{self.topic}"
+    # Carries out notifications event: event json from mqtt:frigate/events
         if self.config['enabled']:
+        # check if notifications are enabled
             target = "after" if event['type'] == "end" else "before"
             camera = event[target]['camera']
             label = event[target]['label']
             eventType = event['type']
             eventid = event[target]['id']
-            nTime = time()
+            nTime = int(time())
             
             if not self.cooldown(camera,label):
+            # Check if we are in a cooldown period for this camera and event
                 # Determine which data to send
                 if eventType == "end":
-                    # Evemt Video Clip if event is over
+                # Get event video clip if event is over
                     dataURL = f"{self.fevr['url']}/api/event/clip/{eventid}"
                 else:
-                    # Take snapshot from camera if event is not over
+                # Take snapshot from camera if event is not over
                     dataURL = f"{self.fevr['url']}/api/cameras/{camera}/snapshot/320"
                 
-                # Authenticate with fEVR
                 rSession = requests.Session()
                 if auth(url=f"{self.fevr['url']}/apiAuth",apikey=self.mqtt['apikey'],rSession=rSession).api():
+                # Authenticate with fEVR
                     #If authenticated, get notification data
                     self.data = rSession.get(dataURL).content
                     self.server = self.config['notifications']['server']
                     self.topic = self.config['notifications']['topic']
                     self.headers['Title'] = f"{self.config['fevr']['name']}: {event['before']['label'].title()} in {event['before']['camera']}"
                     try:
+                        # Set notification url
                         nURL = f"{self.config['server']}/{self.config['topic']}"
                         requests.put(nURL,data=self.data,headers=self.headers)
-                        self.lastnotify[camera]['time'] = nTime
-                        self.lastnotify[camera]['id'] = eventid
-                        self.lastnotify[camera]['label'] = label
-                        self.lastnotify[camera]['type'] = eventType
+                        # Set last notification data
+                        self.lastnotify[camera] = {
+                            "time"  : nTime,
+                            "id"    : eventid,
+                            "label" : label,
+                            "type"  : eventType
+                        }
+                        # Log the successful notification
                         logit.execute(f"{nURL}: Notification SUCCESS",src=self.source)
-
                     except Exception as error:
+                        # Log the failed notification
                         logit.execute(f"{nURL}: Notification FAILED",src=self.source)
                         logit.execute(f"Error: {error}",src=self.source)
 
