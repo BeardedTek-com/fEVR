@@ -1,7 +1,9 @@
 #  See docs for setup instructions
 #  This yaml file will be used for both fEVR and mqtt_client
 
-broker:
+# Configures the mqtt client settings
+mqtt:
+  enabled: true
   host: mqtt
   port: 1883
   user: ~
@@ -9,14 +11,20 @@ broker:
   topics: frigate/+
   apikey: value
 
+# Configure fEVR settings that mqtt_client uses
 fevr:
   url: http://localhost:5090
 
+# Configure Notifications
+# For now the only option it ntfy, but I plan on adding more options
 notifications:
   enabled: true
   cooldown: 30
+  priority: 4
   service: "ntfy"
   server: "https://ntfy.fevr.video"
   topic: CHANGE_TO_YOUR_TOPIC
 
-verbose: true
+# Should the logs print out way too much information?
+# (Seriously, only use it for debugging.  It's a LOT.)
+verbose: false

@@ -30,6 +30,7 @@ import socket
 import json
 import yaml
 import sys
+from datetime import datetime
 
 class notifications:
     def __init__(self,config={}):
@@ -107,15 +108,21 @@ class notifications:
             eventType = event['type']
             eventid = event[target]['id']
             nTime = int(time())
+            dateobj = datetime.fromtimestamp(nTime)
+            datestr = dateobj.strftime("%m/%d/%y")
+            timestr = dateobj.strftime("%H:%M:%S")
+            filedate = dateobj.strftime("%Y-%m-%d_%H-%M-%S")
             
             if not self.cooldown(camera,label):
             # Check if we are in a cooldown period for this camera and event
                 # Determine which data to send
                 if eventType == "end":
                 # Get event video clip if event is over
+                    filename = f"{filedate}-clip.mp4"
                     dataURL = f"{self.fevr['url']}/api/event/clip/{eventid}"
                 else:
                 # Take snapshot from camera if event is not over
+                    filename = f"{filedate}-snapshot.jpg"
                     dataURL = f"{self.fevr['url']}/api/cameras/{camera}/snapshot/320"
                 
                 rSession = requests.Session()
@@ -123,9 +130,11 @@ class notifications:
                 # Authenticate with fEVR
                     #If authenticated, get notification data
                     self.data = rSession.get(dataURL).content
-                    self.server = self.config['notifications']['server']
-                    self.topic = self.config['notifications']['topic']
-                    self.headers['Title'] = f"{self.config['fevr']['name']}: {event['before']['label'].title()} in {event['before']['camera']}"
+                    self.headers['Filename'] = f""
+                    self.headers['Title'] = f"fEVR: {self.fevr['name']}"
+                    self.headers['Message'] = f"{datestr} - {label} detected in {camera} at {timestr}"
+                    self.headers['Priority'] = f"{self.config['priority']}"
+                    self.headers['Action'] = f"view, View Event, https://192.168.2.240:5090/event/{eventid}/snap,clear=false;"
                     try:
                         # Set notification url
                         nURL = f"{self.config['server']}/{self.config['topic']}"
@@ -194,7 +203,8 @@ class fevrMQTT:
                             "name" : "fEVR"
                            },
                     "mqtt":{
-                            "host"      : "mqtt",
+                            "enabled"   : True,
+                            "host"      : "localhost",
                             "port"      : "1883",
                             "user"      : None,
                             "password"  : None,
@@ -204,6 +214,7 @@ class fevrMQTT:
                     "notifications":{
                             "enabled": True,
                             "cooldown": 30,
+                            "priority": 4,
                             "service": "ntfy",
                             "server": "https://ntfy.fevr.video",
                             "topic"     : f"fEVR-{socket.gethostname()}"
