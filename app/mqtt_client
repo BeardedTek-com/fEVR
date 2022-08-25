@@ -119,7 +119,7 @@ class notifications:
                     dataURL = f"{self.fevr['url']}/api/cameras/{camera}/snapshot/320"
                 
                 rSession = requests.Session()
-                if auth(url=f"{self.fevr['url']}/apiAuth",apikey=self.mqtt['apikey'],rSession=rSession).api():
+                if auth(url=f"{self.fevr['url']}",apikey=self.mqtt['apikey'],rSession=rSession).api():
                 # Authenticate with fEVR
                     #If authenticated, get notification data
                     self.data = rSession.get(dataURL).content
