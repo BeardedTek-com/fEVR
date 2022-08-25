@@ -15,7 +15,7 @@
 #    You should have received a copy of the GNU AfferoGeneral Public License
 #    along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-from flask import Blueprint, render_template, escape, redirect, url_for, jsonify, make_response,send_file
+from flask import Blueprint, render_template, escape, redirect, url_for, jsonify, make_response
 from flask_login import login_required, current_user
 from flask_sqlalchemy import inspect
 from sqlalchemy import desc
@@ -23,7 +23,6 @@ import subprocess
 from datetime import datetime
 import os
 import shutil
-import requests
 
 from app.models.frigate import frigate
 from app.models.events import events
@@ -186,15 +185,6 @@ def apiSingleEvent(eventid):
     query = events.query.filter_by(eventid=eventid)
     return iterateQuery(query)
 
-@api.route('/api/event/clip/<eventid>')
-def apiEventClip(eventid):
-    clip = f"{os.getcwd()}/app/static/events/{eventid}/clip.mp4"
-    try:
-        return send_file(clip,attachment_filename="clip.mp4")
-    except Exception as error:
-        return jsonify({"error": error})
-            
-
 @api.route('/api/events/camera/<camera>')
 @login_required
 def apiEventsByCamera(camera):
@@ -223,17 +213,3 @@ def apiCameras(camera):
     else:
         query = cameras.query.filter_by(camera=camera)
     return iterateQuery(query)
-
-@api.route('/api/cameras/<camera>/snapshot/<height>')
-@login_required
-def apiSnapshot(camera,height):
-    frigateConfig = apiFrigate()
-    snapshot = None
-    for frigate in frigateConfig:
-        try:
-            snapshot = requests.get(f"{frigateConfig[frigate]['url']}/api/{camera}/latest.jpg?h={height}", allow_redirects=True).content
-            with open(f'/tmp/{camera}.jpg','wb') as snap:
-                snap.write(snapshot)
-            return send_file(f'/tmp/{camera}.jpg',attachment_filename="snapshot.jpg")
-        except Exception as error:
-            return jsonify({"error": error})
