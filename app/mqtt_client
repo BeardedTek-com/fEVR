@@ -107,8 +107,12 @@ class fevrMQTT:
                         # Check if value exists
                         test = Config[value]
                     except KeyError:
-                        # If not, set it to None
-                        Config[value] = None
+                        # If mqtt_user or mqtt_password do not exist, set them to an empty string
+                        if value == "mqtt_user" or value== "mqtt_password":
+                            Config[value] = ""
+                        # Otherwise, set it to None
+                        else:
+                            Config[value] = None
             Config["error"] = None
         else:
             if path.isfile(config):
