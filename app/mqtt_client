@@ -89,6 +89,9 @@ class fevrMQTT:
             self.configFile = self.getConfig(self.Args['config'])
             if self.configFile['fevr_host'] and self.configFile['fevr_port']:
                 self.configFile["fevr"] = f"{self.configFile['fevr_host']}:{self.configFile['fevr_port']}"
+            if "error" in self.configFile:
+                errors = f"Config File Import Failure: {self.configFile['error']}" if self.configFile['error'] else "Config File Import Successful."
+                logit.execute(errors,src="MQTT | CONFIG")
         self.setup()
         self.run()
         
