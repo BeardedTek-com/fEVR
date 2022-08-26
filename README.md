@@ -1,7 +1,3 @@
-<p align="right" style="vertical-align:middle;"><a target="_blank" href="https://www.facebook.com/sharer/sharer.php?u=http%3A%2F%2Ffevr.video"><img src='https://fevr.video/img/share-fb.svg' style="height: 2em;"></a><a target="_blank" href="https://twitter.com/intent/tweet?url=http%3A%2F%2Ffevr.video&text=AI%20Object%20Detection%20with%20fEVR%20-%20frigate%20Event%20Video%20Recorder"><img src='https://fevr.video/img/share-twitter.svg' style="height: 2em;"></a><a target="_blank" href="http://pinterest.com/pin/create/button/?url=http%3A%2F%2Ffevr.video&media=&description=AI%20Object%20Detection%20with%20fEVR%20-%20frigate%20Event%20Video%20Recorder"><img src='https://fevr.video/img/share-pin.svg' style="height: 2em;"></a><a target="_blank" href="https://reddit.com/submit?url=https://fevr.video&title=AI%20Object%20Detection%20with%20fEVR%20-%20frigate%20Event%20Video%20Recorder"><img src='https://fevr.video/img/share-reddit.svg' style="height: 2em;"></a><a target="_blank" href="http://www.linkedin.com/shareArticle?mini=true&url=http%3A%2F%2Ffevr.video&title=AI%20Object%20Detection%20with%20fEVR%20-%20frigate%20Event%20Video%20Recorder"><img src='https://fevr.video/img/share-linkedin.svg' style="margin-right: 2em;height: 2em;"></a><a href="https://www.paypal.com/donate/?hosted_button_id=ZAHLQF24WAKES"><img src='https://fevr.video/img/paypal-donate.svg' style="height: 2em;"></a><a href="https://github.com/sponsors/BeardedTek-com"><img src='https://fevr.video/img/github-sponsor.svg' style="height: 2em;"></a><a href="https://tallyco.in/s/waqwip/"><img src='https://fevr.video/img/tallycoin-donate.png' style="height: 2em;"></a></p>
-
----
-
 # fEVR - frigate Event Video Recorder
 
 [![license](https://img.shields.io/github/license/beardedtek-com/fevr)](https://github.com/BeardedTek-com/fevr/blob/0.1.0/LICENSE)
@@ -13,6 +9,12 @@
 [![Twitter URL](https://img.shields.io/twitter/url?style=social&url=https%3A%2F%2Fgithub.com%2Fbeardedtek-com%2Ffevr)](https://twitter.com/intent/tweet?url=https%3A%2F%2Ffevr.video&text=AI%20Object%20Detection%20with%20fEVR%20-%20frigate%20Event%20Video%20Recorder)
 [![twitter-follow](https://img.shields.io/twitter/follow/beardedtek?style=social)](https://twitter.com/intent/user?screen_name=beardedtek)
 
+[![Pinterest](https://img.shields.io/badge/Share-Pin%20It!-e60023)](http://pinterest.com/pin/create/button/?url=http%3A%2F%2Ffevr.video&media=&description=AI%20Object%20Detection%20with%20fEVR%20-%20frigate%20Event%20Video%20Recorder)
+[![Reddit](https://img.shields.io/badge/Share-Reddit-orange)](https://reddit.com/submit?url=https://fevr.video&title=AI%20Object%20Detection%20with%20fEVR%20-%20frigate%20Event%20Video%20Recorder)
+[![LinkedIn](https://img.shields.io/badge/Share-LinkedIn-blue)](http://www.linkedin.com/shareArticle?mini=true&url=http%3A%2F%2Ffevr.video&title=AI%20Object%20Detection%20with%20fEVR%20-%20frigate%20Event%20Video%20Recorder)
+[![Donate - Paypal](https://img.shields.io/badge/Donate-Paypal-0070e0)](https://www.paypal.com/donate/?hosted_button_id=ZAHLQF24WAKES)
+[![Donate - GitHub](https://img.shields.io/badge/Donate-GitHub%20Sponsors-blue)](https://github.com/sponsors/BeardedTek-com)
+[![Donate - Tallyco.in](https://img.shields.io/badge/Donate-Tallyco.in-fdc948)](https://tallyco.in/s/waqwip/)
 
 fEVR works along side of [frigate](https://frigate.video) to collect video and snapshots of objects detected using your existing camera systems.
 <p align="center">
@@ -52,7 +54,6 @@ Feature comparison to leading cloud event detection providers
 
 # Support
 Please note, I will generally answer questions within 24 hours, and most times even faster unless I'm on vacation or going on adventures with the family.
-Any abuse, harassment, bullying, or just being mean about a free project that I do in my spare time will get you blocked and reported.  I have no tolerance for this.
 
 - [Submit an Issue](https://github.com/BeardedTek-com/fEVR/issues)
   - This is the preferred method if you find an error in the code or something that crashes fEVR.
@@ -63,11 +64,48 @@ Any abuse, harassment, bullying, or just being mean about a free project that I 
 - [Telegram Support Channel](https://t.me/BeardedTekfEVR)
   - For troubleshooting, a quick question, or you just want to say hi!
 
-- [Sponsors get priority support](https://github.com/sponsors/BeardedTek-com)
-  - Any tier of monthly sponsorship will get you priority support and a mention in the README
+- [Matrix Support Space](https://matrix.to/#/#fevrsupport:matrix.org)
 
 ---
+# Development
+## Main Branch
+The main branch is the current release branch.  When I do a release on 0.6 it will be merged to here.
 
+## 0.6 Branch
+Each major version will have its own branch.  This is the current gold standard for the newest release in 0.6
+
+## 0.6-dev Branch
+This is the development branch for v0.6  Any changes will be added here before being merged with the 0.6 Branch
+
+## 0.7-dev Branch
+This is the development branch for the next version.  If it introduces breaking changes, it belongs here.
+
+# Releases
+## Docker
+**docker compose** is the recommended method to deploy fEVR
+
+#### GitHub Container Repository ghcr.io (preferred location)
+ghcr.io/beardedtek-com/fevr
+#### Docker Hub
+beardedtek/fevr
+
+The following tags are available:
+- **RECOMMENDED**
+  - latest
+    - This contains the latest release in the current stable branch
+
+  - 0.6
+    - This contains the latest release in the 0.6 branch
+
+- **NOT RECOMMENDED**
+  - 0.6-dev 
+    - Latest development image in the 0.6 branch.  This could potentially change a couple times a day when under heavy development.
+  - 0.7-dev **NOT RECOMMENDED**
+    - Bleeding Edge and almost guaranteed to contain **breaking changes**
+
+## PyPi
+### **NOT RECOMMENDED**
+I'm starting to release some code on pypi as I break a few things apart for the 0.7 branch.  Use at your own risk.  It may or may not work as intended for now and breaking changes are certainly coming before this is an official release channel.
 # Documentation
 ## **[Main API Calls](docs/API.md)**
 ## **[mqtt_client](docs/MQTT_CLIENT.md)**
