@@ -56,5 +56,5 @@ jobs:
         with:
           context: .
           push: true
-          tags: ${{ steps.meta.outputs.tags }},ghcr.io/beardedtek-com/fevr:0.6,ghcr.io/beardedtek-com/fevr:v0.6,beardedtek/fevr:0.6,beardedtek/fevr:v0.6,beardedtek/fevr:latest,beardedtek/fevr:main
+          tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}

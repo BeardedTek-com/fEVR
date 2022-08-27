@@ -1,7 +1,4 @@
-#  See docs for setup instructions
-#  This yaml file will be used for both fEVR and mqtt_client
-
-# Configures the mqtt client settings
+# Configures mqtt_client settings
 mqtt:
   enabled: true
   host: mqtt
