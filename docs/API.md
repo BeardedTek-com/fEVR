@@ -4,7 +4,7 @@
 Throughout the documentation, any url for fEVR will be listed as ```http://fevr:5090/```.  It is assumed that you will replace this url for your setup.
 
 ## Authentication
-In order to be logged in, you must be logged into fEVR.  This can be accomplished by regular login if accessed via a browser, or using an Auth Key.
+In order use the API, you must be logged into fEVR.  This can be accomplished by regular login if accessed via a browser, or using an Auth Key.
 ### Admin Login
 - Login as you normally would in any supported web browser at ```http://fevr:5090/login```
 ### Auth Key
@@ -18,7 +18,20 @@ curl -X Post http://fevr:5090/apiAuth \
 ```
 Each subsequent call to the api should reference the cookie jar created.  See API calls below for use.
 
-## **/api/frigate/add/`<name>`/`<http>`/`<ip>`/`<port>`**
+### **/auth/add/key/`<name>`/`<ip>`/`<limit>`**
+Adds an API Key to fEVR with the following parameters:
+- name: Name to reference the API Key
+- ip: IP Addresses allowed to access key (CIDR Format: 0.0.0.0/0 for all)
+- limit: How many times the key can be used (0 for unlimited)
+  - if limit is set greater than 1, each time the key is used, this value will be decreased by 1.  If it reaches 0, it will be decreased to -1 and disabled
+
+### **/auth/add/key [POST]**
+Adds an API Key using form data with the same parameters as above.
+
+
+## Setup
+
+### **/api/frigate/add/`<name>`/`<http>`/`<ip>`/`<port>`**
 Adds an instance of frigate
   - name: Name as defined to MQTT broker
     - external: if set to external, this is the externally viewable address for frigate (not recommended as it exposes frigate with no authentication)
@@ -37,23 +50,7 @@ Returns:
 }
 ```
 
-## **/api/frigate**
-Returns information about frigate instances
-```
-curl http://fevr:5090/api/frigate \
-    -c /tmp/fevr_cookiejar
-```
-Returns:
-```
-{
-  "1": {
-    "name": "frigate", 
-    "url": "http://frigate:5000"
-  }
-}
-```
-
-## **/api/cameras/add/`<camera>`/`<server>`/`<show>`**
+### **/api/cameras/add/`<camera>`/`<server>`/`<show>`**
 Adds a camera to fEVR
   - camera: camera name
   - server: ip or url of rtsp-simple-server
@@ -66,28 +63,9 @@ curl http://fevr:5090/api/cameras/add/front/rtsp/true \
     -c /tmp/fevr_cookiejar
 ```
 
-## **/api/cameras/`<camera>`**
-Returns information about cameras in JSON
-  - use all to get info on all cameras
-  - use camera name to get info on specific camera
-```
-curl http://fevr:5090/api/cameras/front \
-    -c /tmp/fevr_cookiejar
-```
-Returns:
-```
-{
-  "front": {
-    "camera": "front", 
-    "hls": "http://rtsp:5084/front", 
-    "id": 1, 
-    "rtsp": "rtsp://rtsp:5082/front", 
-    "show": true
-  }
-}
-```
+## Adding or Modifying Events
 
-## **/api/events/add/`<eventid>`/`<camera>`/`<object>`/`<score>`**
+### **/api/events/add/`<eventid>`/`<camera>`/`<object>`/`<score>`**
 Adds an event from Frigate
 
 **NOTE**: This is what mqtt_client uses to insert data into fEVR.  While you can insert data by looking at frigate, it is not necessary unless mqtt_client fails or you want to archive a non-qualified event.
@@ -137,8 +115,7 @@ Return if Event Does Not Exist:
   "msg": "Unable to Fetch Event"
 }
 ```
-
-## **/api/events/ack/`<eventid>`**
+### **/api/events/ack/`<eventid>`**
 Acknowledge an Event
   - eventid: Event ID from frigate
 ```
@@ -159,7 +136,7 @@ Return if Failed:
 }
 ```
 
-## **/api/events/unack/`<eventid>`**
+### **/api/events/unack/`<eventid>`**
 Unacknowledge an Event
   - eventid: Event ID from frigate
 ```
@@ -180,7 +157,46 @@ Return if Failed:
 }
 ```
 
-## **/api/events/latest**
+## Retrieve Information
+
+### **/api/frigate**
+Returns information about configured frigate instances
+```
+curl http://fevr:5090/api/frigate \
+    -c /tmp/fevr_cookiejar
+```
+Returns:
+```
+{
+  "1": {
+    "name": "frigate", 
+    "url": "http://frigate:5000"
+  }
+}
+```
+
+### **/api/cameras/`<camera>`**
+Returns information about cameras in JSON
+  - use all to get info on all cameras
+  - use camera name to get info on specific camera
+```
+curl http://fevr:5090/api/cameras/front \
+    -c /tmp/fevr_cookiejar
+```
+Returns:
+```
+{
+  "front": {
+    "camera": "front", 
+    "hls": "http://rtsp:5084/front", 
+    "id": 1, 
+    "rtsp": "rtsp://rtsp:5082/front", 
+    "show": true
+  }
+}
+```
+
+### **/api/events/latest**
 Displays the last 12 events
 ```
 curl http://fevr:5090/api/events/latest \
@@ -213,7 +229,7 @@ Return:
 }
 ```
 
-## **/api/events/all**
+### **/api/events/all**
 Displays all events
 ```
 curl http://fevr:5090/api/events/latest \
@@ -246,7 +262,7 @@ Return:
 }
 ```
 
-## **/api/events/camera/`<camera>`**
+### **/api/events/camera/`<camera>`**
 Displays all events from a camera
 ```
 curl http://fevr:5090/api/events/camera/front \
@@ -278,7 +294,7 @@ Return:
   }
 }
 ```
-## **/api/event/`<eventid>`**
+### **/api/event/`<eventid>`**
 Displays information about an event
   - eventid: Event ID from frigate
 ```
@@ -302,7 +318,9 @@ Return:
 
 # **The following API Calls are intened to be used from the UI Only.**
 
-## **/api/events/del/`<eventid>`**
+## Deleting Events
+
+### **/api/events/del/`<eventid>`**
 Deletes an Event
 **NOTE**: This api call is intended to be used from the UI only.  There are no checks to acknowledge deleting this event.
   - eventid: Event ID from frigate
