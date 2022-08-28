@@ -2,35 +2,23 @@
 
 ## Docker Compose:
 docker-compose is the preferred installation method
+## Create directory structure
+```
+mkdir fevr
+cd fevr
+mkdir data
+mkdir events
+```
 
-### Environment Variables **NOT RECOMMENDED**
-The following environment variables can be used to configure fEVR:
-If not set, configuration can be done via the Web UI.
-
-- FEVR_TRANSPORT
-  - http or https
-- FEVR_URL
-  - defaults to 'fevr'
-- FEVR_PORT
-  - defaults to 5090
-- FEVR_DEVELOPMENT
-  - If set to true, it will use the builtin flask server in development/debug mode
-  - If set to false or unset, it will use uwsgi server.
-- TAILSCALE_ENABLE
-  - Enable or disable tailscale functionality
-  - [Sign up for tailscale](https://login.tailscale.com/start) prior to use.
-- TAILSCALE_TAGS
-  - Use tailscale tags
-  - To use tags, you must [set them up](https://login.tailscale.com/admin/acls) first.
-- TAILSCALE_HOSTNAME
-  - Set hostname for tailscale
--TAILSCALE_AUTHKEY
-  - You must [generate an auth key](https://login.tailscale.com/admin/settings/keys) first.
-
-### Edit .env file
-Copy template.env to .env and adjust as necessary:
+### Create .env file
+A template .env file is available [on GitHub](https://raw.githubusercontent.com/BeardedTek-com/fEVR/main/template.env) and down below:
 NOTE: The IP addresses in the .env file are for internal bridge networking and SHOULD NOT be on the same subnet as your home network.
 The default values should serve you well.
+
+```
+curl -o .env https://raw.githubusercontent.com/BeardedTek-com/fEVR/main/template.env
+nano .env
+```
 ```
 ### fEVR Setup ######################################################
 
@@ -48,11 +36,17 @@ TAILSCALE_ENABLE=true
 TAILSCALE_TAGS=tag:fevr
 TAILSCALE_HOSTNAME=fevr
 
-
 # Obtain Auth Key from https://login.tailscale.com/admin/authkeys
 TAILSCALE_AUTHKEY=tskey-XXXXXXXXXXXX-XXXXXXXXXXXXXXXXXXXXXX
 ```
+### Edit docker-compose.yml
+A template docker.compose.yml file is provided [on GitHub](https://raw.githubusercontent.com/BeardedTek-com/fEVR/main/docker-compose.yml) and down below:
 
+```
+cd ..
+curl -o docker-compose.yml https://raw.githubusercontent.com/BeardedTek-com/fEVR/main/docker-compose.yml
+nano docker-compose.yml
+```
 ```
 version: '2.4'
 services:
@@ -79,10 +73,16 @@ services:
 This config.yml is separate from fEVR as mqtt_client can run separately from fEVR.
 In most use cases, running inside the docker container will be sufficient.
 At least 1 mqtt_client instance needs to be running either in the docker container or on a separate host as long as it can communicate with the main fEVR instance.
+**config.yml should be placed in the defined volume for `data` listed in the docker-compose.yml file provided.**
 
-More Information on mqtt_client is available in [docs/MQTT_CLIENT.md](MQTT_CLIENT)
+More Information on mqtt_client is available [here](https://ghost.fevr.video/mqtt-client)
 
-An example config.yml is provided [config.yml.template](../config.yml.template) and below
+An example config.yml is provided [on GitHub](https://raw.githubusercontent.com/BeardedTek-com/fEVR/main/config.yml.template) and below
+```
+cd data
+wget -o config.yml https://raw.githubusercontent.com/BeardedTek-com/fEVR/main/config.yml.template
+nano config.yml
+```
 ```
 fevr_host: localhost
 fevr_port: 5090
@@ -98,7 +98,9 @@ mqtt_topics:
 mqtt_apikey: 128-bit-apikey-from-fevr
 verbose: true
 ```
-config.yml should be placed in the defined volume for `data` listed in the docker-compose.yml file provided.
+```
+cd ..
+```
 
 ## Bring the system up:
 ```
