@@ -52,19 +52,32 @@ Feature comparison to leading cloud event detection providers
 
 ---
 
+# Documentation
+
+
+## [Installation - docs/INSTALL.md](docs/INSTALL.md)
+## [Setup - SETUP.md](docs/SETUP.md)
+## [More Info on mqtt_client - MQTT_CLIENT.md](docs/MQTT_CLIENT.md)
+
+## [Main API Calls](docs/API.md)
+
+## [Tutorial Videos](https://beardedtek.net/c/tutorials/videos)
+
+---
+
 # Support
 Please note, I will generally answer questions within 24 hours, and most times even faster unless I'm on vacation or going on adventures with the family.
 
-- [Submit an Issue](https://github.com/BeardedTek-com/fEVR/issues)
-  - This is the preferred method if you find an error in the code or something that crashes fEVR.
+## [Submit an Issue](https://github.com/BeardedTek-com/fEVR/issues)
+This is the preferred method if you find an error in the code or something that crashes fEVR.
   
-- [Start a discussion](https://github.com/BeardedTek-com/fEVR/discussions)
-  - For discussing configuration issues or things that bug you (UI tweaks or process improvements)
+## [Start a discussion](https://github.com/BeardedTek-com/fEVR/discussions)
+For discussing configuration issues or things that bug you (UI tweaks or process improvements)
   
-- [Telegram Support Channel](https://t.me/BeardedTekfEVR)
-  - For troubleshooting, a quick question, or you just want to say hi!
+## [Telegram Support Channel](https://t.me/BeardedTekfEVR)
+## [Matrix Support Space](https://matrix.to/#/#fevrsupport:matrix.org)
+For troubleshooting, a quick question, or you just want to say hi!
 
-- [Matrix Support Space](https://matrix.to/#/#fevrsupport:matrix.org)
 
 ---
 # Development
@@ -106,136 +119,16 @@ The following tags are available:
 ## PyPi
 ### **NOT RECOMMENDED**
 I'm starting to release some code on pypi as I break a few things apart for the 0.7 branch.  Use at your own risk.  It may or may not work as intended for now and breaking changes are certainly coming before this is an official release channel.
-# Documentation
-## **[Main API Calls](docs/API.md)**
-## **[mqtt_client](docs/MQTT_CLIENT.md)**
+
+
 ---
 
-# Installation
+# Notifications
 
-## Docker Compose:
-docker-compose is the preferred installation method
+## More coming in 0.7
+I have started experimenting with ntfy.sh and apprise for notifications.
 
-### Environment Variables
-The following environment variables can be used to configure fEVR:
-If not set, configuration can be done via the Web UI.
-
-- FEVR_TRANSPORT
-  - http or https
-- FEVR_URL
-  - defaults to 'fevr'
-- FEVR_PORT
-  - defaults to 5090
-- FEVR_DEVELOPMENT
-  - If set to true, it will use the builtin flask server in development/debug mode
-  - If set to false or unset, it will use uwsgi server.
-- TAILSCALE_ENABLE
-  - Enable or disable tailscale functionality
-  - [Sign up for tailscale](https://login.tailscale.com/start) prior to use.
-- TAILSCALE_TAGS
-  - Use tailscale tags
-  - To use tags, you must [set them up](https://login.tailscale.com/admin/acls) first.
-- TAILSCALE_HOSTNAME
-  - Set hostname for tailscale
--TAILSCALE_AUTHKEY
-  - You must [generate an auth key](https://login.tailscale.com/admin/settings/keys) first.
-
-### Edit .env file
-Copy template.env to .env and adjust as necessary:
-NOTE: The IP addresses in the .env file are for internal bridge networking and SHOULD NOT be on the same subnet as your home network.
-The default values should serve you well.
-```
-### fEVR Setup ######################################################
-
-# Set fevr in development mode using built in flask server (true/false)
-FEVR_DEVELOPMENT=false
-
-# Changes the port fEVR runs on DEFAULT: 5090
-FEVR_PORT=5090
-
-### Tailscale #######################################################
-
-# Set to false to disable tailscale
-TAILSCALE_ENABLE=true
-
-TAILSCALE_TAGS=tag:fevr
-TAILSCALE_HOSTNAME=fevr
-
-# Obtain Auth Key from https://login.tailscale.com/admin/authkeys
-TAILSCALE_AUTHKEY=tskey-XXXXXXXXXXXX-XXXXXXXXXXXXXXXXXXXXXX
-
-
-### Tailscale #######################################################
-
-# Set to false to disable tailscale
-TAILSCALE_ENABLE=true
-
-TAILSCALE_TAGS=tag:fevr
-TAILSCALE_HOSTNAME=fevr
-
-
-# Obtain Auth Key from https://login.tailscale.com/admin/authkeys
-TAILSCALE_AUTHKEY=tskey-XXXXXXXXXXXX-XXXXXXXXXXXXXXXXXXXXXX
-```
-
-```
-version: '2.4'
-services:
-  fevr:
-    image: ghcr.io/beardedtek-com/fevr:0.6
-    container_name: fevr
-    restart: unless-stopped
-    privileged: true
-    ports:
-      - 5090:${FEVR_PORT:-5090}
-    volumes:
-      - ./events:/fevr/app/static/events
-      - ./data:/fevr/app/data
-      - ./varlib:/var/lib
-    environment:
-      FEVR_DEVELOPMENT: ${FEVR_DEVELOPMENT:-false}
-      TAILSCALE_ENABLE: ${TAILSCALE_ENABLE:-false}
-      TAILSCALE_AUTHKEY: ${TAILSCALE_AUTHKEY}
-      TAILSCALE_HOSTNAME: ${TAILSCALE_HOSTNAME:-fevr}
-      TAILSCALE_TAGS: ${TAILSCALE_TAGS}
-```
-
-Bring the system up:
-```
-docker-compose up -d
-```
-
-# Setup
-
-- Visit http(s)://<fevr_url>/setup
-- Create admin account
-- Login to new admin account
-- Add all of your cameras.
-  - It asks for both HLS and RTSP feeds.  Technically you don't need to enter anything but the camera name, but in a future release live view and frigate config will be enabled and will require these values
-  - Click Next
-- Configure Frigate
-  - make one entry called 'frigate' (without the quotes) with your internally accessible frigate URL
-  - make another entry called 'external' (without the quotes) with your externally accessible frigate URL
-    - This is 100% Optional.  It does, however, enable live view outside your network.
-    - If you don't have an externally accessible frigate URL, you can skip this step.
-  - Click Next
-- Other is not populated yet, There are future plans for this page, just click Next again and you'll be brought to the main interface.
-- Generate API Key for mqtt_client
-  - mqtt_client authenticates with fEVR using a 128 character API Key.
-  - You can generate an API Key from `/profile` or click on the beard icon to drop down the menu, and click Profile.
-  - Here you can view any API keys you have generated in the past and generate a new one.
-  - There are 3 fields to fill out:
-    - Name: A unique name to identify this key (no duplicates allowed)
-    - IPv4 Address: Not used as of now but required to be a valid IP or network (without cidr notation)
-      - Enter 0.0.0.0 to future proof.
-    - Login Count: this can be used to limit the amount of times this API Key can be used.  While not used at the moment, it will function as the base of a limited login solution (say one time passwords for law enforcement and the like)
-      - Enter 0 for unlimited usage
-- Configure mqtt_client
-  - Once you have your API Key you can generate your config file for the mqtt_client.
-    - [See mqtt_client docs here](docs/MQTT_CLIENT.md) for an example
-  - This should be automated further in 0.6.1
-
-# Home Assistant Notifications
+## Home Asisstant
 As of right now it's a bit complicated. For each notification type you want for each camera, a helper entity must be added.
 For example, I have notifications setup for my driveway camera for person, animal, and vehicle, so I have the following helpers:
 - fevrDrivewayAnimal
