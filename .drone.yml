@@ -4,11 +4,7 @@ image_pull_secrets:
   - docker-auth-beardedtek.com
 trigger:
   branch:
-    - main
     - 0.7-dev
-    - 0.6-dev
-    - 0.6
-    - 0.7
   event:
     - push
 steps:
@@ -23,7 +19,7 @@ steps:
       from_secret: docker_password
     repo: docker.beardedtek.com/beardedtek/fevr
     registry: docker.beardedtek.com
-    tags: dev,${DRONE_REPO_BRANCH}
+    tags: 0.7-dev
     experimental: true
     compress: true
     squash: true
