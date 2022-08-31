@@ -11,6 +11,7 @@ mqtt:
 # Configure fEVR settings that mqtt_client uses
 fevr:
   url: http://localhost:5090
+  name: fEVR
 
 # Configure Notifications
 # For now the only option it ntfy, but I plan on adding more options
@@ -25,3 +26,6 @@ notifications:
 # Should the logs print out way too much information?
 # (Seriously, only use it for debugging.  It's a LOT.)
 verbose: false
+
+# Timezone for notifications and display
+timezone: America/Anchorage

@@ -8,13 +8,16 @@ mqtt:
 
 fevr:
   url: http://localhost:5090
-  name: JeanDr
+  name: fEVR
+
 notifications:
   enabled: true
   cooldown: 60
   priority: 4
-  service: "ntfy"
-  server: "https://ntfy.fevr.video"
+  service: ntfy
+  server: https://ntfy.fevr.video
   topic: ~
 
 verbose: false
+
+timezone: America/Anchorage

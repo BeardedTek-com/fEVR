@@ -21,7 +21,6 @@ from flask_sqlalchemy import SQLAlchemy
 import json
 from flask_login import LoginManager
 from datetime import timedelta
-import pytz
 from app.helpers.convert import convert
 
 # Config File

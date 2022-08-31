@@ -31,6 +31,7 @@ import json
 import yaml
 import sys
 from datetime import datetime
+from helpers.convert import convert
 
 class notifications:
     def __init__(self,config={}):
@@ -110,9 +111,8 @@ class notifications:
             eventid = event[target]['id']
             nTime = int(time())
             dateobj = datetime.fromtimestamp(nTime)
-            datestr = dateobj.strftime("%m/%d/%y")
-            timestr = dateobj.strftime("%H:%M:%S")
-            filedate = dateobj.strftime("%Y-%m-%d_%H-%M-%S")
+            filedate = convert.convertTZ(dateobj,purpose='filename')
+            displaydate = convert.convertTZ(dateobj)
             
             if not self.cooldown(camera,label):
             # Check if we are in a cooldown period for this camera and event
@@ -138,9 +138,9 @@ class notifications:
                         message = f"Error obtaining snapshot Error: {e}"
                         self.data = message
                         logit.execute(message,src=self.source)
-                    self.headers['Filename'] = f""
+                    self.headers['Filename'] = filename
                     self.headers['Title'] = f"fEVR: {self.fevr['name']}"
-                    self.headers['Message'] = f"{datestr} - {label} detected in {camera} at {timestr}"
+                    self.headers['Message'] = f"{displaydate}: {label} detected in {camera}"
                     self.headers['Priority'] = f"{self.config['priority']}"
                     self.headers['Action'] = f"view, View Event, https://192.168.2.240:5090/event/{eventid}/snap,clear=false;"
                     if self.verbose:
@@ -231,7 +231,8 @@ class fevrMQTT:
                             "server": "https://ntfy.fevr.video",
                             "topic"     : f"fEVR-{socket.gethostname()}"
                            },
-                    "verbose": True
+                    "verbose": True,
+                    "timezone": "America/Anchorage"
         }
         # Get the Command Line Arguments in a dict
         self.Args = self.cla()
