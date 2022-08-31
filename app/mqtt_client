@@ -37,6 +37,7 @@ class notifications:
         self.config = config['notifications']
         self.fevr = config['fevr']
         self.mqtt = config['mqtt']
+        self.verbose = config['verbose']
         self.service = self.config['service']    # Which service to use
         self.cooldownTime = self.config['cooldown']  # Cooldown period so we don't overload notifications
         self.snap = None                    # Does Snapshot Exist?
@@ -124,17 +125,28 @@ class notifications:
                 # Take snapshot from camera if event is not over
                     filename = f"{filedate}-snapshot.jpg"
                     dataURL = f"{self.fevr['url']}/api/cameras/{camera}/snapshot/320"
+                if self.verbose:
+                    logit.execute(f"dataURL: {dataURL}",src=self.source)
                 
                 rSession = requests.Session()
                 if auth(url=f"{self.fevr['url']}",apikey=self.mqtt['apikey'],rSession=rSession).api():
                 # Authenticate with fEVR
                     #If authenticated, get notification data
-                    self.data = rSession.get(dataURL).content
+                    try:
+                        self.data = rSession.get(dataURL).content
+                    except requests.ConnectionError as e:
+                        message = f"Error obtaining snapshot Error: {e}"
+                        self.data = message
+                        logit.execute(message,src=self.source)
                     self.headers['Filename'] = f""
                     self.headers['Title'] = f"fEVR: {self.fevr['name']}"
                     self.headers['Message'] = f"{datestr} - {label} detected in {camera} at {timestr}"
                     self.headers['Priority'] = f"{self.config['priority']}"
                     self.headers['Action'] = f"view, View Event, https://192.168.2.240:5090/event/{eventid}/snap,clear=false;"
+                    if self.verbose:
+                        logit.execute("Header Contents:")
+                        for header in self.headers:
+                            logit.execute(f"{header}: {self.headers[header]}")
                     try:
                         # Set notification url
                         nURL = f"{self.config['server']}/{self.config['topic']}"

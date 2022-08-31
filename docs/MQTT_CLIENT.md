@@ -3,7 +3,7 @@
 mqtt_client is an integral part of fEVR.  It functions as the link between fEVR and frigate.
 
 # Features
-- Can run on any host that can reach both fEVR and frigate
+- Can run on any host that can reach fEVR
 - Configurable by yaml, json, or command line arguments
 
 # What is it doing?
@@ -40,26 +40,19 @@ Here is a sample yaml configuration file:
 [yaml 1.2 specification](https://yaml.org/spec/1.2.2/)
 [yamllint.com](https://yamllint.com) - Test to see if your yaml is properly formatted.
 ```
-fevr_host:
-    localhost
-fevr_port:
-    5090
-fevr_transport:
-    http://
-mqtt_broker:
-    mqtt
-mqtt_port:
-    1883
-mqtt_user:
-mqtt_password:
+fevr_host: localhost
+fevr_port: 5090
+fevr_transport: http://
+mqtt_broker: mqtt
+mqtt_port: 1883
+mqtt_user: ~
+mqtt_password: ~
 mqtt_topics:
     - frigate/available
     - frigate/events
     - frigate/stats
-mqtt_apikey:
-    128-bit-apikey-from-fevr
-verbose:
-    true
+mqtt_apikey: 128-bit-apikey-from-fevr
+verbose: true
 ```
 ## Json
 Here is a sample Json configuration file:
