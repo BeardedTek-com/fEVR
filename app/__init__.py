@@ -22,6 +22,7 @@ import json
 from flask_login import LoginManager
 from datetime import timedelta
 import pytz
+from app.helpers.convert import convert
 
 # Config File
 configFile = "data/config"
@@ -70,12 +71,4 @@ app.register_blueprint(setup_blueprint)
 # Define Templates
 @app.template_filter('timezone')
 def convertTZ(time,clockFmt=12,Timezone="America/Anchorage"):
-        dt_utc = time
-        dt_utc = dt_utc.replace(tzinfo=pytz.UTC)
-        dt = dt_utc.astimezone(pytz.timezone(Timezone))
-        if clockFmt == 12:
-            outformat = "%-m/%-d/%y %-I:%M:%S %p"
-        else:
-            outformat = "%-m/%-d/%y %H:%M:%S"
-        outTime = dt.strftime(outformat).lower()
-        return outTime
+        convert.convertTZ(time,clockFmt,Timezone)

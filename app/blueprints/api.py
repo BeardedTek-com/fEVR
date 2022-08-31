@@ -34,7 +34,7 @@ from app.helpers.fetch import Fetch
 from app.helpers.cookies import cookies
 from app.helpers.iterateQuery import iterateQuery
 from app.helpers.logit import logit
-from app import convertTZ
+from app.helpers.convert import convert
 
 # API Routes
 api = Blueprint('api',__name__)
@@ -191,7 +191,7 @@ def apiSingleEvent(eventid):
 def apiEventClip(eventid):
     clip = f"{os.getcwd()}/app/static/events/{eventid}/clip.mp4"
     try:
-        return send_file(clip,download_name=f"{convertTZ(datetime.now())}-clip.mp4")
+        return send_file(clip,download_name=f"{convert.convertTZ(datetime.now())}-clip.mp4")
     except Exception as error:
         return jsonify({"error": error})
             
@@ -235,6 +235,6 @@ def apiSnapshot(camera,height):
             snapshot = requests.get(f"{frigateConfig[frigate]['url']}/api/{camera}/latest.jpg?h={height}", allow_redirects=True).content
             with open(f'/tmp/{camera}.jpg','wb') as snap:
                 snap.write(snapshot)
-            return send_file(f'/tmp/{camera}.jpg',download_name=f"{convertTZ(datetime.now())}-snapshot.jpg")
+            return send_file(f'/tmp/{camera}.jpg',download_name=f"{convert.convertTZ(datetime.now())}-snapshot.jpg")
         except Exception as error:
             return jsonify({"error": error})
