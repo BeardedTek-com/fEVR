@@ -12,5 +12,4 @@ pytz
 uwsgi
 netifaces
 PyYAML
-rtspscanner~=0.1.5
-apprise~=1.0.0
+rtspscanner~=0.1.1

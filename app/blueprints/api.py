@@ -15,7 +15,7 @@
 #    You should have received a copy of the GNU AfferoGeneral Public License
 #    along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-from flask import Blueprint, render_template, escape, redirect, jsonify, make_response,send_file, request
+from flask import Blueprint, render_template, escape, redirect, jsonify, make_response,send_file
 from flask_login import login_required
 from flask_sqlalchemy import inspect
 from sqlalchemy import desc
@@ -189,14 +189,11 @@ def apiSingleEvent(eventid):
 
 @api.route('/api/event/clip/<eventid>')
 def apiEventClip(eventid):
-    if request.remote_addr == "127.0.0.1" or request.remote_addr == "localhost":
-        clip = f"{os.getcwd()}/app/static/events/{eventid}/clip.mp4"
-        try:
-            return send_file(clip,download_name=f"{convert.convertTZ(datetime.now(),purpose='filename')}-clip.mp4")
-        except Exception as error:
-            return jsonify({"error": error})
-    else:
-        return jsonify({"error": "Not Authenticated"})
+    clip = f"{os.getcwd()}/app/static/events/{eventid}/clip.mp4"
+    try:
+        return send_file(clip,download_name=f"{convert.convertTZ(datetime.now(),purpose='filename')}-clip.mp4")
+    except Exception as error:
+        return jsonify({"error": error})
             
 
 @api.route('/api/events/camera/<camera>')
@@ -229,17 +226,15 @@ def apiCameras(camera):
     return iterateQuery(query)
 
 @api.route('/api/cameras/<camera>/snapshot/<height>')
+@login_required
 def apiSnapshot(camera,height):
-    if request.remote_addr == "127.0.0.1" or request.remote_addr == "localhost":
-        frigateConfig = apiFrigate()
-        snapshot = None
-        for frigate in frigateConfig:
-            try:
-                snapshot = requests.get(f"{frigateConfig[frigate]['url']}/api/{camera}/latest.jpg?h={height}", allow_redirects=True).content
-                with open(f'/tmp/{camera}.jpg','wb') as snap:
-                    snap.write(snapshot)
-                return send_file(f'/tmp/{camera}.jpg',download_name=f"{convert.convertTZ(datetime.now(),purpose='filename')}-snapshot.jpg")
-            except Exception as error:
-                return jsonify({"error": error})
-    else:
-        return jsonify({"error": "Not Authenticated"})
+    frigateConfig = apiFrigate()
+    snapshot = None
+    for frigate in frigateConfig:
+        try:
+            snapshot = requests.get(f"{frigateConfig[frigate]['url']}/api/{camera}/latest.jpg?h={height}", allow_redirects=True).content
+            with open(f'/tmp/{camera}.jpg','wb') as snap:
+                snap.write(snapshot)
+            return send_file(f'/tmp/{camera}.jpg',download_name=f"{convert.convertTZ(datetime.now(),purpose='filename')}-snapshot.jpg")
+        except Exception as error:
+            return jsonify({"error": error})

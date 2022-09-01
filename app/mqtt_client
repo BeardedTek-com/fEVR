@@ -20,7 +20,6 @@ from urllib.parse import _NetlocResultMixinStr
 from paho.mqtt import client as mqtt_client
 import argparse
 from os import path, access, R_OK
-from os import remove as rmFile
 from time import time
 from math import floor
 from random import randint
@@ -32,80 +31,75 @@ import json
 import yaml
 import sys
 from datetime import datetime
-import apprise
-import pytz
+from helpers.convert import convert
 
-class convert:
-    def convertTZ(time,clockFmt=12,Timezone="America/Anchorage",format="%m/%d/%y %I:%M:%S %p",purpose="display"):
-        dt_utc = time.replace(tzinfo=pytz.UTC)
-        dt = dt_utc.astimezone(pytz.timezone(Timezone))
-        if clockFmt == 12:
-            if purpose == "display":
-                format = "%m/%d/%y %I:%M:%S %p"
-            elif purpose == "filename":
-                format = "%m-%d-%y_%I-%M-%S_%p"
-        else:
-            if purpose == "display":
-                format = "%m/%d/%y %H:%M:%S"
-            elif purpose == "filename":
-                format = "%m-%d-%y_%H-%M-%S"
-        tzString = dt.strftime(format).lower()
-        return tzString
-    
 class notifications:
     def __init__(self,config={}):
         self.config = config['notifications']
         self.fevr = config['fevr']
         self.mqtt = config['mqtt']
-        self.timezone = config['timezone']
         self.verbose = config['verbose']
+        self.service = self.config['service']    # Which service to use
         self.cooldownTime = self.config['cooldown']  # Cooldown period so we don't overload notifications
-        self.source = f"MQTT | APPRISE"
+        self.snap = None                    # Does Snapshot Exist?
+        self.clip = None                    # Does Clip Exist
+        self.event = None                   # Event dict from mqtt event
+        self.lastnotify = {
+            "default":
+                {
+                    "time"  : 0,            # int(time())
+                    "id"    : "",           # event id
+                    "label" : "",           # person, animal, car, etc...
+                    "type"  : ""            # new update or end
+                }
+        }
+        self.lastnotification = 0
+        self.source = f"MQTT | {self.service}"
+        self.configured = False
         
     def cooldown(self,camera,label):
-        last = self.notification['last'][camera] if camera in self.notification['last'] else self.notification['last']['default']
+        last = self.lastnotify[camera] if camera in self.lastnotify else self.lastnotify['default']
         byTime = True if (last['time'] + self.cooldownTime) > time() else False
         byType = True if last['type'] == 'end' else False
         byLabel = True if last['label'] == label else False
         # All must be true to enter cooldown period for this camera.
         return True if byTime and byType and byLabel else False
         
+        
+        
     def setup(self):
-        self.notification = {
-            "source": "apprise",
-            "server": None,
-            "topic": None,
-            "data": None,
-            "title": None,
-            "message": None,
-            "priority": 3,
-            "tags": None,
-            "delay": None,
-            "actions": None,
-            "click": None,
-            "attach": None,
-            "filename": None,
-            "email": None,
-            "cache": None,
-            "username": None,
-            "password": None,
-            "last": {
-                "default":{
-                "time"  : 0,
-                "id"    : "",
-                "label" : "",
-                "type"  : ""
-                }
-            }
-        }
-        if self.verbose:
-            logit.execute('    Notification Options:', src='MQTT | APPRISE')
-        for key in self.config:
-            self.notification[key] = self.config[key] if key in self.config else None
-            if self.verbose:
-                if self.notification[key]:
-                    logit.execute(f"      {key}: {self.config[key]}", src='MQTT | APPRISE')
-            
+        if self.service == "ntfy":
+            try:
+                self.ntfy()
+                self.configured = True
+            except Exception as error:
+                pass
+        entry = f"{self.service.title()} configured and ready" if self.configured else f"{self.service.title()} not configured.  Error: {error}"
+        logit.execute(entry,src=self.source)
+   
+    def ntfy(self):
+        self.source = "MQTT | ntfy"
+        self.server = "https://ntfy.fevr.video"
+        self.topic = f"{self.config['topic']}"
+        self.data = None
+        self.headers =  {
+                            "Title": "",
+                            "Message": "",
+                            "Priority": "3",
+                            "Tags": None,
+                            "Delay": None,
+                            "Actions": None,
+                            "Click": None,
+                            "Attach": None,
+                            "Filename": None,
+                            "Email": None,
+                            "Cache": None,
+                            "Firebase": None,
+                            "UnifiedPush": None,
+                            "Poll-ID": None,
+                            "Authorization": None
+                        }
+        
     def notify(self,event):
     # Carries out notifications event: event json from mqtt:frigate/events
         if self.config['enabled']:
@@ -117,64 +111,59 @@ class notifications:
             eventid = event[target]['id']
             nTime = int(time())
             dateobj = datetime.fromtimestamp(nTime)
-            filedate = convert.convertTZ(dateobj,purpose='filename',Timezone=self.timezone)
-            displaydate = convert.convertTZ(dateobj,Timezone=self.timezone)
-
+            filedate = convert.convertTZ(dateobj,purpose='filename')
+            displaydate = convert.convertTZ(dateobj)
+            
             if not self.cooldown(camera,label):
             # Check if we are in a cooldown period for this camera and event
-                # Craft our message
-                message = f"{displaydate}: {label} detected in {camera}"
                 # Determine which data to send
                 if eventType == "end":
                 # Get event video clip if event is over
-                    filename = f"apprise-{filedate}-clip.mp4"
-                    dataURL = f"http://localhost/api/event/clip/{eventid}"
+                    filename = f"{filedate}-clip.mp4"
+                    dataURL = f"{self.fevr['url']}/api/event/clip/{eventid}"
                 else:
                 # Take snapshot from camera if event is not over
                     filename = f"{filedate}-snapshot.jpg"
-                    dataURL = f"http://localhost/api/cameras/{camera}/snapshot/320"
+                    dataURL = f"{self.fevr['url']}/api/cameras/{camera}/snapshot/320"
                 if self.verbose:
                     logit.execute(f"dataURL: {dataURL}",src=self.source)
-#                # Authenticate with fEVR
-#                rSession = requests.Session()
-#                if auth(url=f"{self.fevr['url']}",apikey=self.mqtt['apikey'],rSession=rSession).api():
-#                    # Get Snapshot
-#                    try:
-#                        data = rSession.get(dataURL, allow_redirects=True).content
-#                        with open(f'/tmp/{filename}','wb') as attachment:
-#                            logit.execute(f"Notification Attachment: /tmp/apprise/{filename}",src=self.source)
-#                            attachment.write(data)
-#                        message = f"{displaydate}: {label} detected in {camera}"
-#                    except requests.ConnectionError as e:
-#                        message = f"Error obtaining snapshot Error: {e}"
-#                        self.notification['data'] = message
-#                        logit.execute(message,src=self.source)
-                # Build Notification
-                appriseObj = apprise.Apprise()
-                attach = f"/tmp/{filename}"
-                title = f"fEVR: {self.fevr['name']}"
-                body = message
-                priorityLevels = ['none','min','low','default','high','max']
-                priority = priorityLevels[self.notification['priority']]
-                action = f"view, View Event, https://192.168.2.240:5090/event/{eventid}/snap,clear=false;"
-                URL = f"{self.notification['server']}?priority={priority}&action={action}&filename={filename}"
-                appriseObj.add(self.notification['server'])
-                try:
-                    result = appriseObj.notify(
-                        attach=dataURL,
-                        title=title,
-                        body=body
-                        )
-                    logit.execute("Apprise Notification Success",src=self.source)
-                    logit.execute(f"    {result}")
+                
+                rSession = requests.Session()
+                if auth(url=f"{self.fevr['url']}",apikey=self.mqtt['apikey'],rSession=rSession).api():
+                # Authenticate with fEVR
+                    #If authenticated, get notification data
+                    try:
+                        self.data = rSession.get(dataURL).content
+                    except requests.ConnectionError as e:
+                        message = f"Error obtaining snapshot Error: {e}"
+                        self.data = message
+                        logit.execute(message,src=self.source)
+                    self.headers['Filename'] = filename
+                    self.headers['Title'] = f"fEVR: {self.fevr['name']}"
+                    self.headers['Message'] = f"{displaydate}: {label} detected in {camera}"
+                    self.headers['Priority'] = f"{self.config['priority']}"
+                    self.headers['Action'] = f"view, View Event, https://192.168.2.240:5090/event/{eventid}/snap,clear=false;"
                     if self.verbose:
-                        for key in self.notification:
-                            if self.notification[key]:
-                                logit.execute(f"{key}: {self.notification[key]}",src=self.source)
-                        logit.execute(f"attachments: {attach}",src=self.source)
-                except Exception as error:
-                    logit.execute("Apprise Notification Failure",self.source)
-                    logit.execute(f"Error: {error}",self.source)
+                        logit.execute("Header Contents:")
+                        for header in self.headers:
+                            logit.execute(f"{header}: {self.headers[header]}")
+                    try:
+                        # Set notification url
+                        nURL = f"{self.config['server']}/{self.config['topic']}"
+                        requests.put(nURL,data=self.data,headers=self.headers)
+                        # Set last notification data
+                        self.lastnotify[camera] = {
+                            "time"  : nTime,
+                            "id"    : eventid,
+                            "label" : label,
+                            "type"  : eventType
+                        }
+                        # Log the successful notification
+                        logit.execute(f"{nURL}: Notification SUCCESS",src=self.source)
+                    except Exception as error:
+                        # Log the failed notification
+                        logit.execute(f"{nURL}: Notification FAILED",src=self.source)
+                        logit.execute(f"Error: {error}",src=self.source)
 
 class logit:
     def execute(msg,src='fEVR',debug=True):
@@ -235,10 +224,12 @@ class fevrMQTT:
                             "apikey"    : None
                            },
                     "notifications":{
-                            "enabled": False,
+                            "enabled": True,
                             "cooldown": 30,
                             "priority": 4,
+                            "service": "ntfy",
                             "server": "https://ntfy.fevr.video",
+                            "topic"     : f"fEVR-{socket.gethostname()}"
                            },
                     "verbose": True,
                     "timezone": "America/Anchorage"
@@ -279,7 +270,7 @@ class fevrMQTT:
                         if not subkey in Config[key]:
                             Config[key][subkey] = self.defaultConfig[key][subkey]
                 if key == "notifications":
-                    for subkey in ["enabled","cooldown","server"]:
+                    for subkey in ["enabled","cooldown","service","server","topic"]:
                         if not subkey in Config[key]:
                             Config[key][subkey] = self.defaultConfig[key][subkey]            
             else:
@@ -369,14 +360,14 @@ class fevrMQTT:
         If it does, we respond
         '''
         if 'available' in topic:
-            source = "MQTT | STATUS"
+            source = "MQTT | status"
         # If frigate says its available, we output to the logs
             logit.execute('frigate is online',src=source)
         elif 'event' in topic:
             source = "MQTT | EVENT"
             # If it's an event we take action
             event = json.loads(msg)
-            eventfound = event["after"]["id"]
+            eventfound = f"\n{json.dumps(event)}" if self.config['verbose'] else event["after"]["id"]
             # Log the event
             if self.config['verbose']:
                 logit.execute(f"{eventfound} ({event['type']})", src="MQTT | EVENT")
@@ -393,6 +384,10 @@ class fevrMQTT:
                 self.notify.notify(event)
     def subscribe(self, client: mqtt_client):
         def on_message(client, userdata, msg):
+            source = "MQTT | RCVD"
+            ## This is where our code goes to do what we want when a message is received
+            if self.config['verbose']:
+                logit.execute(f"{msg.topic}: Message Received",src=source)
             self.processMsg(msg.payload.decode(),msg.topic)
         for topic in self.config['mqtt']['topics']:
             source = "MQTT | SUBSCRIBE"

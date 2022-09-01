@@ -14,5 +14,3 @@ run_mqtt_client.sh
 events/*
 data/*
 test
-config.yml
-docker-compose.yml
