@@ -15,7 +15,7 @@
 #    You should have received a copy of the GNU AfferoGeneral Public License
 #    along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-FROM docker.beardedtek.com/beardedtek-com/fevr-base:0.7-dev
+FROM docker.beardedtek.com/beardedtek-com/fevr-base:0.6
 COPY . /fevr
 COPY rootfs /
 RUN chown -R fevr /fevr
