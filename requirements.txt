@@ -3,7 +3,7 @@ Pillow~=9.2.0
 paho-mqtt~=1.6.1
 Flask~=2.2.2
 flasK_sqlalchemy~=2.5.1
-python-dotenv~=0.20.0
+python-dotenv~=1.0.0
 flask-login~=0.6.2
 IPy
 svgwrite
