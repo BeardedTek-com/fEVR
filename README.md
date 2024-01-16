@@ -1,6 +1,6 @@
 # fEVR - frigate Event Video Recorder
 
-## Development has ceased on this project.  Frigate has matured to a pint where I feel this is no longer necessary.
+## Development has ceased on this project.  Frigate has matured to a point where I feel this is no longer necessary.
 
 [![license](https://img.shields.io/github/license/beardedtek-com/fevr)](https://github.com/BeardedTek-com/fevr/blob/0.1.0/LICENSE)
 [![telegram](https://img.shields.io/badge/Support-Telegram-blue)](https://t.me/BeardedTekfEVR)
