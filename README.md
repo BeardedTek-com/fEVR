@@ -1,5 +1,5 @@
 # fEVR - frigate Event Video Recorder
-
+## NOTICE: At this time fEVER does not support any features in addition to Frigate 0.13. This repo is for demo purposes only.
 [![license](https://img.shields.io/github/license/beardedtek-com/fevr)](https://github.com/BeardedTek-com/fevr/blob/0.1.0/LICENSE)
 [![telegram](https://img.shields.io/badge/Support-Telegram-blue)](https://t.me/BeardedTekfEVR)
 [![Discussions](https://img.shields.io/github/discussions/beardedtek-com/fevr)](https://github.com/BeardedTek-com/fEVR/discussions)
